@@ -1,0 +1,53 @@
+creature:
+    abstract: true
+    databaseAttributes: [strength, dexterity, agility, endurance, perception,
+                         intelligence, psyche, charisma]
+    displayedAttributes: [strength, dexterity, agility, endurance,
+                          perception, intelligence, psyche, charisma]
+
+humanoid:
+    abstract: true
+    basetype: creature
+    attributes: [rightArmStrength, leftArmStrength, rightLegStrength,
+                 leftLegStrength, rightArmDexterity, leftArmDexterity,
+                 rightLegAgility, leftLegAgility, endurance, perception,
+                 intelligence, psyche, charisma]
+    attributeIndices: [[0, 1, 2, 3], [0, 1], [2, 3], [0], [1], [2],
+                       [3], [4, 5], [4], [5], [6, 7], [6], [7], [8],
+                       [9, 10, 11], [9], [10], [11], [12], [13], [14]]
+
+nonhumanoid:
+    abstract: true
+    basetype: creature
+    attributes: [strength, dexterity, dexterity, agility, endurance,
+                 perception, intelligence, psyche, charisma]
+    displayedAttributes: [strength, dexterity, agility, endurance, perception,
+                          intelligence, psyche, charisma]
+    attributeIndices: [[0], [0], [0], [0], [0], [0], [0], [1], [1], [1], [2],
+                       [2], [2], [3], [4, 5, 6], [4], [5], [6], [7], [8], [9]]
+
+human:
+    basetype: humanoid
+    spritePosition: [0, 0]
+    spawnRate: 0
+    strength: 12
+    dexterity: 12
+    agility: 12
+    endurance: 12
+    perception: 12
+    intelligence: 12
+    psyche: 12
+    charisma: 12
+
+bat:
+    basetype: nonhumanoid
+    spritePosition: [0, 1]
+    spawnRate: 0.005
+    strength: 5
+    dexterity: 5
+    agility: 5
+    endurance: 5
+    perception: 5
+    intelligence: 5
+    psyche: 0
+    charisma: 0

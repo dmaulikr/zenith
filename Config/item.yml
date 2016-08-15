@@ -1,0 +1,32 @@
+broccoli:
+    spritePosition: [0, 0]
+    spawnRate: 0.0001
+    isEdible: true
+    levels: [0]
+
+banana:
+    spritePosition: [1, 0]
+    spawnRate: 0.0001
+    isEdible: true
+    levels: [0]
+    leftover: bananaPeel
+
+bananaPeel:
+    spritePosition: [2, 0]
+    spriteMultiplicity: 2
+    spawnRate: 0.0001
+    levels: [-1, 0, 1]
+
+lantern:
+    spritePosition: [0, 1]
+    spawnRate: 0.001
+    lightColor: 332200
+    lightRange: 4
+    levels: [-1, 0, 1]
+
+pickaxe:
+    spritePosition: [1, 1]
+    spawnRate: 0.001
+    levels: [-1, 0, 1]
+    isUsable: true
+    components: [dig]
