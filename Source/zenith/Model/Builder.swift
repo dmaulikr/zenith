@@ -54,7 +54,7 @@ class Builder {
             guard let targetTile = northWestCorner.adjacentTile(position) else {
                 return false // Going outside the generated world
             }
-            if [wallType, "stairsUp"].contains({ $0 == targetTile.structure?.id }) {
+            if let id = targetTile.structure?.id, [wallType, "stairsUp"].contains(id) {
                 return false
             }
 
@@ -98,7 +98,7 @@ class Builder {
             for y in 0..<roomSize.y {
                 let targetTile = northWestCorner.adjacentTile(Vector2(x, y))!
                 targetTile.groundId = "woodenFloor"
-                if ["tree", "ground"].contains({ $0 == targetTile.structure?.id }) {
+                if let id = targetTile.structure?.id, ["tree", "ground"].contains(id) {
                     targetTile.structure = nil // Remove natural obstacles, like trees.
                 }
                 allRoomTiles.append(targetTile)

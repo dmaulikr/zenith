@@ -80,6 +80,6 @@ public class Window {
 
 private(set) var renderer: OpaquePointer!
 
-@noreturn func fatalSDLError() {
+func fatalSDLError() -> Never {
     fatalError(String(cString: SDL_GetError()))
 }

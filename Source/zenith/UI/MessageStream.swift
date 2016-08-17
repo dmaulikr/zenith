@@ -1,4 +1,4 @@
-class MessageStream: OutputStream {
+class MessageStream: TextOutputStream {
 
     private var messages = Array<Message>()
 

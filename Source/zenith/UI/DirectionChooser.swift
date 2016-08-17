@@ -7,7 +7,7 @@ class DirectionChooser: State {
     private let resultHandler: (Direction4?) -> Void
     private var result: Direction4?
 
-    init(gui: GraphicalUserInterface, title: String, resultHandler: (Direction4?) -> Void) {
+    init(gui: GraphicalUserInterface, title: String, resultHandler: @escaping (Direction4?) -> Void) {
         self.gui = gui
         label = Label(font: font, text: title)
         label.position = gui.worldViewRect.topLeft + spacingVector

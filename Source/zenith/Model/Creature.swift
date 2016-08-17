@@ -62,7 +62,7 @@ class Creature: Object, SpriteHelper {
         }
         let subAttributes = Creature.subAttributes(of: attribute)
         let subAttributeValues = subAttributes.map { attributeValue($0) }
-        return subAttributeValues.reduce(0, combine: +) / subAttributes.count
+        return subAttributeValues.reduce(0, +) / subAttributes.count
     }
 
     var rightArmStrength:  Int { return attributeValue(.rightArmStrength) }

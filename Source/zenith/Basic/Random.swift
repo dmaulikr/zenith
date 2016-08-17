@@ -5,13 +5,13 @@ public extension Int {
     /// - returns: a uniformly distributed pseudo-random `Int` in the given range.
     public static func random(_ range: Range<Int>) -> Int {
         let distance = range.upperBound - range.lowerBound
-        return range.lowerBound + Int(Double.random * Double(distance))
+        return range.lowerBound + Int(Double.random(0...1) * Double(distance))
     }
 
     /// - returns: a uniformly distributed pseudo-random `Int` in the given range.
     public static func random(_ range: ClosedRange<Int>) -> Int {
         let distance = range.upperBound - range.lowerBound + 1
-        return range.lowerBound + Int(Double.random * Double(distance))
+        return range.lowerBound + Int(Double.random(0...1) * Double(distance))
     }
 }
 

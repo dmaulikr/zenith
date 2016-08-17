@@ -6,7 +6,7 @@ class ItemMenu: Question<Item> {
     private let menu: Menu<Item>
 
     init(gui: GraphicalUserInterface, title: String, items: Array<(Item, Int)>,
-         resultHandler: (Item?) -> Void) {
+         resultHandler: @escaping (Item?) -> Void) {
         self.items = items
         menu = Menu(items: items.map { $0.0 })
         super.init(gui: gui, title: title, resultHandler: resultHandler)

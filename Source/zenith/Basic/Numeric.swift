@@ -3,13 +3,13 @@ public protocol Numeric: Equatable, Comparable {
     init(_: Int32)
     init(_: Double)
     init(_: Float)
-    func +(_: Self, _: Self) -> Self
-    func -(_: Self, _: Self) -> Self
-    func *(_: Self, _: Self) -> Self
-    func /(_: Self, _: Self) -> Self
-    func %(_: Self, _: Self) -> Self
-    prefix func +(_: Self) -> Self
-    prefix func -(_: Self) -> Self
+    static func +(_: Self, _: Self) -> Self
+    static func -(_: Self, _: Self) -> Self
+    static func *(_: Self, _: Self) -> Self
+    static func /(_: Self, _: Self) -> Self
+    static func %(_: Self, _: Self) -> Self
+    prefix static func +(_: Self) -> Self
+    prefix static func -(_: Self) -> Self
     func cast<T: Numeric>() -> T
 }
 
