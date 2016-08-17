@@ -1,8 +1,8 @@
-import Yaml
+import Toml
 
 protocol SpriteHelper {
 
-    static var config: Yaml { get }
+    static var config: Toml { get }
 }
 
 private var spriteRectCache = Dictionary<String, (Rect<Int>, Int)>()
@@ -14,13 +14,13 @@ extension SpriteHelper {
             return createSpriteRect(from: spriteRectData).moved(by: offset * tileSize)
         }
 
-        let positionArray = Self.config[.String(id)]["spritePosition"]
-        var spritePosition = Vector2(positionArray[0].int!, positionArray[1].int!)
-        let spriteMultiplicity = Self.config[.String(id)]["spriteMultiplicity"]
+        let positionArray: Array<Int> = try! Self.config.array(id, "spritePosition")
+        var spritePosition = Vector2(positionArray[0], positionArray[1])
+        let spriteMultiplicity = try? Self.config.int(id, "spriteMultiplicity")
         spritePosition *= tileSize
 
         let spriteRectData = (Rect(position: spritePosition, size: tileSizeVector),
-                              spriteMultiplicity.int ?? 0)
+                              spriteMultiplicity ?? 0)
         spriteRectCache[id] = spriteRectData
         return createSpriteRect(from: spriteRectData).moved(by: offset * tileSize)
     }

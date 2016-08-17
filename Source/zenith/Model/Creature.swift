@@ -1,3 +1,5 @@
+import Foundation
+
 class Creature: Object, SpriteHelper {
 
     private(set) var tileUnder: Tile {
@@ -212,11 +214,10 @@ class Creature: Object, SpriteHelper {
     static var spawnRates: Array<(id: String, levels: Array<Int>, spawnRate: Double)> {
         if _spawnRates.isEmpty {
             // Initialize from config file
-            for (id, data) in Creature.config.dictionary! {
-                if data["spawnRate"] != nil {
-                    _spawnRates.append((id: id.string!,
-                                        levels: [-1, 0, 1],
-                                        spawnRate: data["spawnRate"].double!))
+            for key in Creature.config.keys {
+                let id = key.components(separatedBy: CharacterSet(charactersIn: "[\", ]"))[2]
+                if let spawnRate = try? Creature.config.double(id, "spawnRate") {
+                    _spawnRates.append((id: id, levels: [-1, 0, 1], spawnRate: spawnRate))
                 }
             }
         }
@@ -229,24 +230,25 @@ class Creature: Object, SpriteHelper {
 
     private static func initAttributes(id: String) -> Dictionary<Attribute, Int> {
         var attributes = Dictionary<Attribute, Int>()
-        let baseType = config[.String(id)]["basetype"].string!
+        let baseType = try! config.string(id, "basetype")
+        let baseTypeAttributes: Array<String> = try! config.array(baseType, "attributes")
 
-        for attribute in config[.String(baseType)]["attributes"].array! {
-            let attributeEnum = Attribute(rawValue: attribute.string!)!
+        for attribute in baseTypeAttributes {
+            let attributeEnum = Attribute(rawValue: attribute)!
 
-            if let attributeValue = config[.String(id)][attribute].int {
+            if let attributeValue = try? config.int(id, attribute) {
                 attributes[attributeEnum] = attributeValue
             } else {
                 guard var superAttribute = Creature.superAttribute(of: attributeEnum) else {
                     fatalError() // TODO: Look up baseType attribute.
                 }
 
-                if config[.String(id)][.String(superAttribute.rawValue)].int == nil {
+                if (try? config.int(id, superAttribute.rawValue)) == nil {
                     superAttribute = Creature.superAttribute(of: superAttribute)!
-                    assert(config[.String(id)][.String(superAttribute.rawValue)] != nil)
+                    assert(config.hasKey(id, superAttribute.rawValue))
                 }
 
-                attributes[attributeEnum] = config[.String(id)][.String(superAttribute.rawValue)].int
+                attributes[attributeEnum] = try! config.int(id, superAttribute.rawValue)
             }
         }
 

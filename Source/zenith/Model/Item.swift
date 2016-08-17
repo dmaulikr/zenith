@@ -1,4 +1,4 @@
-import Yaml
+import Foundation
 
 class Item: Object, SpriteHelper, Hashable, Equatable {
 
@@ -9,11 +9,11 @@ class Item: Object, SpriteHelper, Hashable, Equatable {
             }
         }
     }
-    static let config: Yaml = Configuration.load(name: "item")
+    static let config = Configuration.load(name: "item")
     let sprite: Sprite
 
     override init(id: String) {
-        assert(Item.config[.String(id)] != nil)
+        assert(Item.config.hasTable(id))
         sprite = Sprite(fileName: Assets.graphicsPath + "item.bmp",
                         textureRegion: Item.spriteRect(id: id))
         super.init(id: id)
@@ -29,11 +29,12 @@ class Item: Object, SpriteHelper, Hashable, Equatable {
     static var spawnRates: Array<(id: String, levels: Array<Int>, spawnRate: Double)> {
         if _spawnRates.isEmpty {
             // Initialize from config file
-            for (id, data) in Item.config.dictionary! {
-                if data["spawnRate"] != nil {
-                    _spawnRates.append((id: id.string!,
-                                        levels: data["levels"].array!.map { $0.int! },
-                                        spawnRate: data["spawnRate"].double!))
+            for key in Item.config.keys {
+                let id = key.components(separatedBy: CharacterSet(charactersIn: "[\", ]"))[2]
+                if let spawnRate = try? Item.config.double(id, "spawnRate") {
+                    _spawnRates.append((id: id,
+                                        levels: try! Item.config.array(id, "levels"),
+                                        spawnRate: spawnRate))
                 }
             }
         }
@@ -41,11 +42,11 @@ class Item: Object, SpriteHelper, Hashable, Equatable {
     }
 
     var isEdible: Bool {
-        return Item.config[.String(id)]["isEdible"].bool == true
+        return (try? Item.config.bool(id, "isEdible")) ?? false
     }
 
     var isUsable: Bool {
-        return Item.config[.String(id)]["isUsable"].bool == true
+        return (try? Item.config.bool(id, "isUsable")) ?? false
     }
 
     func use(world: World, gui: GraphicalUserInterface, user: Creature) {
@@ -55,25 +56,25 @@ class Item: Object, SpriteHelper, Hashable, Equatable {
     }
 
     var leftover: Item? {
-        if let leftoverID = Item.config[.String(id)]["leftover"].string {
+        if let leftoverID = try? Item.config.string(id, "leftover") {
             return Item(id: leftoverID)
         }
         return nil
     }
 
     var emitsLight: Bool {
-        return Item.config[.String(id)]["lightColor"] != nil
+        return Item.config.hasKey(id, "lightColor")
     }
 
     var lightColor: Color {
-        let hex = Int(String(Item.config[.String(id)]["lightColor"].int!), radix: 16)!
+        let hex = Int(String(try! Item.config.int(id, "lightColor")), radix: 16)!
         return Color(r: UInt8(truncatingBitPattern: hex >> 16),
                      g: UInt8(truncatingBitPattern: hex >> 8),
                      b: UInt8(truncatingBitPattern: hex))
     }
 
     var lightRange: Int {
-        return Item.config[.String(id)]["lightRange"].int!
+        return try! Item.config.int(id, "lightRange")
     }
 
     func beKicked(by kicker: Creature, direction kickDirection: Direction4) {

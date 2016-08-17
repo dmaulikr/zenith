@@ -1,4 +1,4 @@
-import Yaml
+import Toml
 
 /// A physical in-game object that has a name.
 class Object: Entity, CustomStringConvertible {
@@ -19,9 +19,9 @@ class Object: Entity, CustomStringConvertible {
         return name.name(flags: flags)
     }
 
-    func addComponents(config: Yaml) {
-        config[.String(id)]["components"].array?.forEach {
-            addComponent(getComponent(id: id, name: $0.string!))
+    func addComponents(config: Toml) {
+        try? config.array(id, "components").forEach {
+            addComponent(getComponent(id: id, name: $0))
         }
     }
 

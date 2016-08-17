@@ -1,13 +1,13 @@
-import Yaml
+import Toml
 
 protocol Configurable {
 
-    var config: Yaml { get }
+    var config: Toml { get }
 }
 
 class Configuration {
 
-    static func load(name: String) -> Yaml {
-        return try! Yaml.load(String(contentsOfFile: Assets.configPath + "\(name).yml")).value!
+    static func load(name: String) -> Toml {
+        return try! Toml(contentsOfFile: Assets.configPath + "\(name).cfg")
     }
 }

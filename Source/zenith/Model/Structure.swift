@@ -1,3 +1,5 @@
+import Foundation
+
 class Structure: Object, SpriteHelper {
 
     let sprite: Sprite
@@ -57,11 +59,12 @@ class Structure: Object, SpriteHelper {
     static var spawnRates: SpawnRateArray {
         if _spawnRates.isEmpty {
             // Initialize from config file
-            for (id, data) in Structure.config.dictionary! {
-                if data["spawnRate"] != nil {
-                    _spawnRates.append((id: id.string!,
-                                        levels: data["levels"].array!.map { $0.int! },
-                                        spawnRate: data["spawnRate"].double!))
+            for key in Structure.config.keys {
+                let id = key.components(separatedBy: CharacterSet(charactersIn: "[\", ]"))[2]
+                if let spawnRate = try? Structure.config.double(id, "spawnRate") {
+                    _spawnRates.append((id: id,
+                                        levels: try! Structure.config.array(id, "levels"),
+                                        spawnRate: spawnRate))
                 }
             }
         }
