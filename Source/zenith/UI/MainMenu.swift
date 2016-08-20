@@ -26,11 +26,11 @@ class MainMenu: State {
         }
     }
 
-    override func render() {
+    func render() {
         menu.render()
     }
 
-    override func keyWasPressed(key: SDL_Keycode) {
+    func keyWasPressed(key: SDL_Keycode) {
         switch Int(key) {
             case SDLK_UP:
                 menu.selectPrevious()

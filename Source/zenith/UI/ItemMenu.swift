@@ -12,7 +12,7 @@ class ItemMenu: Question<Item> {
         super.init(gui: gui, title: title, resultHandler: resultHandler)
     }
 
-    override func keyWasPressed(key: SDL_Keycode) {
+    func keyWasPressed(key: SDL_Keycode) {
         switch Int(key) {
             case SDLK_UP:
                 menu.selectPrevious()
@@ -27,7 +27,7 @@ class ItemMenu: Question<Item> {
         }
     }
 
-    override func render() {
+    func render() {
         drawRectangle(gui.worldViewRect, color: Color.black, filled: true)
 
         var position = gui.worldViewRect.topLeft + spacingVector
@@ -48,5 +48,5 @@ class ItemMenu: Question<Item> {
         }
     }
 
-    override var shouldRenderStateBelow: Bool { return true }
+    var shouldRenderStateBelow: Bool { return true }
 }

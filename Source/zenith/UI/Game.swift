@@ -8,7 +8,7 @@ class Game: State {
     private let sidebar: Sidebar
     private var player: Creature { return world.player }
 
-    override init() {
+    init() {
         gui = GraphicalUserInterface(windowSize: app.window.size)
         world = World(worldViewSize: gui.worldViewRect.size / tileSize)
         messageStream = MessageStream()
@@ -20,7 +20,7 @@ class Game: State {
         world.update()
     }
 
-    override func keyWasPressed(key: SDL_Keycode) {
+    func keyWasPressed(key: SDL_Keycode) {
         messageStream.makeMessagesOld()
 
         switch Int(key) {
@@ -45,7 +45,7 @@ class Game: State {
         }
     }
 
-    override func render() {
+    func render() {
         world.render(destination: gui.worldViewRect)
         sidebar.render(region: gui.sidebarRect)
         messageStream.render(region: gui.messageViewRect)

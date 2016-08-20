@@ -30,7 +30,7 @@ class HelpView: State {
         #endif
     }
 
-    override func keyWasPressed(key: SDL_Keycode) {
+    func keyWasPressed(key: SDL_Keycode) {
         switch Int(key) {
             case SDLK_ESCAPE:
                 app.popState()
@@ -39,7 +39,7 @@ class HelpView: State {
         }
     }
 
-    override func render() {
+    func render() {
         drawRectangle(gui.worldViewRect, color: Color.black, filled: true)
 
         var position = gui.worldViewRect.topLeft + spacingVector
@@ -77,5 +77,5 @@ class HelpView: State {
         }
     }
 
-    override var shouldRenderStateBelow: Bool { return true }
+    var shouldRenderStateBelow: Bool { return true }
 }

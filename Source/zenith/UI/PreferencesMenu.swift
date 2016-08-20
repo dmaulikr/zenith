@@ -15,7 +15,7 @@ class PreferencesMenu: State {
         var description: String { return rawValue }
     }
 
-    override init() {
+    init() {
         preferences = [
             .resolution: { "\(app.window.size.x)x\(app.window.size.y)" },
             .scale: { "\(app.window.scale)x" },
@@ -26,7 +26,7 @@ class PreferencesMenu: State {
         menu = Menu(items: [.back, .resolution, .scale])
     }
 
-    override func keyWasPressed(key: SDL_Keycode) {
+    func keyWasPressed(key: SDL_Keycode) {
         switch Int(key) {
             case SDLK_UP:   menu.selectPrevious()
             case SDLK_DOWN: menu.selectNext()
@@ -48,7 +48,7 @@ class PreferencesMenu: State {
         }
     }
 
-    override func render() {
+    func render() {
         var left = app.window.size / 4
         var right = Vector2(app.window.size.x - left.x, left.y)
         let dy = Int(Double(lineHeight) * 1.5)

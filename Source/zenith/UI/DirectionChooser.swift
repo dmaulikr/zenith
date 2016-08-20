@@ -14,7 +14,7 @@ class DirectionChooser: State {
         self.resultHandler = resultHandler
     }
 
-    override func keyWasPressed(key: SDL_Keycode) {
+    func keyWasPressed(key: SDL_Keycode) {
         switch Int(key) {
             case SDLK_UP:    result = .north
             case SDLK_RIGHT: result = .east
@@ -27,7 +27,7 @@ class DirectionChooser: State {
         resultHandler(result)
     }
 
-    override func render() {
+    func render() {
         let rect = Rect(position: gui.worldViewRect.topLeft,
                         size: Vector2(label.text.characters.count * font.glyphSize.x + 2 * spacing,
                                       lineHeight + 2 * spacing))
@@ -35,5 +35,5 @@ class DirectionChooser: State {
         label.render()
     }
 
-    override var shouldRenderStateBelow: Bool { return true }
+    var shouldRenderStateBelow: Bool { return true }
 }
