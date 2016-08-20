@@ -4,7 +4,7 @@ struct Assets {
     static let graphicsPath = assetsPath + "Graphics/"
 }
 
-let app = Application(windowOptions: Window.Options(size: Vector2(512, 384), title: "Zenith"))
+let app = Application(size: Vector2(512, 384), title: "Zenith")
 
 Sprite.transparentColor = Color(r: 0x5a, g: 0x52, b: 0x68)
 

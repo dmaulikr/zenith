@@ -13,8 +13,8 @@ public class Application {
     /// to be done. [More info](https://en.wikipedia.org/wiki/Delta_timing).
     public private(set) var deltaTime: Float = 0
 
-    public init(windowOptions: Window.Options) {
-        window = Window(options: windowOptions)
+    public init(size: Vector2i, title: String = "") {
+        window = Window(size: size, title: title)
         stateStack = Array<State>()
         running = false
         frameTimer = Timer()

@@ -2,26 +2,16 @@ import CSDL2
 
 public class Window {
 
-    public class Options {
-        public var size: Vector2i
-        public var title: String
-
-        public init(size: Vector2i, title: String = "") {
-            self.size = size
-            self.title = title
-        }
-    }
-
     private var window: OpaquePointer?
     public var clearColor: Color
 
-    public init(options: Options) {
+    public init(size: Vector2i, title: String = "") {
         SDL_Init(Uint32(SDL_INIT_VIDEO))
         let flags = SDL_WINDOW_ALLOW_HIGHDPI.rawValue
 
-        window = SDL_CreateWindow(options.title,
+        window = SDL_CreateWindow(title,
                                   SDL_WINDOWPOS_CENTERED_MASK, SDL_WINDOWPOS_CENTERED_MASK,
-                                  Int32(options.size.x), Int32(options.size.y), flags)
+                                  Int32(size.x), Int32(size.y), flags)
         guard window != nil else { fatalSDLError() }
 
         renderer = SDL_CreateRenderer(window, -1, 0)
@@ -29,7 +19,7 @@ public class Window {
 
         var outputSize = Vector2<Int32>(0, 0)
         SDL_GetRendererOutputSize(renderer, &outputSize.x, &outputSize.y)
-        let scale = Vector2f(outputSize) / Vector2f(options.size)
+        let scale = Vector2f(outputSize) / Vector2f(size)
         SDL_RenderSetScale(renderer, scale.x, scale.y)
 
         clearColor = Color.black
