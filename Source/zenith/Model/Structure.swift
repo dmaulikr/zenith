@@ -1,5 +1,3 @@
-import Foundation
-
 class Structure: Object, Configurable {
 
     let sprite: Sprite
@@ -59,12 +57,9 @@ class Structure: Object, Configurable {
     static var spawnRates: SpawnRateArray {
         if _spawnRates.isEmpty {
             // Initialize from config file
-            for key in Structure.config.keys {
-                let id = key.components(separatedBy: CharacterSet(charactersIn: "[\", ]"))[2]
-                if let spawnRate = try? Structure.config.double(id, "spawnRate") {
-                    _spawnRates.append((id: id,
-                                        levels: try! Structure.config.array(id, "levels"),
-                                        spawnRate: spawnRate))
+            for (id, data) in try! Structure.config.tables() {
+                if let spawnRate = try? data.double("spawnRate") {
+                    _spawnRates.append((id: id, levels: try! data.array("levels"), spawnRate: spawnRate))
                 }
             }
         }

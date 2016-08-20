@@ -1,5 +1,3 @@
-import Foundation
-
 class Creature: Object, Configurable {
 
     private(set) var tileUnder: Tile {
@@ -214,9 +212,8 @@ class Creature: Object, Configurable {
     static var spawnRates: Array<(id: String, levels: Array<Int>, spawnRate: Double)> {
         if _spawnRates.isEmpty {
             // Initialize from config file
-            for key in Creature.config.keys {
-                let id = key.components(separatedBy: CharacterSet(charactersIn: "[\", ]"))[2]
-                if let spawnRate = try? Creature.config.double(id, "spawnRate") {
+            for (id, data) in try! Creature.config.tables() {
+                if let spawnRate = try? data.double("spawnRate") {
                     _spawnRates.append((id: id, levels: [-1, 0, 1], spawnRate: spawnRate))
                 }
             }
