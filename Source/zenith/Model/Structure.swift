@@ -1,6 +1,6 @@
 import Foundation
 
-class Structure: Object, SpriteHelper {
+class Structure: Object, Configurable {
 
     let sprite: Sprite
 

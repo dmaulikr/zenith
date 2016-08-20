@@ -1,6 +1,6 @@
 import Foundation
 
-class Item: Object, SpriteHelper, Hashable, Equatable {
+class Item: Object, Configurable, Hashable, Equatable {
 
     weak var tileUnder: Tile? {
         didSet {

@@ -1,6 +1,6 @@
 import Foundation
 
-class Creature: Object, SpriteHelper {
+class Creature: Object, Configurable {
 
     private(set) var tileUnder: Tile {
         didSet {

@@ -1,6 +1,6 @@
 import CSDL2
 
-class Tile: SpriteHelper {
+class Tile: Configurable {
 
     unowned let area: Area
     let position: Vector2i
