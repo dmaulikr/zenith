@@ -1,6 +1,6 @@
 import CSDL2
 
-public class Sprite {
+public struct Sprite {
 
     /// The current position in the coordinate system. The default is `(0, 0)`.
     public var position: Vector2i = Vector2(0, 0)

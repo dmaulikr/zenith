@@ -1,6 +1,6 @@
 class Structure: Object, Configurable {
 
-    let sprite: Sprite
+    var sprite: Sprite
 
     static let config = Configuration.load(name: "structure")
 

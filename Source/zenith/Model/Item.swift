@@ -8,7 +8,7 @@ class Item: Object, Configurable, Hashable, Equatable {
         }
     }
     static let config = Configuration.load(name: "item")
-    let sprite: Sprite
+    var sprite: Sprite
 
     override init(id: String) {
         assert(Item.config.hasTable(id))

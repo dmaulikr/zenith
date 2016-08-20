@@ -11,7 +11,7 @@ class Creature: Object, Configurable {
     private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Int!
     private var attributes: Dictionary<Attribute, Int>
 
-    private let sprite: Sprite
+    private var sprite: Sprite
     static let config = Configuration.load(name: "creature")
     static var allCreatures = Array<Creature>()
 
