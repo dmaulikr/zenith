@@ -4,6 +4,7 @@ class Tile: Configurable {
 
     unowned let area: Area
     let position: Vector2i
+    private let bounds: Rect<Int>
     private(set) var items: Array<Item>
     var structure: Structure? {
         didSet {
@@ -23,6 +24,7 @@ class Tile: Configurable {
     init(area: Area, position: Vector2i) {
         self.area = area
         self.position = position
+        bounds = Rect(position: self.position * tileSize, size: tileSizeVector)
         creature = nil
         lights = Array()
         fogOfWar = false
@@ -162,8 +164,7 @@ class Tile: Configurable {
     private func renderLight() {
         var lightColor = Color.black
         for light in lights { lightColor.blend(with: light, blendMode: .additive) }
-        let rect = Rect(position: position * tileSize, size: tileSizeVector)
-        drawRectangle(rect, color: lightColor, filled: true, blendMode: SDL_BLENDMODE_ADD)
+        drawRectangle(bounds, color: lightColor, filled: true, blendMode: SDL_BLENDMODE_ADD)
     }
 
     func addItem(_ item: Item) {
