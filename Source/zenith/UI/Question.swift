@@ -1,4 +1,4 @@
-class Question<Result>: State {
+class Question<Result> {
 
     let gui: GraphicalUserInterface
     let title: String

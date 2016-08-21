@@ -1,6 +1,6 @@
 import CSDL2
 
-class ItemMenu: Question<Item> {
+class ItemMenu: Question<Item>, State {
 
     private let items: Array<(Item, Int)>
     private let menu: Menu<Item>
