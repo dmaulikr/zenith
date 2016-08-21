@@ -37,7 +37,7 @@ class World {
                     continue
                 }
                 for tile in area.tiles {
-                    tile.lights.removeAll(keepingCapacity: true)
+                    tile.lightColor = Color.black
                 }
             }
         }

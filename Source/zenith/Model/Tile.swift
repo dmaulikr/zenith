@@ -12,7 +12,7 @@ class Tile: Configurable {
         }
     }
     var creature: Creature?
-    var lights: Array<Color>
+    var lightColor: Color
     private var fogOfWar: Bool
     var groundId: String {
         didSet { loadGroundSprite() }
@@ -26,7 +26,7 @@ class Tile: Configurable {
         self.position = position
         bounds = Rect(position: self.position * tileSize, size: tileSizeVector)
         creature = nil
-        lights = Array()
+        lightColor = Color.black
         fogOfWar = false
         items = Array()
         groundId = area.position.z < 0 ? "dirtFloor" : "grass"
@@ -126,7 +126,8 @@ class Tile: Configurable {
 
                     if let tile = adjacentTile(lightVector) {
                         let lightIntensity = 1 - Double(lightVector.lengthSquared) / maxLengthSquared
-                        tile.lights.append(lightColor.multipliedComponentwise(by: lightIntensity))
+                        let actualLight = lightColor.multipliedComponentwise(by: lightIntensity)
+                        tile.lightColor.blend(with: actualLight, blendMode: .additive)
                     }
                 }
             }
@@ -162,8 +163,6 @@ class Tile: Configurable {
     }
 
     private func renderLight() {
-        var lightColor = Color.black
-        for light in lights { lightColor.blend(with: light, blendMode: .additive) }
         drawRectangle(bounds, color: lightColor, filled: true, blendMode: SDL_BLENDMODE_ADD)
     }
 
