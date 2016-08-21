@@ -165,7 +165,7 @@ class Tile: Configurable {
         for item in items { item.render() }
         structure?.render()
         if !fogOfWar { creature?.render() }
-        renderLight()
+        if lightColor != Color.black { renderLight() }
         if fogOfWar { Tile.fogOfWarSprite.render(at: position * tileSize) }
     }
 
