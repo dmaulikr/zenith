@@ -4,7 +4,7 @@ class Tile: Configurable {
 
     unowned let area: Area
     let position: Vector2i
-    private let bounds: Rect<Int>
+    private var bounds: SDL_Rect
     private(set) var items: Array<Item>
     var structure: Structure? {
         didSet {
@@ -19,12 +19,19 @@ class Tile: Configurable {
     }
     private var groundSprite: Sprite!
     static let config = Configuration.load(name: "terrain")
+    private static let lightTexture: OpaquePointer = {
+        let surface = SDL_CreateRGBSurface(0, Int32(tileSize), Int32(tileSize), 1, 0, 0, 0, 0)
+        defer { SDL_FreeSurface(surface) }
+        let texture = SDL_CreateTextureFromSurface(renderer, surface)!
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD)
+        return texture
+    }()
     private static let fogOfWarSprite = Sprite(fileName: Assets.graphicsPath + "fogOfWar.bmp")
 
     init(area: Area, position: Vector2i) {
         self.area = area
         self.position = position
-        bounds = Rect(position: self.position * tileSize, size: tileSizeVector)
+        bounds = Rect(position: self.position * tileSize, size: tileSizeVector).asSDLRect()
         creature = nil
         lightColor = Color.black
         fogOfWar = false
@@ -163,7 +170,8 @@ class Tile: Configurable {
     }
 
     private func renderLight() {
-        drawRectangle(bounds, color: lightColor, filled: true, blendMode: SDL_BLENDMODE_ADD)
+        SDL_SetTextureColorMod(Tile.lightTexture, lightColor.red, lightColor.green, lightColor.blue)
+        SDL_RenderCopy(renderer, Tile.lightTexture, nil, &bounds)
     }
 
     func addItem(_ item: Item) {
