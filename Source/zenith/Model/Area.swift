@@ -5,7 +5,7 @@ class Area {
     private(set) var tiles: Array<Tile>
     var populationDensity: Double!
 
-    static let size = 32
+    static let size = 16
     static let sizeVector = Vector2(size, size)
     static let populationDensityRange = 0.1...0.99
 
