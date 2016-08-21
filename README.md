@@ -14,7 +14,7 @@ Install dependencies:
 
 Build in release mode and run the project:
 
-    swift build -c release && ./build/release/zenith
+    swift build -c release && .build/release/zenith
 
 You may need to specify the path to the SDL library, e.g.:
 
