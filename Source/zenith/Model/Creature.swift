@@ -170,6 +170,7 @@ class Creature: Object, Configurable {
         assert(inventory.contains { $0 === item })
         removeItem(item)
         tileUnder.addItem(item)
+        addMessage("You drop \(item.name(.definite)).")
     }
 
     func removeItem(_ item: Item) {
