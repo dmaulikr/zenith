@@ -16,7 +16,7 @@ class Game: State {
                                 tile: world.area(at: Vector3(0, 0, 0))!
                                            .tile(at: Area.sizeVector / 2),
                                 messageStream: messageStream)
-        sidebar = Sidebar(gui: gui, player: world.player)
+        sidebar = Sidebar(gui: gui, world: world)
         world.update()
     }
 

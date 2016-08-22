@@ -2,6 +2,7 @@ import CSDL2
 
 class World {
 
+    private(set) var tick: Int
     private var areas: Dictionary<Vector3i, Area>
     var player: Creature!
     private let areaGenerationDistance = 1
@@ -10,6 +11,7 @@ class World {
     private let lineOfSightUpdateDistance: Vector2i
 
     init(worldViewSize: Vector2i) {
+        tick = 0
         lineOfSightUpdateDistance = Vector2(Int(ceil(Double(worldViewSize.x) / 2)),
                                             Int(ceil(Double(worldViewSize.y) / 2)))
         areas = Dictionary()
@@ -25,6 +27,7 @@ class World {
     }
 
     func update() {
+        tick += 1
         generateAreas()
 
         // FIXME: Should only update creatures within areaUpdateDistance.

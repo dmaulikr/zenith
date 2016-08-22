@@ -2,10 +2,12 @@ class Sidebar {
 
     private let gui: GraphicalUserInterface
     private let player: Creature
+    private unowned let world: World
 
-    init(gui: GraphicalUserInterface, player: Creature) {
+    init(gui: GraphicalUserInterface, world: World) {
         self.gui = gui
-        self.player = player
+        self.player = world.player
+        self.world = world
     }
 
     func render(region: Rect<Int>) {
@@ -41,5 +43,17 @@ class Sidebar {
         drawAttribute(text: "Int", value: player.intelligence)
         drawAttribute(text: "Psy", value: player.psyche)
         drawAttribute(text: "Cha", value: player.charisma)
+
+        position.y += lineHeight
+
+        font.renderText("Time " + tickAsTimeString(world.tick),
+                        at: position, color: textColorHighlight)
     }
+}
+
+private func tickAsTimeString(_ tick: Int) -> String {
+    // 1 tick == 1 second
+    let hours = tick / 3600 % 24
+    let minutes = tick % 3600 / 60
+    return String(format: "%02d:%02d", hours, minutes)
 }
