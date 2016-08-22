@@ -9,11 +9,14 @@ class Item: Object, Configurable, Hashable, Equatable {
     }
     static let config = Configuration.load(name: "item")
     var sprite: Sprite
+    let wieldedSprite: Sprite
 
     override init(id: String) {
         assert(Item.config.hasTable(id))
         sprite = Sprite(fileName: Assets.graphicsPath + "item.bmp",
                         textureRegion: Item.spriteRect(id: id))
+        wieldedSprite = Sprite(fileName: Assets.graphicsPath + "item.bmp",
+                               textureRegion: Item.spriteRect(id: id, offset: Vector2(0, 1)))
         super.init(id: id)
         addComponents(config: Item.config)
     }

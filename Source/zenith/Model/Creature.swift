@@ -6,6 +6,7 @@ class Creature: Object, Configurable {
         }
     }
     var backpack: Array<Item>
+    private(set) var wieldedItem: Item?
     private let messageStream: MessageStream?
 
     private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Int!
@@ -166,6 +167,11 @@ class Creature: Object, Configurable {
         return result.map { ($0.key, $0.value) }
     }
 
+    func wieldItem(_ item: Item) {
+        wieldedItem = item
+        addMessage("You wield \(item.name(.definite)).")
+    }
+
     func dropItem(_ item: Item) {
         assert(inventory.contains { $0 === item })
         removeItem(item)
@@ -174,6 +180,7 @@ class Creature: Object, Configurable {
     }
 
     func removeItem(_ item: Item) {
+        if wieldedItem === item { wieldedItem = nil }
         backpack.remove(at: backpack.index(where: { $0 === item })!)
     }
 
@@ -185,6 +192,7 @@ class Creature: Object, Configurable {
 
     override func render() {
         sprite.render()
+        wieldedItem?.wieldedSprite.render(at: sprite.position)
     }
 
     var area: Area { return tileUnder.area }

@@ -110,8 +110,16 @@ class Tile: Configurable {
         calculateLights()
     }
 
+    private var lightEmitters: Array<Item> {
+        var lightEmitters = items
+        if let wielded = creature?.wieldedItem {
+            lightEmitters.append(wielded)
+        }
+        return lightEmitters
+    }
+
     func calculateLights() {
-        for item in items {
+        for item in lightEmitters {
             if !item.emitsLight { continue }
             let lightColor = item.lightColor
             let distance = item.lightRange

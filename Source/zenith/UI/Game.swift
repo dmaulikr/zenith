@@ -33,6 +33,7 @@ class Game: State {
             case SDLK_PERIOD: performWait()
             case SDLK_i:      performShowInventory()
             case SDLK_g:      performGo()
+            case SDLK_w:      performWield()
             case SDLK_u:      performUse()
             case SDLK_e:      performEat()
             case SDLK_d:      performDrop()
@@ -82,6 +83,17 @@ class Game: State {
         if player.useStairs() {
             world.update()
         }
+    }
+
+    private func performWield() {
+        let state = ItemMenu(gui: gui, title: "Wield what?", items: player.equipment) {
+            app.popState()
+            if let selectedItem = $0 {
+                self.player.wieldItem(selectedItem)
+                self.world.update()
+            }
+        }
+        app.pushState(state)
     }
 
     private func performUse() {
