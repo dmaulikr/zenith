@@ -31,7 +31,7 @@ class PreferencesMenu: State {
             case SDLK_UP:   menu.selectPrevious()
             case SDLK_DOWN: menu.selectNext()
             case SDLK_RETURN:
-                switch menu.selection {
+                switch menu.selection! {
                     case .back:
                         app.popState()
                     case .resolution:

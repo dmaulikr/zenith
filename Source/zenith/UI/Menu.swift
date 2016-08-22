@@ -6,8 +6,8 @@ class Menu<T: CustomStringConvertible> {
     private let labelColor: Color = textColor
     private let selectionColor: Color = textColorHighlight
 
-    var selection: T {
-        return items[selectionIndex]
+    var selection: T? {
+        return items.isEmpty ? nil : items[selectionIndex]
     }
 
     init(items: Array<T>) {
@@ -24,6 +24,7 @@ class Menu<T: CustomStringConvertible> {
     }
 
     func selectNext() {
+        if items.isEmpty { return }
         if selectionIndex == items.count - 1 { return }
         labels[selectionIndex].color = labelColor
         selectionIndex += 1
@@ -31,6 +32,7 @@ class Menu<T: CustomStringConvertible> {
     }
 
     func selectPrevious() {
+        if items.isEmpty { return }
         if selectionIndex == 0 { return }
         labels[selectionIndex].color = labelColor
         selectionIndex -= 1

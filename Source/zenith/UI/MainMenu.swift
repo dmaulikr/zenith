@@ -37,7 +37,7 @@ class MainMenu: State {
             case SDLK_DOWN:
                 menu.selectNext()
             case SDLK_RETURN:
-                switch menu.selection {
+                switch menu.selection! {
                     case .newGame:     app.pushState(Game())
                     case .preferences: app.pushState(PreferencesMenu())
                     case .quit:        app.stop()
