@@ -46,14 +46,6 @@ class Sidebar {
 
         position.y += lineHeight
 
-        font.renderText("Time " + tickAsTimeString(world.tick),
-                        at: position, color: textColorHighlight)
+        font.renderText("Time \(world.currentTime)", at: position, color: textColorHighlight)
     }
-}
-
-private func tickAsTimeString(_ tick: Int) -> String {
-    // 1 tick == 1 second
-    let hours = tick / 3600 % 24
-    let minutes = tick % 3600 / 60
-    return String(format: "%02d:%02d", hours, minutes)
 }

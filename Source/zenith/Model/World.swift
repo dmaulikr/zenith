@@ -93,6 +93,11 @@ class World {
         SDL_RenderSetViewport(renderer, &viewport)
     }
 
+    var currentTime: Time {
+        // 1 tick == 1 second
+        return Time(hours: tick / 3600 % 24, minutes: tick % 3600 / 60)
+    }
+
     func area(at position: Vector3i) -> Area? {
         return areas[position]
     }
@@ -110,5 +115,15 @@ class World {
 
     private func generateArea(position: Vector3i) {
         areas[position] = Area(world: self, position: position)
+    }
+}
+
+struct Time: CustomStringConvertible {
+
+    let hours: Int
+    let minutes: Int
+
+    var description: String {
+        return String(format: "%02d:%02d", hours, minutes)
     }
 }
