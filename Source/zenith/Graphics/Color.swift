@@ -27,6 +27,60 @@ public struct Color {
     public static let white = Color(r: 255, g: 255, b: 255)
     public static let black = Color(r: 0, g: 0, b: 0)
 
+    public var hue: Double {
+        get {
+            let r = Double(red), g = Double(green), b = Double(blue)
+            let minComponent = min(r, g, b), maxComponent = max(r, g, b)
+
+            var hue: Double
+            switch maxComponent {
+                case r:
+                    hue = (g - b) / (maxComponent - minComponent)
+                case g:
+                    hue = (b - r) / (maxComponent - minComponent) + 2
+                default:
+                    hue = (r - g) / (maxComponent - minComponent) + 4
+            }
+
+            hue /= 6
+            return hue < 0 ? hue + 1 : hue
+        }
+        set {
+            let (r, g, b) = Color.hslAsRGB(newValue, saturation, lightness)
+            red   = UInt8(r * 255)
+            green = UInt8(g * 255)
+            blue  = UInt8(b * 255)
+        }
+    }
+
+    public var saturation: Double {
+        get {
+            let minComponent = min(Double(red)/255, Double(green)/255, Double(blue)/255)
+            let maxComponent = max(Double(red)/255, Double(green)/255, Double(blue)/255)
+            return (maxComponent - minComponent) / (1 - abs(2 * lightness - 1))
+        }
+        set {
+            let (r, g, b) = Color.hslAsRGB(hue, newValue, lightness)
+            red   = UInt8(r * 255)
+            green = UInt8(g * 255)
+            blue  = UInt8(b * 255)
+        }
+    }
+
+    public var lightness: Double {
+        get {
+            let minComponent = min(Double(red)/255, Double(green)/255, Double(blue)/255)
+            let maxComponent = max(Double(red)/255, Double(green)/255, Double(blue)/255)
+            return (maxComponent + minComponent) / 2
+        }
+        set {
+            let (r, g, b) = Color.hslAsRGB(hue, saturation, newValue)
+            red   = UInt8(r * 255)
+            green = UInt8(g * 255)
+            blue  = UInt8(b * 255)
+        }
+    }
+
     public enum BlendMode {
         case alpha
         case additive
