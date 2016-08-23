@@ -31,6 +31,7 @@ public struct Color {
         get {
             let r = Double(red), g = Double(green), b = Double(blue)
             let minComponent = min(r, g, b), maxComponent = max(r, g, b)
+            if maxComponent - minComponent == 0 { return 0 }
 
             var hue: Double
             switch maxComponent {
