@@ -85,6 +85,7 @@ public struct Color {
         case alpha
         case additive
         case multiply
+        case screen
     }
 
     public func blended(with color: Color, blendMode: BlendMode = .alpha) -> Color {
@@ -111,6 +112,10 @@ public struct Color {
                 dstR = srcR * dstR
                 dstG = srcG * dstG
                 dstB = srcB * dstB
+            case .screen:
+                dstR = 1 - (1 - dstR) * (1 - srcR)
+                dstG = 1 - (1 - dstG) * (1 - srcG)
+                dstB = 1 - (1 - dstB) * (1 - srcB)
         }
 
         return Color(r: UInt8(min(dstR, 1.0) * 255),
