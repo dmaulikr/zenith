@@ -65,12 +65,9 @@ class Item: Object, Configurable, Hashable, Equatable {
     }
 
     var lightColor: Color {
-        let hexString = try! Item.config.string(id, "lightColor")
-        // hexString should match the following regex: 0x[0-9a-fA-F]{6}
-        let hex = Int(hexString.replacingOccurrences(of: "0x", with: ""), radix: 16)!
-        return Color(r: UInt8(truncatingBitPattern: hex >> 16),
-                     g: UInt8(truncatingBitPattern: hex >> 8),
-                     b: UInt8(truncatingBitPattern: hex))
+        return Color(hue: try! Item.config.double(id, "lightColor", "hue"),
+              saturation: try! Item.config.double(id, "lightColor", "saturation"),
+               lightness: try! Item.config.double(id, "lightColor", "lightness"))
     }
 
     var lightRange: Int {
