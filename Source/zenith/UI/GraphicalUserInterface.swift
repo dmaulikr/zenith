@@ -21,15 +21,15 @@ class GraphicalUserInterface {
     let worldViewRect: Rect<Int>
     let messageViewRect: Rect<Int>
 
-    init(windowSize: Vector2i) {
+    init(resolution: Vector2i) {
         // Round sidebar width up to a multiple of tile size (for zoom view scaling).
         let sidebarWidth = (80 + tileSize - 1) / tileSize * tileSize
-        let sidebarLeft = windowSize.x - spacing - sidebarWidth
+        let sidebarLeft = resolution.x - spacing - sidebarWidth
         let sidebarTop = spacing
         let zoomViewWidth = sidebarWidth
         let zoomViewHeight = zoomViewWidth
         let zoomViewLeft = sidebarLeft
-        let zoomViewTop = windowSize.y - spacing - zoomViewHeight
+        let zoomViewTop = resolution.y - spacing - zoomViewHeight
         let sidebarHeight = zoomViewTop - spacing - sidebarTop
         let worldViewLeft = 0
         let worldViewTop = 0

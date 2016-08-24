@@ -7,11 +7,10 @@ public class Window {
 
     public init(size: Vector2i, title: String = "") {
         SDL_Init(Uint32(SDL_INIT_VIDEO))
-        let flags = SDL_WINDOW_ALLOW_HIGHDPI.rawValue
 
         window = SDL_CreateWindow(title,
                                   SDL_WINDOWPOS_CENTERED_MASK, SDL_WINDOWPOS_CENTERED_MASK,
-                                  Int32(size.x), Int32(size.y), flags)
+                                  Int32(size.x), Int32(size.y), 0)
         guard window != nil else { fatalSDLError() }
 
         renderer = SDL_CreateRenderer(window, -1, 0)
@@ -29,6 +28,15 @@ public class Window {
         SDL_DestroyRenderer(renderer)
         SDL_DestroyWindow(window)
         SDL_Quit()
+    }
+
+    public var resolution: Vector2i {
+        get {
+            return size / scale
+        }
+        set {
+            size = newValue * scale
+        }
     }
 
     public var size: Vector2i {
@@ -49,11 +57,12 @@ public class Window {
 
     public var scale: Int {
         get {
-            var scale: Float = 0
+            var scale = Float(0)
             SDL_RenderGetScale(renderer, &scale, nil)
             return Int(scale)
         }
         set {
+            resolution = Vector2(Vector2d(resolution) * Double(newValue) / Double(scale))
             SDL_RenderSetScale(renderer, Float(newValue), Float(newValue))
         }
     }

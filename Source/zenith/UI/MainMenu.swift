@@ -14,20 +14,17 @@ class MainMenu: State {
 
     init(font: Font) {
         menu = Menu(items: [.newGame, .preferences, .quit])
-
-        // Position menu items
-        var position = Vector2(app.window.size.x / 2, app.window.size.y / 3)
-        let spacing = app.window.size.y / 3 / menu.items.count
-
-        for label in menu.labels {
-            label.alignment = .center
-            label.position = position
-            position.y += spacing
-        }
     }
 
     func render() {
-        menu.render()
+        var position = Vector2(app.window.resolution.x / 2, app.window.resolution.y / 3)
+        let spacing = app.window.resolution.y / 3 / menu.items.count
+
+        for item in menu.items {
+            let color = item == menu.selection ? textColorHighlight : textColor
+            font.renderText(item.rawValue, at: position, color: color, align: .center)
+            position.y += spacing
+        }
     }
 
     func keyWasPressed(key: SDL_Keycode) {

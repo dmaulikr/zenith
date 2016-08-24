@@ -9,7 +9,7 @@ class Game: State {
     private var player: Creature { return world.player }
 
     init() {
-        gui = GraphicalUserInterface(windowSize: app.window.size)
+        gui = GraphicalUserInterface(resolution: app.window.resolution)
         world = World(worldViewSize: gui.worldViewRect.size / tileSize)
         messageStream = MessageStream()
         world.player = Creature(id: "human",

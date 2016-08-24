@@ -5,6 +5,7 @@ struct Assets {
 }
 
 let app = Application(size: Vector2(512, 384), title: "Zenith")
+app.window.scale = 2
 
 Sprite.transparentColor = Color(r: 0x5a, g: 0x52, b: 0x68)
 

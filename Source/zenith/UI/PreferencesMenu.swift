@@ -17,7 +17,7 @@ class PreferencesMenu: State {
 
     init() {
         preferences = [
-            .resolution: { "\(app.window.size.x)x\(app.window.size.y)" },
+            .resolution: { "\(app.window.resolution.x)x\(app.window.resolution.y)" },
             .scale: { "\(app.window.scale)x" },
         ]
         resolutions = [Vector2(512, 384), Vector2(640, 480),
@@ -37,7 +37,7 @@ class PreferencesMenu: State {
                     case .resolution:
                         currentResolutionIndex += 1
                         currentResolutionIndex %= resolutions.count
-                        app.window.size = resolutions[currentResolutionIndex]
+                        app.window.resolution = resolutions[currentResolutionIndex]
                     case .scale:
                         app.window.scale = app.window.scale % 2 + 1
                 }
@@ -49,8 +49,8 @@ class PreferencesMenu: State {
     }
 
     func render() {
-        var left = app.window.size / 4
-        var right = Vector2(app.window.size.x - left.x, left.y)
+        var left = app.window.resolution / 4
+        var right = Vector2(app.window.resolution.x - left.x, left.y)
         let dy = Int(Double(lineHeight) * 1.5)
 
         for item in menu.items {
