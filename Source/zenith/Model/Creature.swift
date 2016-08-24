@@ -167,9 +167,11 @@ class Creature: Object, Configurable {
         return result.map { ($0.key, $0.value) }
     }
 
-    func wieldItem(_ item: Item) {
+    func wieldItem(_ item: Item?) {
         wieldedItem = item
-        addMessage("You wield \(item.name(.definite)).")
+        if let item = item {
+            addMessage("You wield \(item.name(.definite)).")
+        }
     }
 
     func dropItem(_ item: Item) {

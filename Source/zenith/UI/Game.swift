@@ -86,7 +86,7 @@ class Game: State {
     }
 
     private func performWield() {
-        let state = ItemMenu(gui: gui, title: "Wield what?", items: player.equipment) {
+        let state = ItemMenu(gui: gui, title: "Wield what?", items: player.equipment, allowNothingAsOption: true) {
             app.popState()
             if let selectedItem = $0 {
                 self.player.wieldItem(selectedItem)
@@ -101,7 +101,7 @@ class Game: State {
         let state = ItemMenu(gui: gui, title: "Use what?", items: usableItems) {
             app.popState()
             if let selectedItem = $0 {
-                selectedItem.use(world: self.world, gui: self.gui, user: self.player)
+                selectedItem!.use(world: self.world, gui: self.gui, user: self.player)
                 self.world.update()
             }
         }
@@ -113,8 +113,8 @@ class Game: State {
         let state = ItemMenu(gui: gui, title: "Eat what?", items: edibleItems) {
             app.popState()
             if let selectedItem = $0 {
-                self.player.eat(selectedItem)
-                if let leftover = selectedItem.leftover {
+                self.player.eat(selectedItem!)
+                if let leftover = selectedItem!.leftover {
                     self.player.tileUnder.addItem(leftover)
                 }
                 self.world.update()
@@ -127,7 +127,7 @@ class Game: State {
         let state = ItemMenu(gui: gui, title: "Drop what?", items: player.equipment) {
             app.popState()
             if let selectedItem = $0 {
-                self.player.dropItem(selectedItem)
+                self.player.dropItem(selectedItem!)
                 self.world.update()
             }
         }

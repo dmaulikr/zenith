@@ -1,14 +1,29 @@
 import CSDL2
 
-class ItemMenu: Question<Item>, State {
+struct OptionalItemWrapper: CustomStringConvertible {
+    let item: Item?
+    var description: String {
+        return item?.description ?? "nothing"
+    }
+}
+
+class ItemMenu: Question<Item?>, State {
 
     private let items: Array<(Item, Int)>
-    private let menu: Menu<Item>
+    private let menu: Menu<OptionalItemWrapper>
+    private let allowNothingAsOption: Bool
 
     init(gui: GraphicalUserInterface, title: String, items: Array<(Item, Int)>,
-         resultHandler: @escaping (Item?) -> Void) {
+         allowNothingAsOption: Bool = false, resultHandler: @escaping (Item??) -> Void) {
         self.items = items
-        menu = Menu(items: items.map { $0.0 })
+
+        var menuItems = items.map { OptionalItemWrapper(item: $0.0) }
+        if allowNothingAsOption {
+            menuItems.insert(OptionalItemWrapper(item: nil), at: 0)
+        }
+        menu = Menu(items: menuItems)
+
+        self.allowNothingAsOption = allowNothingAsOption
         super.init(gui: gui, title: title, resultHandler: resultHandler)
     }
 
@@ -21,7 +36,7 @@ class ItemMenu: Question<Item>, State {
             case SDLK_ESCAPE:
                 resultHandler(nil)
             case SDLK_RETURN:
-                resultHandler(menu.selection)
+                resultHandler(menu.selection?.item)
             default:
                 break
         }
@@ -38,10 +53,17 @@ class ItemMenu: Question<Item>, State {
         var textPosition = position
         textPosition += Vector2(tileSize + spacing, (tileSize - font.glyphSize.y) / 2)
 
+        if allowNothingAsOption {
+            let color = menu.selection!.item == nil ? textColorHighlight : textColor
+            font.renderText("nothing", at: textPosition, color: color)
+            spritePosition.y += tileSize
+            textPosition.y += tileSize
+        }
+
         for (item, amount) in items {
             item.sprite.render(at: spritePosition)
             let line = (amount > 1 ? "\(amount)x " : "") + item.name()
-            let color = menu.selection === item ? textColorHighlight : textColor
+            let color = menu.selection!.item === item ? textColorHighlight : textColor
             font.renderText(line, at: textPosition, color: color)
             spritePosition.y += tileSize
             textPosition.y += tileSize
