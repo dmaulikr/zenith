@@ -223,8 +223,8 @@ class Creature: Object, Configurable {
     static var spawnRates: Array<(id: String, levels: Array<Int>, spawnRate: Double)> {
         if _spawnRates.isEmpty {
             // Initialize from config file
-            for (id, data) in try! Creature.config.tables() {
-                if let spawnRate = try? data.double("spawnRate") {
+            for (id, data) in Creature.config.tables() {
+                if let spawnRate = data.double("spawnRate") {
                     _spawnRates.append((id: id, levels: [-1, 0, 1], spawnRate: spawnRate))
                 }
             }
@@ -238,25 +238,25 @@ class Creature: Object, Configurable {
 
     private static func initAttributes(id: String) -> Dictionary<Attribute, Int> {
         var attributes = Dictionary<Attribute, Int>()
-        let baseType = try! config.string(id, "basetype")
-        let baseTypeAttributes: Array<String> = try! config.array(baseType, "attributes")
+        let baseType = config.string(id, "basetype")!
+        let baseTypeAttributes: Array<String> = config.array(baseType, "attributes")!
 
         for attribute in baseTypeAttributes {
             let attributeEnum = Attribute(rawValue: attribute)!
 
-            if let attributeValue = try? config.int(id, attribute) {
+            if let attributeValue = config.int(id, attribute) {
                 attributes[attributeEnum] = attributeValue
             } else {
                 guard var superAttribute = Creature.superAttribute(of: attributeEnum) else {
                     fatalError() // TODO: Look up baseType attribute.
                 }
 
-                if (try? config.int(id, superAttribute.rawValue)) == nil {
+                if config.int(id, superAttribute.rawValue) == nil {
                     superAttribute = Creature.superAttribute(of: superAttribute)!
                     assert(config.hasKey(id, superAttribute.rawValue))
                 }
 
-                attributes[attributeEnum] = try! config.int(id, superAttribute.rawValue)
+                attributes[attributeEnum] = config.int(id, superAttribute.rawValue)!
             }
         }
 

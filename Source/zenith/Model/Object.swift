@@ -20,7 +20,7 @@ class Object: Entity, CustomStringConvertible {
     }
 
     func addComponents(config: Toml) {
-        try? config.array(id, "components").forEach {
+        config.array(id, "components")?.forEach {
             addComponent(getComponent(id: id, name: $0))
         }
     }

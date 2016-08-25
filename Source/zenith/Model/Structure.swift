@@ -57,9 +57,9 @@ class Structure: Object, Configurable {
     static var spawnRates: SpawnRateArray {
         if _spawnRates.isEmpty {
             // Initialize from config file
-            for (id, data) in try! Structure.config.tables() {
-                if let spawnRate = try? data.double("spawnRate") {
-                    _spawnRates.append((id: id, levels: try! data.array("levels"), spawnRate: spawnRate))
+            for (id, data) in Structure.config.tables() {
+                if let spawnRate = data.double("spawnRate") {
+                    _spawnRates.append((id: id, levels: data.array("levels")!, spawnRate: spawnRate))
                 }
             }
         }

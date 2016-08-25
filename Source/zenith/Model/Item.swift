@@ -30,9 +30,9 @@ class Item: Object, Configurable, Hashable, Equatable {
     static var spawnRates: Array<(id: String, levels: Array<Int>, spawnRate: Double)> {
         if _spawnRates.isEmpty {
             // Initialize from config file
-            for (id, data) in try! Item.config.tables() {
-                if let spawnRate = try? data.double("spawnRate") {
-                    _spawnRates.append((id: id, levels: try! data.array("levels"), spawnRate: spawnRate))
+            for (id, data) in Item.config.tables() {
+                if let spawnRate = data.double("spawnRate") {
+                    _spawnRates.append((id: id, levels: data.array("levels")!, spawnRate: spawnRate))
                 }
             }
         }
@@ -40,11 +40,11 @@ class Item: Object, Configurable, Hashable, Equatable {
     }
 
     var isEdible: Bool {
-        return (try? Item.config.bool(id, "isEdible")) ?? false
+        return Item.config.bool(id, "isEdible") ?? false
     }
 
     var isUsable: Bool {
-        return (try? Item.config.bool(id, "isUsable")) ?? false
+        return Item.config.bool(id, "isUsable") ?? false
     }
 
     func use(world: World, gui: GraphicalUserInterface, user: Creature) {
@@ -54,7 +54,7 @@ class Item: Object, Configurable, Hashable, Equatable {
     }
 
     var leftover: Item? {
-        if let leftoverID = try? Item.config.string(id, "leftover") {
+        if let leftoverID = Item.config.string(id, "leftover") {
             return Item(id: leftoverID)
         }
         return nil
@@ -65,13 +65,13 @@ class Item: Object, Configurable, Hashable, Equatable {
     }
 
     var lightColor: Color {
-        return Color(hue: try! Item.config.double(id, "lightColor", "hue"),
-              saturation: try! Item.config.double(id, "lightColor", "saturation"),
-               lightness: try! Item.config.double(id, "lightColor", "lightness"))
+        return Color(hue: Item.config.double(id, "lightColor", "hue")!,
+              saturation: Item.config.double(id, "lightColor", "saturation")!,
+               lightness: Item.config.double(id, "lightColor", "lightness")!)
     }
 
     var lightRange: Int {
-        return try! Item.config.int(id, "lightRange")
+        return Item.config.int(id, "lightRange")!
     }
 
     func beKicked(by kicker: Creature, direction kickDirection: Direction4) {
