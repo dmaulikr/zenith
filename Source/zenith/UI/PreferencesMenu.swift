@@ -5,6 +5,8 @@ class PreferencesMenu: State {
     private let preferences: Dictionary<MenuItem, () -> String>
     private let resolutions: Array<Vector2i>
     private var currentResolutionIndex: Int
+    private let scales: Array<Double>
+    private var currentScaleIndex: Int
     private let menu: Menu<MenuItem>
 
     private enum MenuItem: String, CustomStringConvertible {
@@ -23,6 +25,10 @@ class PreferencesMenu: State {
         resolutions = [Vector2(512, 384), Vector2(640, 480),
                        Vector2(800, 600), Vector2(1024, 768)]
         currentResolutionIndex = 0
+
+        scales = app.window.isHighDPI ? [1, 1.5, 2] : [1, 2]
+        currentScaleIndex = scales.index(of: 2)!
+
         menu = Menu(items: [.back, .resolution, .scale])
     }
 
@@ -39,7 +45,9 @@ class PreferencesMenu: State {
                         currentResolutionIndex %= resolutions.count
                         app.window.resolution = resolutions[currentResolutionIndex]
                     case .scale:
-                        app.window.scale = app.window.scale % 2 + 1
+                        currentScaleIndex += 1
+                        currentScaleIndex %= scales.count
+                        app.window.scale = scales[currentScaleIndex]
                 }
             case SDLK_ESCAPE:
                 app.popState()
