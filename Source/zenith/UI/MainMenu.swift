@@ -3,6 +3,7 @@ import CSDL2
 class MainMenu: State {
 
     private let menu: Menu<MenuItem>
+    private var game: Game?
 
     private enum MenuItem: String, CustomStringConvertible {
         case newGame = "New game"
@@ -22,7 +23,8 @@ class MainMenu: State {
 
         for item in menu.items {
             let color = item == menu.selection ? textColorHighlight : textColor
-            font.renderText(item.rawValue, at: position, color: color, align: .center)
+            let text = item == .newGame && game != nil ? "Continue game" : item.rawValue
+            font.renderText(text, at: position, color: color, align: .center)
             position.y += spacing
         }
     }
@@ -35,9 +37,15 @@ class MainMenu: State {
                 menu.selectNext()
             case SDLK_RETURN:
                 switch menu.selection! {
-                    case .newGame:     app.pushState(Game())
-                    case .preferences: app.pushState(PreferencesMenu())
-                    case .quit:        app.stop()
+                    case .newGame:
+                        if game == nil {
+                            game = Game()
+                        }
+                        app.pushState(game!)
+                    case .preferences:
+                        app.pushState(PreferencesMenu())
+                    case .quit:
+                        app.stop()
                 }
             case SDLK_ESCAPE:
                 app.stop()
