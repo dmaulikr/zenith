@@ -3,6 +3,7 @@ import CSDL2
 public class Window {
 
     private var window: OpaquePointer?
+    private let dpiScale: Float
     public var clearColor: Color
 
     public init(size: Vector2i, title: String = "") {
@@ -10,7 +11,7 @@ public class Window {
 
         window = SDL_CreateWindow(title,
                                   SDL_WINDOWPOS_CENTERED_MASK, SDL_WINDOWPOS_CENTERED_MASK,
-                                  Int32(size.x), Int32(size.y), 0)
+                                  Int32(size.x), Int32(size.y), SDL_WINDOW_ALLOW_HIGHDPI.rawValue)
         guard window != nil else { fatalSDLError() }
 
         renderer = SDL_CreateRenderer(window, -1, 0)
@@ -20,6 +21,7 @@ public class Window {
         SDL_GetRendererOutputSize(renderer, &outputSize.x, &outputSize.y)
         let scale = Vector2f(outputSize) / Vector2f(size)
         SDL_RenderSetScale(renderer, scale.x, scale.y)
+        dpiScale = scale.x
 
         clearColor = Color.black
     }
@@ -59,11 +61,12 @@ public class Window {
         get {
             var scale = Float(0)
             SDL_RenderGetScale(renderer, &scale, nil)
-            return Int(scale)
+            return Int(scale / dpiScale)
         }
         set {
-            resolution = Vector2(Vector2d(resolution) * Double(newValue) / Double(scale))
-            SDL_RenderSetScale(renderer, Float(newValue), Float(newValue))
+            size = Vector2(Vector2d(size) * Double(newValue) / Double(scale))
+            let actualScale = Float(newValue * Int(dpiScale))
+            SDL_RenderSetScale(renderer, actualScale, actualScale)
         }
     }
 
