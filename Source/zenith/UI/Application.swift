@@ -22,6 +22,7 @@ public class Application {
 
     public func pushState(_ state: State) {
         stateStack.append(state)
+        state.enter()
     }
 
     public func popState() {

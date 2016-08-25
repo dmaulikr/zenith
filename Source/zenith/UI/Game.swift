@@ -3,7 +3,7 @@ import CSDL2
 class Game: State {
 
     private let world: World
-    private let gui: GraphicalUserInterface
+    private var gui: GraphicalUserInterface
     private let messageStream: MessageStream
     private let sidebar: Sidebar
     private var player: Creature { return world.player }
@@ -18,6 +18,10 @@ class Game: State {
                                 messageStream: messageStream)
         sidebar = Sidebar(gui: gui, world: world)
         world.update()
+    }
+
+    func enter() {
+        gui = GraphicalUserInterface(resolution: app.window.resolution)
     }
 
     func keyWasPressed(key: SDL_Keycode) {

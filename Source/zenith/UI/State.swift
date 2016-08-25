@@ -10,6 +10,9 @@ public protocol State {
     /// implementation does nothing.
     func update()
 
+    /// Called when the state becomes the active state.
+    func enter()
+
     /// Called immediately when a key is pressed while the state is active.
     func keyWasPressed(key: SDL_Keycode)
 
@@ -25,6 +28,7 @@ public protocol State {
 public extension State {
     func render() {}
     func update() {}
+    func enter() {}
     func keyWasPressed(key: SDL_Keycode) {}
     func keyWasReleased(key: SDL_Keycode) {}
     var shouldRenderStateBelow: Bool { return false }
