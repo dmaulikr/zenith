@@ -1,4 +1,5 @@
 import CSDL2
+import Toml
 
 class PreferencesMenu: State {
 
@@ -8,6 +9,7 @@ class PreferencesMenu: State {
     private let scales: Array<Double>
     private var currentScaleIndex: Int
     private let menu: Menu<MenuItem>
+    private let toml: Toml
 
     private enum MenuItem: String, CustomStringConvertible {
         case back = "Back"
@@ -18,16 +20,25 @@ class PreferencesMenu: State {
     }
 
     init() {
+        toml = (try? Toml(contentsOfFile: Assets.preferencesPath)) ?? Toml()
+
         preferences = [
             .resolution: { "\(app.window.resolution.x)x\(app.window.resolution.y)" },
             .scale: { "\(app.window.scale)x" },
         ]
         resolutions = [Vector2(512, 384), Vector2(640, 480),
                        Vector2(800, 600), Vector2(1024, 768)]
-        currentResolutionIndex = 0
+        if let resolutionPreference: Array<Int> = toml.array("resolution") {
+            let resolutionPreferenceVector = Vector2(resolutionPreference[0], resolutionPreference[1])
+            currentResolutionIndex = resolutions.index(of: resolutionPreferenceVector) ?? 0
+        } else {
+            currentResolutionIndex = 0
+        }
 
         scales = app.window.isHighDPI ? [1, 1.5, 2] : [1, 2]
-        currentScaleIndex = scales.index(of: 2)!
+        let defaultScaleIndex = scales.index(of: 2)!
+        let filev = toml.double("scale")
+        currentScaleIndex = scales.index(of: filev ?? 2) ?? defaultScaleIndex
 
         menu = Menu(items: [.back, .resolution, .scale])
     }
@@ -49,6 +60,7 @@ class PreferencesMenu: State {
                         currentScaleIndex %= scales.count
                         app.window.scale = scales[currentScaleIndex]
                 }
+                try? savePreferencesToFile()
             case SDLK_ESCAPE:
                 app.popState()
             default:
@@ -72,5 +84,12 @@ class PreferencesMenu: State {
             left.y += dy
             right.y += dy
         }
+    }
+
+    private func savePreferencesToFile() throws {
+        let resolution = resolutions[currentResolutionIndex]
+        toml.setValue(key: ["resolution"], value: [resolution.x, resolution.y])
+        toml.setValue(key: ["scale"], value: scales[currentScaleIndex])
+        try toml.description.write(toFile: Assets.preferencesPath, atomically: true, encoding: .utf8)
     }
 }
