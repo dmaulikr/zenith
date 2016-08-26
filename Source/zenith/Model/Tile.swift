@@ -110,16 +110,15 @@ class Tile: Configurable {
     }
 
     private var lightEmitters: Array<Item> {
-        var lightEmitters = items
-        if let wielded = creature?.wieldedItem {
-            lightEmitters.append(wielded)
+        var lightEmitters = items.filter { $0.emitsLight }
+        if let wieldedItem = creature?.wieldedItem, wieldedItem.emitsLight {
+            lightEmitters.append(wieldedItem)
         }
         return lightEmitters
     }
 
     func calculateLights() {
         for item in lightEmitters {
-            if !item.emitsLight { continue }
             let lightColor = item.lightColor
             let distance = item.lightRange
             let maxLengthSquared = Vector2(Double(distance), Double(distance)).lengthSquared
