@@ -4,8 +4,8 @@ public class Window {
 
     private var window: OpaquePointer?
     private let dpiScale: Double
-    private let frameTexture: OpaquePointer
-    private let frameSurface: UnsafeMutablePointer<SDL_Surface>
+    private var frameTexture: OpaquePointer
+    private var frameSurface: UnsafeMutablePointer<SDL_Surface>
 
     public init(size: Vector2i, title: String = "") {
         SDL_Init(Uint32(SDL_INIT_VIDEO))
@@ -45,6 +45,7 @@ public class Window {
         }
         set {
             size = Vector2i(Vector2d(newValue) * scale)
+            recreateFrameTextureAndSurface()
         }
     }
 
@@ -95,6 +96,14 @@ public class Window {
 
         SDL_RenderCopy(renderer, frameTexture, nil, nil)
         SDL_RenderPresent(renderer)
+    }
+
+    private func recreateFrameTextureAndSurface() {
+        frameTexture = SDL_CreateTexture(renderer, UInt32(SDL_PIXELFORMAT_RGB555),
+                                         Int32(SDL_TEXTUREACCESS_STREAMING.rawValue),
+                                         Int32(resolution.x), Int32(resolution.y))
+        frameSurface = SDL_CreateRGBSurface(0, Int32(resolution.x), Int32(resolution.y), 15, 0, 0, 0, 0)
+        targetSurface = frameSurface
     }
 }
 
