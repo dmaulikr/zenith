@@ -6,81 +6,85 @@ public struct Sprite {
     public var position: Vector2i = Vector2(0, 0)
 
     public static var transparentColor: Color?
-    private let texture: Texture
 
-    /// The sub-region of the texture to use for this sprite.
-    public var textureRegion: Rect<Int>
+    /// The underlying image containing the actual pixel data for this sprite.
+    let bitmap: Bitmap
+
+    /// The sub-rectangle of `image` to use for this sprite.
+    public var bitmapRegion: Rect<Int>
 
     /// Loads the sprite from a file.
     /// - Note: Currently only BMP files are supported.
-    public init(fileName: String, textureRegion: Rect<Int>? = nil) {
-        texture = Texture.get(fileName: fileName)
-        let size = texture.size
-        self.textureRegion = textureRegion ?? Rect(position: Vector2(0, 0), size: size)
+    public init(fileName: String, bitmapRegion: Rect<Int>? = nil) {
+        bitmap = Bitmap.get(fileName: fileName)
+        let size = bitmap.size
+        self.bitmapRegion = bitmapRegion ?? Rect(position: Vector2(0, 0), size: size)
     }
 
-    init(texture: Texture, textureRegion: Rect<Int>? = nil) {
-        self.texture = texture
-        self.textureRegion = textureRegion ?? Rect(position: Vector2(0, 0), size: texture.size)
+    init(image: Bitmap, bitmapRegion: Rect<Int>? = nil) {
+        self.bitmap = image
+        self.bitmapRegion = bitmapRegion ?? Rect(position: Vector2(0, 0), size: image.size)
     }
 
     public func render() {
-        var src = textureRegion.asSDLRect()
-        var dst = SDL_Rect(x: Int32(position.x), y: Int32(position.y), w: src.w, h: src.h)
-        SDL_RenderCopy(renderer, texture.sdlTexture, &src, &dst)
+        render(at: position)
     }
 
     public func render(at position: Vector2i) {
-        var src = textureRegion.asSDLRect()
+        var src = bitmapRegion.asSDLRect()
         var dst = SDL_Rect(x: Int32(position.x), y: Int32(position.y), w: src.w, h: src.h)
-        SDL_RenderCopy(renderer, texture.sdlTexture, &src, &dst)
+        if let viewport = targetViewport {
+            dst.x += viewport.x
+            dst.y += viewport.y
+        }
+        SDL_UpperBlit(bitmap.surface, &src, targetSurface, &dst)
     }
 
-    init(fromSDLSurface surface: UnsafeMutablePointer<SDL_Surface>, window: Window) {
-        texture = Texture(SDL_CreateTextureFromSurface(renderer, surface))
-        textureRegion = Rect(position: Vector2(0, 0), size: texture.size)
+    init(fromSDLSurface surface: UnsafeMutablePointer<SDL_Surface>) {
+        bitmap = Bitmap(surface)
+        bitmapRegion = Rect(position: Vector2(0, 0), size: bitmap.size)
     }
 }
 
-/// Memory-managing wrapper around `SDL_Texture`.
-class Texture {
+var targetSurface: UnsafeMutablePointer<SDL_Surface>!
+var targetViewport: SDL_Rect?
 
-    let sdlTexture: OpaquePointer
+/// Memory-managing wrapper around `SDL_Surface`.
+class Bitmap {
 
-    /// Textures loaded from image files. Keys are file paths.
-    private static var textureCache = Dictionary<String, Texture>()
+    let surface: UnsafeMutablePointer<SDL_Surface>
+
+    /// Bitmaps loaded from image files. Keys are file paths.
+    private static var cache = Dictionary<String, Bitmap>()
 
     var size: Vector2i {
-        var size = Vector2<Int32>(0, 0)
-        SDL_QueryTexture(sdlTexture, nil, nil, &size.x, &size.y)
-        return Vector2i(size)
+        return Vector2i(Int(surface.pointee.w), Int(surface.pointee.h))
     }
 
-    init(_ sdlTexture: OpaquePointer) {
-        self.sdlTexture = sdlTexture
+    init(_ surface: UnsafeMutablePointer<SDL_Surface>) {
+        self.surface = surface
     }
 
-    static func get(fileName: String) -> Texture {
-        if let texture = Texture.textureCache[fileName] {
-            return texture
+    static func get(fileName: String) -> Bitmap {
+        if let cachedBitmap = Bitmap.cache[fileName] {
+            return cachedBitmap
         }
-        let texture = Texture.loadFromFile(fileName)
-        Texture.textureCache[fileName] = texture
-        return texture
+        let bitmap = Bitmap.loadFromFile(fileName)
+        Bitmap.cache[fileName] = bitmap
+        return bitmap
     }
 
-    private static func loadFromFile(_ fileName: String) -> Texture {
+    private static func loadFromFile(_ fileName: String) -> Bitmap {
         guard let sdlSurface = loadBitmapFromFile(fileName) else {
             fatalSDLError()
         }
-        defer { SDL_FreeSurface(sdlSurface) }
 
         if let color = Sprite.transparentColor {
             let colorKey = SDL_MapRGB(sdlSurface.pointee.format,
                                       color.red, color.green, color.blue)
             SDL_SetColorKey(sdlSurface, 1, colorKey)
         }
-        return Texture(SDL_CreateTextureFromSurface(renderer, sdlSurface))
+        return Bitmap(sdlSurface)
     }
 
     private static func loadBitmapFromFile(_ fileName: String) -> UnsafeMutablePointer<SDL_Surface>? {
@@ -90,6 +94,6 @@ class Texture {
     }
 
     deinit {
-        SDL_DestroyTexture(sdlTexture)
+        SDL_FreeSurface(surface)
     }
 }

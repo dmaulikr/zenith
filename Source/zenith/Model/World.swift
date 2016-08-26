@@ -61,13 +61,11 @@ class World {
     }
 
     func render(destination: Rect<Int>) {
-        var viewport = SDL_Rect()
-        SDL_RenderGetViewport(renderer, &viewport)
-        var clipRect = SDL_Rect()
-        SDL_RenderGetClipRect(renderer, &clipRect)
-
-        var sdlRect = destination.asSDLRect()
-        SDL_RenderSetClipRect(renderer, &sdlRect)
+        let viewport = targetViewport
+        var oldClipRect = SDL_Rect()
+        SDL_GetClipRect(targetSurface, &oldClipRect)
+        var newClipRect = destination.asSDLRect()
+        SDL_SetClipRect(targetSurface, &newClipRect)
 
         for dx in -areaDrawDistance...areaDrawDistance {
             for dy in -areaDrawDistance...areaDrawDistance {
@@ -80,17 +78,13 @@ class World {
                 sdlRect.y -= playerMiddlePixelPosition.y - destination.size.y / 2
                 sdlRect.w = Int32(Area.size * tileSize)
                 sdlRect.h = Int32(Area.size * tileSize)
-                SDL_RenderSetViewport(renderer, &sdlRect)
+                targetViewport = sdlRect
                 area.render()
             }
         }
 
-        if SDL_RectEmpty(&clipRect) == SDL_TRUE {
-            SDL_RenderSetClipRect(renderer, nil)
-        } else {
-            SDL_RenderSetClipRect(renderer, &clipRect)
-        }
-        SDL_RenderSetViewport(renderer, &viewport)
+        SDL_SetClipRect(targetSurface, &oldClipRect)
+        targetViewport = viewport
     }
 
     var currentTime: Time {

@@ -43,7 +43,7 @@ class ItemMenu: Question<Item?>, State {
     }
 
     func render() {
-        drawRectangle(gui.worldViewRect, color: Color.black, filled: true)
+        drawFilledRectangle(gui.worldViewRect, color: Color.black)
 
         var position = gui.worldViewRect.topLeft + spacingVector
         font.renderText(title, at: position, color: textColor)

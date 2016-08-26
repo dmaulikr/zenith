@@ -6,7 +6,7 @@ class Structure: Object, Configurable {
 
     override init(id: String) {
         sprite = Sprite(fileName: Assets.graphicsPath + "structure.bmp",
-                        textureRegion: Structure.spriteRect(id: id))
+                        bitmapRegion: Structure.spriteRect(id: id))
         super.init(id: id)
         addComponents(config: Structure.config)
     }

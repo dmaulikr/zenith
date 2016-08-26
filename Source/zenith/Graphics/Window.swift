@@ -4,7 +4,8 @@ public class Window {
 
     private var window: OpaquePointer?
     private let dpiScale: Double
-    public var clearColor: Color
+    private let frameTexture: OpaquePointer
+    private let frameSurface: UnsafeMutablePointer<SDL_Surface>
 
     public init(size: Vector2i, title: String = "") {
         SDL_Init(Uint32(SDL_INIT_VIDEO))
@@ -23,10 +24,16 @@ public class Window {
         SDL_RenderSetScale(renderer, scale.x, scale.y)
         dpiScale = Double(scale.x)
 
-        clearColor = Color.black
+        frameTexture = SDL_CreateTexture(renderer, UInt32(SDL_PIXELFORMAT_RGB555),
+                                         Int32(SDL_TEXTUREACCESS_STREAMING.rawValue),
+                                         Int32(size.x), Int32(size.y))
+        frameSurface = SDL_CreateRGBSurface(0, Int32(size.x), Int32(size.y), 15, 0, 0, 0, 0)
+        targetSurface = frameSurface
     }
 
     deinit {
+        SDL_FreeSurface(frameSurface)
+        SDL_DestroyTexture(frameTexture)
         SDL_DestroyRenderer(renderer)
         SDL_DestroyWindow(window)
         SDL_Quit()
@@ -75,11 +82,18 @@ public class Window {
     }
 
     public func clear() {
-        SDL_SetRenderDrawColor(renderer, clearColor.red, clearColor.green, clearColor.blue, clearColor.alpha)
-        SDL_RenderClear(renderer)
+        SDL_FillRect(frameSurface, nil, SDL_MapRGB(frameSurface.pointee.format, 0, 0, 0))
     }
 
     public func display() {
+        var pixels: UnsafeMutableRawPointer? = nil
+        var pitch: Int32 = 0
+
+        SDL_LockTexture(frameTexture, nil, &pixels, &pitch)
+        memcpy(pixels, frameSurface.pointee.pixels, Int(pitch * frameSurface.pointee.h))
+        SDL_UnlockTexture(frameTexture)
+
+        SDL_RenderCopy(renderer, frameTexture, nil, nil)
         SDL_RenderPresent(renderer)
     }
 }

@@ -10,14 +10,14 @@ public protocol Font {
 /// A font that renders character sprites loaded from a bitmap.
 public class BitmapFont: Font {
 
-    private let texture: Texture!
+    private let bitmap: Bitmap
     public let glyphSize: Vector2i
 
     /// - Parameter fileName: The image file that contains the character sprites.
     /// - Note: Currently only BMP files are supported.
     public init(fileName: String) {
-        self.texture = Texture.get(fileName: fileName)
-        self.glyphSize = self.texture.size / glyphCount
+        self.bitmap = Bitmap.get(fileName: fileName)
+        self.glyphSize = self.bitmap.size / glyphCount
     }
 
     public func renderText(_ text: String, at position: Vector2i,
@@ -28,8 +28,8 @@ public class BitmapFont: Font {
             case .center: position.x -= font.textWidth(text) / 2
             case .right:  position.x -= font.textWidth(text)
         }
-        SDL_SetTextureColorMod(texture.sdlTexture, color.red, color.green, color.blue)
-        SDL_SetTextureAlphaMod(texture.sdlTexture, color.alpha)
+        SDL_SetSurfaceColorMod(bitmap.surface, color.red, color.green, color.blue)
+        SDL_SetSurfaceAlphaMod(bitmap.surface, color.alpha)
 
         for unicodeScalar in text.unicodeScalars {
             let i = Int(unicodeScalar.value - firstChar)
@@ -37,7 +37,7 @@ public class BitmapFont: Font {
             var src = SDL_Rect(x: glyphPos.x, y: glyphPos.y, w: Int32(glyphSize.x), h: Int32(glyphSize.y))
             var dst = SDL_Rect(x: position.x, y: position.y, w: Int32(glyphSize.x), h: Int32(glyphSize.y))
             position.x += src.w
-            SDL_RenderCopy(renderer, texture.sdlTexture, &src, &dst)
+            SDL_LowerBlit(bitmap.surface, &src, targetSurface, &dst)
         }
     }
 

@@ -19,12 +19,11 @@ class Tile: Configurable {
     }
     private var groundSprite: Sprite!
     static let config = Configuration.load(name: "terrain")
-    private static let lightTexture: OpaquePointer = {
-        let surface = SDL_CreateRGBSurface(0, Int32(tileSize), Int32(tileSize), 1, 0, 0, 0, 0)
-        defer { SDL_FreeSurface(surface) }
-        let texture = SDL_CreateTextureFromSurface(renderer, surface)!
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD)
-        return texture
+    private static let lightRectangle: Sprite = {
+        let surface = SDL_CreateRGBSurface(0, Int32(tileSize), Int32(tileSize), 15, 0, 0, 0, 0)!
+        SDL_FillRect(surface, nil, SDL_MapRGB(surface.pointee.format, 255, 255, 255))
+        SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_ADD)
+        return Sprite(fromSDLSurface: surface)
     }()
     private static let fogOfWarSprite = Sprite(fileName: Assets.graphicsPath + "fogOfWar.bmp")
 
@@ -164,7 +163,7 @@ class Tile: Configurable {
 
     private func loadGroundSprite() {
         groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
-                              textureRegion: Tile.spriteRect(id: groundId))
+                              bitmapRegion: Tile.spriteRect(id: groundId))
         groundSprite.position = position * tileSize
     }
 
@@ -178,8 +177,8 @@ class Tile: Configurable {
     }
 
     private func renderLight() {
-        SDL_SetTextureColorMod(Tile.lightTexture, lightColor.red, lightColor.green, lightColor.blue)
-        SDL_RenderCopy(renderer, Tile.lightTexture, nil, &bounds)
+        SDL_SetSurfaceColorMod(Tile.lightRectangle.bitmap.surface, lightColor.red, lightColor.green, lightColor.blue)
+        Tile.lightRectangle.render(at: position * tileSize)
     }
 
     func addItem(_ item: Item) {

@@ -14,9 +14,9 @@ class Item: Object, Configurable, Hashable, Equatable {
     override init(id: String) {
         assert(Item.config.hasTable(id))
         sprite = Sprite(fileName: Assets.graphicsPath + "item.bmp",
-                        textureRegion: Item.spriteRect(id: id))
+                        bitmapRegion: Item.spriteRect(id: id))
         wieldedSprite = Sprite(fileName: Assets.graphicsPath + "item.bmp",
-                               textureRegion: Item.spriteRect(id: id, offset: Vector2(0, 1)))
+                               bitmapRegion: Item.spriteRect(id: id, offset: Vector2(0, 1)))
         super.init(id: id)
         addComponents(config: Item.config)
     }

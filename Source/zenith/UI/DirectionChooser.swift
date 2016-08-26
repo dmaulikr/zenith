@@ -31,7 +31,7 @@ class DirectionChooser: State {
         let rect = Rect(position: gui.worldViewRect.topLeft,
                         size: Vector2(label.text.characters.count * font.glyphSize.x + 2 * spacing,
                                       lineHeight + 2 * spacing))
-        drawRectangle(rect, color: Color.black, filled: true)
+        drawFilledRectangle(rect, color: Color.black)
         label.render()
     }
 

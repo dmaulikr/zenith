@@ -21,7 +21,7 @@ class Creature: Object, Configurable {
         backpack = Array()
         self.messageStream = messageStream
         sprite = Sprite(fileName: Assets.graphicsPath + "creature.bmp",
-                        textureRegion: Creature.spriteRect(id: id))
+                        bitmapRegion: Creature.spriteRect(id: id))
         sprite.position = tileUnder.position * tileSize
         attributes = Creature.initAttributes(id: id)
         super.init(id: id)

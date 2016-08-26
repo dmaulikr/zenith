@@ -40,7 +40,7 @@ class HelpView: State {
     }
 
     func render() {
-        drawRectangle(gui.worldViewRect, color: Color.black, filled: true)
+        drawFilledRectangle(gui.worldViewRect, color: Color.black)
 
         var position = gui.worldViewRect.topLeft + spacingVector
         renderCommands(commands: commands, heading: "Help", position: position)
