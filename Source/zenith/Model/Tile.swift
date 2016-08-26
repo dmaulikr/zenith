@@ -19,12 +19,6 @@ class Tile: Configurable {
     }
     private var groundSprite: Sprite!
     static let config = Configuration.load(name: "terrain")
-    private static let lightRectangle: Sprite = {
-        let surface = SDL_CreateRGBSurface(0, Int32(tileSize), Int32(tileSize), 15, 0, 0, 0, 0)!
-        SDL_FillRect(surface, nil, SDL_MapRGB(surface.pointee.format, 255, 255, 255))
-        SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_ADD)
-        return Sprite(fromSDLSurface: surface)
-    }()
     private static let fogOfWarSprite = Sprite(fileName: Assets.graphicsPath + "fogOfWar.bmp")
 
     init(area: Area, position: Vector2i) {
@@ -171,13 +165,54 @@ class Tile: Configurable {
         for item in items { item.render() }
         structure?.render()
         if !fogOfWar { creature?.render() }
-        if lightColor != Color.black { renderLight() }
+        renderLight()
         if fogOfWar { Tile.fogOfWarSprite.render(at: position * tileSize) }
     }
 
     private func renderLight() {
-        SDL_SetSurfaceColorMod(Tile.lightRectangle.bitmap.surface, lightColor.red, lightColor.green, lightColor.blue)
-        Tile.lightRectangle.render(at: position * tileSize)
+        var tileRect = bounds
+        if let viewport = targetViewport {
+            tileRect.x += viewport.x
+            tileRect.y += viewport.y
+        }
+        var clipRect = SDL_Rect()
+        SDL_GetClipRect(targetSurface, &clipRect)
+        SDL_IntersectRect(&tileRect, &clipRect, &tileRect)
+        if tileRect.w <= 0 || tileRect.h <= 0 { return }
+
+        let lightR = Double(lightColor.red)   / 255
+        let lightG = Double(lightColor.green) / 255
+        let lightB = Double(lightColor.blue)  / 255
+        let pixelsPointer = targetSurface.pointee.pixels.assumingMemoryBound(to: UInt16.self)
+        let targetWidth = targetSurface.pointee.w
+        let xMax = tileRect.x + tileRect.w
+        let yMax = tileRect.y + tileRect.h
+
+        var x = tileRect.x
+        while x < xMax {
+            var y = tileRect.y
+            while y < yMax {
+                let pixel = pixelsPointer.advanced(by: Int(y * targetWidth + x)).pointee
+                var r = Double((pixel & 0b0111_1100_0000_0000) >> 10) / 0b11111
+                var g = Double((pixel & 0b0000_0011_1110_0000) >> 5)  / 0b11111
+                var b = Double((pixel & 0b0000_0000_0001_1111))       / 0b11111
+
+                // Use the Linear Light blend mode.
+                if lightR > 0.5 { r += 2 * lightR - 1 } else { r = r + 2 * lightR - 1 }
+                if lightG > 0.5 { g += 2 * lightG - 1 } else { g = g + 2 * lightG - 1 }
+                if lightB > 0.5 { b += 2 * lightB - 1 } else { b = b + 2 * lightB - 1 }
+
+                // Clamp components to 0...1.
+                if r > 1 { r = 1 } else if r < 0 { r = 0 }
+                if g > 1 { g = 1 } else if g < 0 { g = 0 }
+                if b > 1 { b = 1 } else if b < 0 { b = 0 }
+
+                let newPixel = UInt16(0b11111 * r) << 10 | UInt16(0b11111 * g) << 5 | UInt16(0b11111 * b)
+                pixelsPointer.advanced(by: Int(y * targetWidth + x)).pointee = newPixel
+                y += 1
+            }
+            x += 1
+        }
     }
 
     func addItem(_ item: Item) {
