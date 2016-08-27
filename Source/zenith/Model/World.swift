@@ -3,6 +3,8 @@ import CSDL2
 class World {
 
     private(set) var tick: Int
+    private static let ticksPerDay = 60 * 60 * 24
+    var sunlight = Color(hue: 0, saturation: 0, lightness: 0)
     private var areas: Dictionary<Vector3i, Area>
     var player: Creature!
     private let areaGenerationDistance = 1
@@ -28,6 +30,7 @@ class World {
 
     func update() {
         tick += 1
+        updateSunlight()
         generateAreas()
 
         // FIXME: Should only update creatures within areaUpdateDistance.
@@ -40,7 +43,7 @@ class World {
                     continue
                 }
                 for tile in area.tiles {
-                    tile.lightColor = Color.black
+                    tile.lightColor = area.globalLight
                 }
             }
         }
@@ -58,6 +61,14 @@ class World {
                 player.tileUnder.adjacentTile(vector)?.updateFogOfWar(lineOfSight: vector)
             }
         }
+    }
+
+    private func updateSunlight() {
+        // Calculate the amount of light based on the time of day. This uses a sine wave.
+        let frequency = 1.0 / Double(World.ticksPerDay)
+        let phase = Double.pi / 2 * 3
+        let brightness = (sin(2 * Double.pi * frequency * Double(tick) + phase) + 1) / 2
+        sunlight = Color(hue: 0.125, saturation: 0.1, lightness: brightness * 0.55)
     }
 
     func render(destination: Rect<Int>) {

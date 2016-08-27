@@ -81,6 +81,10 @@ class Area {
         return tiles.randomElement()!
     }
 
+    var globalLight: Color {
+        return position.z >= 0 ? world.sunlight : Color.black
+    }
+
     private func connectStairs() {
         if let areaAbove = areaAbove {
             for tile in areaAbove.tiles {

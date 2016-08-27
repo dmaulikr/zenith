@@ -26,7 +26,7 @@ class Tile: Configurable {
         self.position = position
         bounds = Rect(position: self.position * tileSize, size: tileSizeVector).asSDLRect()
         creature = nil
-        lightColor = Color.black
+        lightColor = area.globalLight
         fogOfWar = false
         items = Array()
         groundId = area.position.z < 0 ? "dirtFloor" : "grass"
@@ -133,8 +133,9 @@ class Tile: Configurable {
 
                     if let tile = adjacentTile(lightVector) {
                         let lightIntensity = 1 - Double(lightVector.lengthSquared) / maxLengthSquared
-                        let actualLight = lightColor.multipliedComponentwise(by: lightIntensity)
-                        tile.lightColor.blend(with: actualLight, blendMode: .additive)
+                        var actualLight = lightColor
+                        actualLight.lightness *= lightIntensity
+                        tile.lightColor.blend(with: actualLight, blendMode: .screen)
                     }
                 }
             }
