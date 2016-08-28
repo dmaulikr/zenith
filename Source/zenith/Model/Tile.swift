@@ -120,13 +120,15 @@ class Tile: Configurable {
             for dx in -distance...distance {
                 for dy in -distance...distance {
                     let lightVector = Vector2(dx, dy)
+                    var wasBlocked = false
 
                     let stopped = raycastIntegerBresenham(from: position, to: position + lightVector) {
                         relativePosition in
-                        guard let tile = self.adjacentTile(relativePosition - self.position) else {
-                            return false
+                        if wasBlocked { return true }
+                        if let tile = self.adjacentTile(relativePosition - self.position) {
+                            wasBlocked = tile.structure?.blocksSight == true
                         }
-                        return tile.structure?.blocksSight == true
+                        return false
                     }
 
                     if stopped { continue }
