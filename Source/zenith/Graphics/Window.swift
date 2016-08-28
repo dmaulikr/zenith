@@ -24,10 +24,10 @@ public class Window {
         SDL_RenderSetScale(renderer, scale.x, scale.y)
         dpiScale = Double(scale.x)
 
-        frameTexture = SDL_CreateTexture(renderer, UInt32(SDL_PIXELFORMAT_RGB555),
+        frameTexture = SDL_CreateTexture(renderer, UInt32(SDL_PIXELFORMAT_RGB888),
                                          Int32(SDL_TEXTUREACCESS_STREAMING.rawValue),
                                          Int32(size.x), Int32(size.y))
-        frameSurface = SDL_CreateRGBSurface(0, Int32(size.x), Int32(size.y), 15, 0, 0, 0, 0)
+        frameSurface = SDL_CreateRGBSurface(0, Int32(size.x), Int32(size.y), 32, 0, 0, 0, 0)
         targetSurface = frameSurface
     }
 
@@ -99,10 +99,10 @@ public class Window {
     }
 
     private func recreateFrameTextureAndSurface() {
-        frameTexture = SDL_CreateTexture(renderer, UInt32(SDL_PIXELFORMAT_RGB555),
+        frameTexture = SDL_CreateTexture(renderer, UInt32(SDL_PIXELFORMAT_RGB888),
                                          Int32(SDL_TEXTUREACCESS_STREAMING.rawValue),
                                          Int32(resolution.x), Int32(resolution.y))
-        frameSurface = SDL_CreateRGBSurface(0, Int32(resolution.x), Int32(resolution.y), 15, 0, 0, 0, 0)
+        frameSurface = SDL_CreateRGBSurface(0, Int32(resolution.x), Int32(resolution.y), 32, 0, 0, 0, 0)
         targetSurface = frameSurface
     }
 }

@@ -188,7 +188,7 @@ class Tile: Configurable {
         let lightR = Double(lightColor.red)   / 255
         let lightG = Double(lightColor.green) / 255
         let lightB = Double(lightColor.blue)  / 255
-        let pixelsPointer = targetSurface.pointee.pixels.assumingMemoryBound(to: UInt16.self)
+        let pixelsPointer = targetSurface.pointee.pixels.assumingMemoryBound(to: UInt32.self)
         let targetWidth = targetSurface.pointee.w
         let xMax = tileRect.x + tileRect.w
         let yMax = tileRect.y + tileRect.h
@@ -198,9 +198,9 @@ class Tile: Configurable {
             var y = tileRect.y
             while y < yMax {
                 let pixel = pixelsPointer.advanced(by: Int(y * targetWidth + x)).pointee
-                var r = Double((pixel & 0b0111_1100_0000_0000) >> 10) / 0b11111
-                var g = Double((pixel & 0b0000_0011_1110_0000) >> 5)  / 0b11111
-                var b = Double((pixel & 0b0000_0000_0001_1111))       / 0b11111
+                var r = Double((pixel & 0xFF0000) >> 16) / 255
+                var g = Double((pixel & 0x00FF00) >> 8)  / 255
+                var b = Double((pixel & 0x0000FF))       / 255
 
                 // Use the Linear Light blend mode.
                 if lightR > 0.5 { r += 2 * lightR - 1 } else { r = r + 2 * lightR - 1 }
@@ -212,7 +212,7 @@ class Tile: Configurable {
                 if g > 1 { g = 1 } else if g < 0 { g = 0 }
                 if b > 1 { b = 1 } else if b < 0 { b = 0 }
 
-                let newPixel = UInt16(0b11111 * r) << 10 | UInt16(0b11111 * g) << 5 | UInt16(0b11111 * b)
+                let newPixel = UInt32(255 * r) << 16 | UInt32(255 * g) << 8 | UInt32(255 * b)
                 pixelsPointer.advanced(by: Int(y * targetWidth + x)).pointee = newPixel
                 y += 1
             }
