@@ -126,10 +126,12 @@ struct Time: CustomStringConvertible {
 
     let hours: Int
     let minutes: Int
+    let seconds: Int
 
     init(ticks: Int) {
         hours = ticks / 3600 % 24
         minutes = ticks % 3600 / 60
+        seconds = ticks % 60
     }
 
     var description: String {
@@ -138,7 +140,7 @@ struct Time: CustomStringConvertible {
 
     // 1 tick == 1 second
     var ticks: Int {
-        return hours * 60 * 60 + minutes * 60
+        return hours * 60 * 60 + minutes * 60 + seconds
     }
 
     static var random: Time {
