@@ -93,10 +93,14 @@ class Creature: Object, Configurable {
         let canMove = destinationTile.structure?.preventsMovement != true
         destinationTile.reactToMovementAttempt(of: self)
         if !canMove { return }
+        move(to: destinationTile)
+        addMoveMessages()
+    }
+
+    private func move(to destinationTile: Tile) {
         tileUnder.creature = nil
         tileUnder = destinationTile
         tileUnder.creature = self
-        addMoveMessages()
     }
 
     func useStairs() -> Bool {
@@ -115,19 +119,15 @@ class Creature: Object, Configurable {
     private func goDownStairs() {
         let destinationTile = tileUnder.tileBelow!
         destinationTile.structure = Structure(id: "stairsUp")
-        tileUnder.creature = nil
-        tileUnder = destinationTile
-        tileUnder.creature = self
         addMessage("You go down the stairs.")
+        move(to: destinationTile)
     }
 
     private func goUpStairs() {
         let destinationTile = tileUnder.tileAbove!
         destinationTile.structure = Structure(id: "stairsDown")
-        tileUnder.creature = nil
-        tileUnder = destinationTile
-        tileUnder.creature = self
         addMessage("You go up the stairs.")
+        move(to: destinationTile)
     }
 
     func addMoveMessages() {
