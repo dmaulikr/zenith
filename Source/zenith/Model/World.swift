@@ -3,7 +3,6 @@ import CSDL2
 class World {
 
     private(set) var tick: Int
-    private static let ticksPerDay = 60 * 60 * 24
     var sunlight = Color(hue: 0, saturation: 0, lightness: 0)
     private var areas: Dictionary<Vector3i, Area>
     var player: Creature!
@@ -65,9 +64,9 @@ class World {
 
     private func updateSunlight() {
         // Calculate the amount of light based on the time of day. This uses a sine wave.
-        let frequency = 1.0 / Double(World.ticksPerDay)
+        let frequency = 1.0 / Double(Time.ticksPerDay)
         let phase = Double.pi / 2 * 3
-        let brightness = (sin(2 * Double.pi * frequency * Double(tick) + phase) + 1) / 2
+        let brightness = (sin(2 * Double.pi * frequency * Double(currentTime.ticks) + phase) + 1) / 2
         sunlight = Color(hue: 0.125, saturation: 0.1, lightness: brightness * 0.55)
     }
 
@@ -99,8 +98,7 @@ class World {
     }
 
     var currentTime: Time {
-        // 1 tick == 1 second
-        return Time(hours: tick / 3600 % 24, minutes: tick % 3600 / 60)
+        return Time(ticks: tick)
     }
 
     func area(at position: Vector3i) -> Area? {
@@ -128,7 +126,19 @@ struct Time: CustomStringConvertible {
     let hours: Int
     let minutes: Int
 
+    init(ticks: Int) {
+        hours = ticks / 3600 % 24
+        minutes = ticks % 3600 / 60
+    }
+
     var description: String {
         return String(format: "%02d:%02d", hours, minutes)
     }
+
+    // 1 tick == 1 second
+    var ticks: Int {
+        return hours * 60 * 60 + minutes * 60
+    }
+
+    static let ticksPerDay = 60 * 60 * 24
 }
