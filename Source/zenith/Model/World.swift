@@ -3,6 +3,7 @@ import CSDL2
 class World {
 
     private(set) var tick: Int
+    private let startTime = Time.random
     var sunlight = Color(hue: 0, saturation: 0, lightness: 0)
     private var areas: Dictionary<Vector3i, Area>
     var player: Creature!
@@ -98,7 +99,7 @@ class World {
     }
 
     var currentTime: Time {
-        return Time(ticks: tick)
+        return Time(ticks: startTime.ticks + tick)
     }
 
     func area(at position: Vector3i) -> Area? {
@@ -138,6 +139,10 @@ struct Time: CustomStringConvertible {
     // 1 tick == 1 second
     var ticks: Int {
         return hours * 60 * 60 + minutes * 60
+    }
+
+    static var random: Time {
+        return Time(ticks: Int.random(0..<Time.ticksPerDay))
     }
 
     static let ticksPerDay = 60 * 60 * 24
