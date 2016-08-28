@@ -129,23 +129,23 @@ struct Time: CustomStringConvertible {
     let seconds: Int
 
     init(ticks: Int) {
-        hours = ticks / 3600 % 24
-        minutes = ticks % 3600 / 60
-        seconds = ticks % 60
+        hours   = ticks * Time.secondsPerTick / 3600 % 24
+        minutes = ticks * Time.secondsPerTick % 3600 / 60
+        seconds = ticks * Time.secondsPerTick % 60
     }
 
     var description: String {
         return String(format: "%02d:%02d", hours, minutes)
     }
 
-    // 1 tick == 1 second
     var ticks: Int {
-        return hours * 60 * 60 + minutes * 60 + seconds
+        return (hours * 60 * 60 + minutes * 60 + seconds) / Time.secondsPerTick
     }
 
     static var random: Time {
         return Time(ticks: Int.random(0..<Time.ticksPerDay))
     }
 
-    static let ticksPerDay = 60 * 60 * 24
+    static let ticksPerDay = 60 * 60 * 24 / Time.secondsPerTick
+    static let secondsPerTick = 2
 }
