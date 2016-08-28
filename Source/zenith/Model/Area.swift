@@ -48,25 +48,11 @@ class Area {
     }
 
     var adjacent4Areas: Array<Area?> {
-        return [
-            adjacentArea(direction: Direction4.north.vector),
-            adjacentArea(direction: Direction4.east.vector),
-            adjacentArea(direction: Direction4.south.vector),
-            adjacentArea(direction: Direction4.west.vector)
-        ]
+        return Direction4.allDirections.map { adjacentArea(direction: $0.vector) }
     }
 
     var adjacent8Areas: Array<Area?> {
-        return [
-            adjacentArea(direction: Direction8.north.vector),
-            adjacentArea(direction: Direction8.northEast.vector),
-            adjacentArea(direction: Direction8.east.vector),
-            adjacentArea(direction: Direction8.southEast.vector),
-            adjacentArea(direction: Direction8.south.vector),
-            adjacentArea(direction: Direction8.southWest.vector),
-            adjacentArea(direction: Direction8.west.vector),
-            adjacentArea(direction: Direction8.northWest.vector)
-        ]
+        return Direction8.allDirections.map { adjacentArea(direction: $0.vector) }
     }
 
     var areaBelow: Area? {

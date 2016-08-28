@@ -74,25 +74,11 @@ class Tile: Configurable {
     }
 
     var adjacent4Tiles: Array<Tile?> {
-        return [
-            adjacentTile(Direction4.north.vector),
-            adjacentTile(Direction4.east.vector),
-            adjacentTile(Direction4.south.vector),
-            adjacentTile(Direction4.west.vector)
-        ]
+        return Direction4.allDirections.map { adjacentTile($0.vector) }
     }
 
     var adjacent8Tiles: Array<Tile?> {
-        return [
-            adjacentTile(Direction8.north.vector),
-            adjacentTile(Direction8.northEast.vector),
-            adjacentTile(Direction8.east.vector),
-            adjacentTile(Direction8.southEast.vector),
-            adjacentTile(Direction8.south.vector),
-            adjacentTile(Direction8.southWest.vector),
-            adjacentTile(Direction8.west.vector),
-            adjacentTile(Direction8.northWest.vector)
-        ]
+        return Direction8.allDirections.map { adjacentTile($0.vector) }
     }
 
     var tileBelow: Tile? { return area.areaBelow?.tile(at: position) }

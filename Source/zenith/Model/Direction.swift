@@ -13,16 +13,10 @@ enum Direction4 {
         }
     }
 
+    static var allDirections: Array<Direction4> = [.north, .east, .south, .west]
+
     static var random: Direction4 {
-        switch Int.random(0..<4) {
-            case 0: return .north
-            case 1: return .east
-            case 2: return .south
-            case 3: return .west
-            default:
-                assertionFailure("unreachable")
-                fatalError()
-        }
+        return allDirections[Int.random(0..<4)]
     }
 }
 
@@ -49,19 +43,9 @@ enum Direction8 {
         }
     }
 
+    static var allDirections: Array<Direction8> = [.north, .northEast, .east, .southEast,
+                                                   .south, .southWest, .west, .northWest]
     static var random: Direction8 {
-        switch Int.random(0..<8) {
-            case 0: return .north
-            case 1: return .northEast
-            case 2: return .east
-            case 3: return .southEast
-            case 4: return .south
-            case 5: return .southWest
-            case 6: return .west
-            case 7: return .northWest
-            default:
-                assertionFailure("unreachable")
-                fatalError()
-        }
+        return allDirections[Int.random(0..<8)]
     }
 }
