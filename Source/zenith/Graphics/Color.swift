@@ -86,6 +86,7 @@ public struct Color {
         case alpha
         case additive
         case multiply
+        case lighten
         case screen
     }
 
@@ -113,6 +114,10 @@ public struct Color {
                 dstR = srcR * dstR
                 dstG = srcG * dstG
                 dstB = srcB * dstB
+            case .lighten:
+                dstR = max(dstR, srcR)
+                dstG = max(dstG, srcG)
+                dstB = max(dstB, srcB)
             case .screen:
                 dstR = 1 - (1 - dstR) * (1 - srcR)
                 dstG = 1 - (1 - dstG) * (1 - srcG)

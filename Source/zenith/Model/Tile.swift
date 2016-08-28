@@ -135,7 +135,7 @@ class Tile: Configurable {
                         let lightIntensity = 1 - Double(lightVector.lengthSquared) / maxLengthSquared
                         var actualLight = lightColor
                         actualLight.lightness *= lightIntensity
-                        tile.lightColor.blend(with: actualLight, blendMode: .screen)
+                        tile.lightColor.blend(with: actualLight, blendMode: .lighten)
                     }
                 }
             }
