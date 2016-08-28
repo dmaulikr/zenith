@@ -1,6 +1,11 @@
 class MessageStream: TextOutputStream {
 
     private var messages = Array<Message>()
+    private unowned let world: World
+
+    init(world: World) {
+        self.world = world
+    }
 
     func render(region: Rect<Int>) {
         var position = region.bottomLeft
@@ -22,10 +27,12 @@ class MessageStream: TextOutputStream {
     }
 
     func write(_ message: String) {
-        if messages.last?.text == message {
+        if messages.last?.tick == world.tick {
+            messages.last!.text += " \(message)"
+        } else if messages.last?.text == message {
             messages.last!.addRepetition()
         } else {
-            messages.append(Message(text: message))
+            messages.append(Message(text: message, tick: world.tick))
         }
     }
 
@@ -39,14 +46,16 @@ class MessageStream: TextOutputStream {
 
 private class Message {
 
-    let text: String
+    var text: String
     private(set) var isNew: Bool
     var repetitionCount: Int
+    let tick: Int
 
-    init(text: String) {
+    init(text: String, tick: Int) {
         self.text = text
         isNew = true
         repetitionCount = 1
+        self.tick = tick
     }
 
     func makeOld() {

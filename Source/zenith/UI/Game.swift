@@ -11,7 +11,7 @@ class Game: State {
     init() {
         gui = GraphicalUserInterface(resolution: app.window.resolution)
         world = World(worldViewSize: gui.worldViewRect.size / tileSize)
-        messageStream = MessageStream()
+        messageStream = MessageStream(world: world)
         world.player = Creature(id: "human",
                                 tile: world.area(at: Vector3(0, 0, 0))!
                                            .tile(at: Area.sizeVector / 2),
