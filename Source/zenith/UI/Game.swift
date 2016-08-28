@@ -169,6 +169,7 @@ class Game: State {
             } else {
                 player.tileUnder.structure = Structure(id: "brickWall")
             }
+            world.update()
         #endif
     }
 
@@ -179,6 +180,7 @@ class Game: State {
             } else {
                 player.tileUnder.structure = Structure(id: "door")
             }
+            world.update()
         #endif
     }
 }
