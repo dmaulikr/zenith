@@ -166,12 +166,12 @@ class Tile: Configurable {
     }
 
     func render() {
+        if fogOfWar { return }
         groundSprite.render()
         for item in items { item.render() }
         structure?.render()
-        if !fogOfWar { creature?.render() }
+        creature?.render()
         renderLight()
-        if fogOfWar { Tile.fogOfWarSprite.render(at: position * tileSize) }
     }
 
     private func renderLight() {
