@@ -94,13 +94,13 @@ class Creature: Object, Configurable {
         destinationTile.reactToMovementAttempt(of: self)
         if !canMove { return }
         move(to: destinationTile)
-        addMoveMessages()
     }
 
     private func move(to destinationTile: Tile) {
         tileUnder.creature = nil
         tileUnder = destinationTile
         tileUnder.creature = self
+        addMoveMessages()
     }
 
     func useStairs() -> Bool {
