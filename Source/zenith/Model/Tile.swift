@@ -112,6 +112,8 @@ class Tile: Configurable {
     }
 
     func calculateLights() {
+        if structure?.blocksSight == true { return }
+
         for item in lightEmitters {
             let lightColor = item.lightColor
             let distance = item.lightRange
