@@ -105,29 +105,31 @@ class Tile: Configurable {
             let distance = item.lightRange
             let maxLengthSquared = Vector2(Double(distance), Double(distance)).lengthSquared
 
-            for dx in -distance...distance {
-                for dy in -distance...distance {
-                    let lightVector = Vector2(dx, dy)
-                    var wasBlocked = false
+            func raycast(lightVector: Vector2i) {
+                var wasBlocked = false
 
-                    let stopped = raycastIntegerBresenham(from: position, to: position + lightVector) {
-                        relativePosition in
-                        if wasBlocked { return true }
-                        if let tile = self.adjacentTile(relativePosition - self.position) {
-                            wasBlocked = tile.structure?.blocksSight == true
-                        }
-                        return false
-                    }
-
-                    if stopped { continue }
-
-                    if let tile = adjacentTile(lightVector) {
-                        let lightIntensity = 1 - Double(lightVector.lengthSquared) / maxLengthSquared
+                _ = raycastIntegerBresenham(from: position, to: position + lightVector) {
+                    relativePosition in
+                    if wasBlocked { return true }
+                    let vector = relativePosition - self.position
+                    if let tile = self.adjacentTile(vector) {
+                        wasBlocked = tile.structure?.blocksSight == true
+                        let lightIntensity = 1 - Double(vector.lengthSquared) / maxLengthSquared
                         var actualLight = lightColor
                         actualLight.lightness *= lightIntensity
                         tile.lightColor.blend(with: actualLight, blendMode: .lighten)
                     }
+                    return false
                 }
+            }
+
+            for dx in -distance...distance {
+                raycast(lightVector: Vector2(dx, -distance))
+                raycast(lightVector: Vector2(dx,  distance))
+            }
+            for dy in -distance...distance {
+                raycast(lightVector: Vector2(-distance, dy))
+                raycast(lightVector: Vector2( distance, dy))
             }
         }
     }
