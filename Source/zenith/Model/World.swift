@@ -28,7 +28,7 @@ class World {
         Creature.allCreatures.removeAll()
     }
 
-    func update() {
+    func update(playerIsResting: Bool = false) {
         tick += 1
         updateSunlight()
         generateAreas()
@@ -55,10 +55,12 @@ class World {
         player.area.areaBelow?.update()
         player.area.areaAbove?.update()
 
-        for dx in -lineOfSightUpdateDistance.x...lineOfSightUpdateDistance.x {
-            for dy in -lineOfSightUpdateDistance.y...lineOfSightUpdateDistance.y {
-                let vector = Vector2(dx, dy)
-                player.tileUnder.adjacentTile(vector)?.updateFogOfWar(lineOfSight: vector)
+        if !playerIsResting {
+            for dx in -lineOfSightUpdateDistance.x...lineOfSightUpdateDistance.x {
+                for dy in -lineOfSightUpdateDistance.y...lineOfSightUpdateDistance.y {
+                    let vector = Vector2(dx, dy)
+                    player.tileUnder.adjacentTile(vector)?.updateFogOfWar(lineOfSight: vector)
+                }
             }
         }
     }

@@ -79,7 +79,7 @@ class Game: State {
         let state = TimeQuestion(gui: gui, title: "Rest how long?") {
             if let timeToRest = $0 {
                 for _ in 0..<timeToRest.ticks {
-                    self.world.update()
+                    self.world.update(playerIsResting: true)
                 }
             }
         }
