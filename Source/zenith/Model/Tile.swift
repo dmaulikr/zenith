@@ -108,9 +108,8 @@ class Tile: Configurable {
             func raycast(lightVector: Vector2i) {
                 var wasBlocked = false
 
-                _ = raycastIntegerBresenham(from: position, to: position + lightVector) {
-                    relativePosition in
-                    if wasBlocked { return true }
+                for relativePosition in raycastIntegerBresenham(from: position, to: position + lightVector) {
+                    if wasBlocked { return }
                     let vector = relativePosition - self.position
                     if let tile = self.adjacentTile(vector) {
                         wasBlocked = tile.structure?.blocksSight == true
@@ -119,7 +118,6 @@ class Tile: Configurable {
                         actualLight.lightness *= lightIntensity
                         tile.lightColor.blend(with: actualLight, blendMode: .lighten)
                     }
-                    return false
                 }
             }
 
@@ -135,15 +133,16 @@ class Tile: Configurable {
     }
 
     func updateFogOfWar(lineOfSight: Vector2i) {
-        fogOfWar = raycastIntegerBresenham(from: position - lineOfSight, to: position) {
-            relativePosition in
-            if relativePosition == self.position { return false }
+        fogOfWar = false
+
+        for relativePosition in raycastIntegerBresenham(from: position - lineOfSight, to: position) {
+            if relativePosition == self.position { continue }
             if let tile = self.adjacentTile(relativePosition - self.position) {
                 if tile.structure?.blocksSight == true {
-                    return true
+                    fogOfWar = true
+                    return
                 }
             }
-            return false
         }
     }
 

@@ -65,8 +65,7 @@ public extension Comparable {
 /// algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm).
 /// Continues until `resultHandler` returns `true` or all points have been visited.
 /// - Returns: `true` if `resultHandler` returned `true`, `false` otherwise.
-public func raycastIntegerBresenham(from startPoint: Vector2i, to endPoint: Vector2i,
-                                    resultHandler: (Vector2i) -> Bool) -> Bool {
+public func raycastIntegerBresenham(from startPoint: Vector2i, to endPoint: Vector2i) -> Array<Vector2i> {
     let delta = endPoint - startPoint
     let absDelta = Vector2(abs(delta.x), abs(delta.y))
     let change1 = Vector2(delta.x.sign, delta.y.sign)
@@ -76,12 +75,11 @@ public func raycastIntegerBresenham(from startPoint: Vector2i, to endPoint: Vect
 
     var numerator = longest / 2
     var current = startPoint
+    var results = Array<Vector2i>()
+    results.reserveCapacity(longest + 1)
 
     for _ in 0...longest {
-        if resultHandler(current) {
-            return true
-        }
-
+        results.append(current)
         numerator += shortest
         if numerator >= longest {
             numerator -= longest
@@ -91,5 +89,5 @@ public func raycastIntegerBresenham(from startPoint: Vector2i, to endPoint: Vect
         }
     }
 
-    return false
+    return results
 }
