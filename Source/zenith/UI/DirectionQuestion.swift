@@ -1,6 +1,6 @@
 import CSDL2
 
-class DirectionChooser: State {
+class DirectionQuestion: State {
 
     private let gui: GraphicalUserInterface
     private let label: Label

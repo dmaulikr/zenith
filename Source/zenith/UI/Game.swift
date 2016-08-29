@@ -139,7 +139,7 @@ class Game: State {
     }
 
     private func performClose() {
-        let state = DirectionChooser(gui: gui, title: "Close what?") {
+        let state = DirectionQuestion(gui: gui, title: "Close what?") {
             if let direction = $0 {
                 self.player.tryToClose(direction: direction)
                 self.world.update()
@@ -149,7 +149,7 @@ class Game: State {
     }
 
     private func performKick() {
-        let state = DirectionChooser(gui: gui, title: "Kick in which direction?") {
+        let state = DirectionQuestion(gui: gui, title: "Kick in which direction?") {
             if let direction = $0 {
                 self.player.kick(direction: direction)
                 self.world.update()

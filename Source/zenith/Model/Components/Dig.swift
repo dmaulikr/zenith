@@ -1,7 +1,7 @@
 class Dig: ItemComponent {
 
     func use(world: World, gui: GraphicalUserInterface, user: Creature) {
-        let state = DirectionChooser(gui: gui, title: "Dig in which direction?") {
+        let state = DirectionQuestion(gui: gui, title: "Dig in which direction?") {
             if let selectedDirection = $0 {
                 self.dig(direction: selectedDirection, digger: user, world: world)
             }
