@@ -7,11 +7,14 @@ struct OptionalItemWrapper: CustomStringConvertible {
     }
 }
 
-class ItemMenu: Question<Item?>, State {
+class ItemMenu: State {
 
     private let items: Array<(Item, Int)>
     private let menu: Menu<OptionalItemWrapper>
     private let allowNothingAsOption: Bool
+    private let gui: GraphicalUserInterface
+    private let title: String
+    private let resultHandler: (Item??) -> Void
 
     init(gui: GraphicalUserInterface, title: String, items: Array<(Item, Int)>,
          allowNothingAsOption: Bool = false, resultHandler: @escaping (Item??) -> Void) {
@@ -24,7 +27,9 @@ class ItemMenu: Question<Item?>, State {
         menu = Menu(items: menuItems)
 
         self.allowNothingAsOption = allowNothingAsOption
-        super.init(gui: gui, title: title, resultHandler: resultHandler)
+        self.gui = gui
+        self.title = title
+        self.resultHandler = resultHandler
     }
 
     func keyWasPressed(key: SDL_Keycode) {
