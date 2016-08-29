@@ -124,9 +124,9 @@ class World {
 
 struct Time: CustomStringConvertible {
 
-    let hours: Int
-    let minutes: Int
-    let seconds: Int
+    var hours: Int
+    var minutes: Int
+    var seconds: Int
 
     init(ticks: Int) {
         hours   = ticks * Time.secondsPerTick / 3600 % 24

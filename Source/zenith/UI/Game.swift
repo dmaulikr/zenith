@@ -35,6 +35,7 @@ class Game: State {
             case SDLK_LEFT:   performMove(.west)
             case SDLK_COMMA:  performPickUp()
             case SDLK_PERIOD: performWait()
+            case SDLK_r:      performRest()
             case SDLK_i:      performShowInventory()
             case SDLK_g:      performGo()
             case SDLK_w:      performWield()
@@ -72,6 +73,17 @@ class Game: State {
 
     private func performWait() {
         world.update()
+    }
+
+    private func performRest() {
+        let state = TimeQuestion(gui: gui, title: "Rest how long?") {
+            if let timeToRest = $0 {
+                for _ in 0..<timeToRest.ticks {
+                    self.world.update()
+                }
+            }
+        }
+        app.pushState(state)
     }
 
     private func performShowInventory() {
