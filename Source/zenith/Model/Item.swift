@@ -10,6 +10,9 @@ class Item: Object, Configurable, Hashable, Equatable {
     static let config = Configuration.load(name: "item")
     var sprite: Sprite
     let wieldedSprite: Sprite
+    var emitsLight: Bool { return lightRange != 0 }
+    let lightColor: Color
+    let lightRange: Int
 
     override init(id: String) {
         assert(Item.config.hasTable(id))
@@ -17,6 +20,15 @@ class Item: Object, Configurable, Hashable, Equatable {
                         bitmapRegion: Item.spriteRect(id: id))
         wieldedSprite = Sprite(fileName: Assets.graphicsPath + "item.bmp",
                                bitmapRegion: Item.spriteRect(id: id, offset: Vector2(0, 1)))
+        if Item.config.hasKey(id, "lightColor") {
+            lightColor = Color(hue: Item.config.double(id, "lightColor", "hue")!,
+                               saturation: Item.config.double(id, "lightColor", "saturation")!,
+                               lightness: Item.config.double(id, "lightColor", "lightness")!)
+            lightRange = Item.config.int(id, "lightRange")!
+        } else {
+            lightColor = Color.black
+            lightRange = 0
+        }
         super.init(id: id)
         addComponents(config: Item.config)
     }
@@ -58,20 +70,6 @@ class Item: Object, Configurable, Hashable, Equatable {
             return Item(id: leftoverID)
         }
         return nil
-    }
-
-    var emitsLight: Bool {
-        return Item.config.hasKey(id, "lightColor")
-    }
-
-    var lightColor: Color {
-        return Color(hue: Item.config.double(id, "lightColor", "hue")!,
-              saturation: Item.config.double(id, "lightColor", "saturation")!,
-               lightness: Item.config.double(id, "lightColor", "lightness")!)
-    }
-
-    var lightRange: Int {
-        return Item.config.int(id, "lightRange")!
     }
 
     func beKicked(by kicker: Creature, direction kickDirection: Direction4) {
