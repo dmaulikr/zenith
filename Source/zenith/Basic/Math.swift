@@ -60,11 +60,9 @@ public extension Comparable {
     }
 }
 
-/// Invokes `resultHandler` with the position of each tile that a line from
+/// - Returns: an array containing the positions of each tile that a line from
 /// `startPoint` to `endPoint` would intersect as determined by [Bresenham's line
 /// algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm).
-/// Continues until `resultHandler` returns `true` or all points have been visited.
-/// - Returns: `true` if `resultHandler` returned `true`, `false` otherwise.
 public func raycastIntegerBresenham(from startPoint: Vector2i, to endPoint: Vector2i) -> Array<Vector2i> {
     let delta = endPoint - startPoint
     let absDelta = Vector2(abs(delta.x), abs(delta.y))
