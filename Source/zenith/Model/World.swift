@@ -70,7 +70,7 @@ class World {
         let frequency = 1.0 / Double(Time.ticksPerDay)
         let phase = Double.pi / 2 * 3
         let brightness = (sin(2 * Double.pi * frequency * Double(currentTime.ticks) + phase) + 1) / 2
-        sunlight = Color(hue: 0.125, saturation: 0.1, lightness: brightness * 0.55)
+        sunlight = Color(hue: 0.125, saturation: 0.1, lightness: 0.2 + brightness * 0.35)
     }
 
     func render(destination: Rect<Int>) {
