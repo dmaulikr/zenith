@@ -21,11 +21,11 @@ class Object: Entity, CustomStringConvertible {
 
     func addComponents(config: Toml) {
         config.array(id, "components")?.forEach {
-            addComponent(getComponent(id: id, name: $0))
+            addComponent(createComponent($0))
         }
     }
 
-    func getComponent(id: String, name: String) -> Component {
+    private func createComponent(_ name: String) -> Component {
         switch name {
             case "wall":
                 return Wall()
