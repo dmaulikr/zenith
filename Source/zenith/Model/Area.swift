@@ -12,16 +12,15 @@ class Area {
     init(world: World, position: Vector3i) {
         self.world = world
         self.position = position
-        populationDensity = nil
-
         tiles = Array()
+        populationDensity = calculatePopulationDensity()
+
         for x in 0..<Area.size {
             for y in 0..<Area.size {
                 tiles.append(Tile(area: self, position: Vector2(x, y)))
             }
         }
 
-        populationDensity = calculatePopulationDensity()
         if position.z == 0 {
             Builder.spawnBuildings(to: self, withDensity: populationDensity)
         }

@@ -241,7 +241,9 @@ class Tile: Configurable {
 
     func spawnStructures() {
         for (id, spawnInfo) in Structure.spawnInfoMap {
-            if spawnInfo.levels.contains(area.position.z.sign) && Double.random(0...1) < spawnInfo.spawnRate {
+            let spawnRateScale = 1.0 - abs(spawnInfo.populationDensityFactor - area.populationDensity)
+            if spawnInfo.levels.contains(area.position.z.sign)
+                && Double.random(0...1) < spawnInfo.spawnRate * spawnRateScale {
                 structure = Structure(id: id)
             }
         }
@@ -249,7 +251,9 @@ class Tile: Configurable {
 
     func spawnItems() {
         for (id, spawnInfo) in Item.spawnInfoMap {
-            if spawnInfo.levels.contains(area.position.z.sign) && Double.random(0...1) < spawnInfo.spawnRate {
+            let spawnRateScale = 1.0 - abs(spawnInfo.populationDensityFactor - area.populationDensity)
+            if spawnInfo.levels.contains(area.position.z.sign)
+                && Double.random(0...1) < spawnInfo.spawnRate * spawnRateScale {
                 addItem(Item(id: id))
             }
         }
@@ -257,7 +261,8 @@ class Tile: Configurable {
 
     func spawnCreatures() {
         for (id, spawnInfo) in Creature.spawnInfoMap {
-            if Double.random(0...1) < spawnInfo.spawnRate {
+            let spawnRateScale = 1.0 - abs(spawnInfo.populationDensityFactor - area.populationDensity)
+            if Double.random(0...1) < spawnInfo.spawnRate * spawnRateScale {
                 _ = Creature(id: id, tile: self)
             }
         }

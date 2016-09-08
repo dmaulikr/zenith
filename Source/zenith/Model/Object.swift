@@ -46,7 +46,11 @@ class Object: Entity, CustomStringConvertible {
 ///
 /// - `spawnRate` defines how often to spawn the object.
 ///   0 means never, 0.5 means on every other tile (on average), 1 means on every tile.
-typealias SpawnInfo = (levels: Array<Int>, spawnRate: Double)
+///
+/// - `populationDensityFactor` defines how the population density of an area affects the
+///   spawn rate of the object.
+///   0 will prefer low-density areas, 1 will prefer high-density areas.
+typealias SpawnInfo = (levels: Array<Int>, spawnRate: Double, populationDensityFactor: Double)
 typealias SpawnInfoMap = Dictionary<String, SpawnInfo>
 
 protocol Spawnable: Configurable {
@@ -62,7 +66,11 @@ extension Spawnable {
             for (id, data) in config.tables() {
                 if let spawnRate = data.double("spawnRate") {
                     let levels = data.array("levels") ?? [-1, 0, 1]
-                    _spawnInfoMap[id] = (levels: levels, spawnRate: spawnRate)
+                    _spawnInfoMap[id] = (
+                        levels: levels,
+                        spawnRate: spawnRate,
+                        populationDensityFactor: data.double("spawnRatePopulationDensityFactor") ?? 0.5
+                    )
                 }
             }
         }
