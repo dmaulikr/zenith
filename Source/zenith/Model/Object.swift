@@ -39,6 +39,13 @@ class Object: Entity, CustomStringConvertible {
     }
 }
 
+/// About the `SpawnInfo` members:
+///
+/// - `levels` defines where to spawn the object.
+///   -1 means underground, 0 means on the ground level, 1 means above the ground level.
+///
+/// - `spawnRate` defines how often to spawn the object.
+///   0 means never, 0.5 means on every other tile (on average), 1 means on every tile.
 typealias SpawnInfo = (levels: Array<Int>, spawnRate: Double)
 typealias SpawnInfoMap = Dictionary<String, SpawnInfo>
 
