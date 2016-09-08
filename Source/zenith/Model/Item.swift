@@ -1,4 +1,4 @@
-class Item: Object, Configurable, Hashable, Equatable {
+class Item: Object, Configurable, Spawnable, Hashable, Equatable {
 
     weak var tileUnder: Tile? {
         didSet {
@@ -37,19 +37,7 @@ class Item: Object, Configurable, Hashable, Equatable {
         sprite.render()
     }
 
-    // TODO: Remove this copy-paste code.
-    private static var _spawnRates = Array<(id: String, levels: Array<Int>, spawnRate: Double)>()
-    static var spawnRates: Array<(id: String, levels: Array<Int>, spawnRate: Double)> {
-        if _spawnRates.isEmpty {
-            // Initialize from config file
-            for (id, data) in Item.config.tables() {
-                if let spawnRate = data.double("spawnRate") {
-                    _spawnRates.append((id: id, levels: data.array("levels")!, spawnRate: spawnRate))
-                }
-            }
-        }
-        return _spawnRates
-    }
+    static var _spawnRates = SpawnRateArray()
 
     var isEdible: Bool {
         return Item.config.bool(id, "isEdible") ?? false

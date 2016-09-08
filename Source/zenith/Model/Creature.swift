@@ -1,4 +1,4 @@
-class Creature: Object, Configurable {
+class Creature: Object, Configurable, Spawnable {
 
     private(set) var tileUnder: Tile {
         didSet {
@@ -218,19 +218,7 @@ class Creature: Object, Configurable {
         // TODO: Deal damage.
     }
 
-    // TODO: Remove this copy-paste code.
-    private static var _spawnRates = Array<(id: String, levels: Array<Int>, spawnRate: Double)>()
-    static var spawnRates: Array<(id: String, levels: Array<Int>, spawnRate: Double)> {
-        if _spawnRates.isEmpty {
-            // Initialize from config file
-            for (id, data) in Creature.config.tables() {
-                if let spawnRate = data.double("spawnRate") {
-                    _spawnRates.append((id: id, levels: [-1, 0, 1], spawnRate: spawnRate))
-                }
-            }
-        }
-        return _spawnRates
-    }
+    static var _spawnRates = SpawnRateArray()
 
     private var isPlayer: Bool {
         return messageStream != nil

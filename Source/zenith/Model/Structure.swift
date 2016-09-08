@@ -1,4 +1,4 @@
-class Structure: Object, Configurable {
+class Structure: Object, Configurable, Spawnable {
 
     var sprite: Sprite
 
@@ -51,18 +51,5 @@ class Structure: Object, Configurable {
         kicker.addMessage("You kick \(name(.definite)).")
     }
 
-    // TODO: Remove this copy-paste code.
-    typealias SpawnRateArray = Array<(id: String, levels: Array<Int>, spawnRate: Double)>
-    private static var _spawnRates = SpawnRateArray()
-    static var spawnRates: SpawnRateArray {
-        if _spawnRates.isEmpty {
-            // Initialize from config file
-            for (id, data) in Structure.config.tables() {
-                if let spawnRate = data.double("spawnRate") {
-                    _spawnRates.append((id: id, levels: data.array("levels")!, spawnRate: spawnRate))
-                }
-            }
-        }
-        return _spawnRates
-    }
+    static var _spawnRates = SpawnRateArray()
 }
