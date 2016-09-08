@@ -51,5 +51,5 @@ class Structure: Object, Configurable, Spawnable {
         kicker.addMessage("You kick \(name(.definite)).")
     }
 
-    static var _spawnRates = SpawnRateArray()
+    static var _spawnInfoMap = SpawnInfoMap()
 }

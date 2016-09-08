@@ -218,7 +218,7 @@ class Creature: Object, Configurable, Spawnable {
         // TODO: Deal damage.
     }
 
-    static var _spawnRates = SpawnRateArray()
+    static var _spawnInfoMap = SpawnInfoMap()
 
     private var isPlayer: Bool {
         return messageStream != nil

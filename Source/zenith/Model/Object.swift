@@ -39,25 +39,26 @@ class Object: Entity, CustomStringConvertible {
     }
 }
 
-typealias SpawnRateArray = Array<(id: String, levels: Array<Int>, spawnRate: Double)>
+typealias SpawnInfo = (levels: Array<Int>, spawnRate: Double)
+typealias SpawnInfoMap = Dictionary<String, SpawnInfo>
 
 protocol Spawnable: Configurable {
 
-    static var _spawnRates: SpawnRateArray { get set }
+    static var _spawnInfoMap: SpawnInfoMap { get set }
 }
 
 extension Spawnable {
 
-    static var spawnRates: SpawnRateArray {
-        if _spawnRates.isEmpty {
+    static var spawnInfoMap: SpawnInfoMap {
+        if _spawnInfoMap.isEmpty {
             // Initialize from config file
             for (id, data) in config.tables() {
                 if let spawnRate = data.double("spawnRate") {
                     let levels = data.array("levels") ?? [-1, 0, 1]
-                    _spawnRates.append((id: id, levels: levels, spawnRate: spawnRate))
+                    _spawnInfoMap[id] = (levels: levels, spawnRate: spawnRate)
                 }
             }
         }
-        return _spawnRates
+        return _spawnInfoMap
     }
 }

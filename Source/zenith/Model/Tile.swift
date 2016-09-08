@@ -240,24 +240,24 @@ class Tile: Configurable {
     }
 
     func spawnStructures() {
-        for (id, levels, spawnRate) in Structure.spawnRates {
-            if levels.contains(area.position.z.sign) && Double.random(0...1) < spawnRate {
+        for (id, spawnInfo) in Structure.spawnInfoMap {
+            if spawnInfo.levels.contains(area.position.z.sign) && Double.random(0...1) < spawnInfo.spawnRate {
                 structure = Structure(id: id)
             }
         }
     }
 
     func spawnItems() {
-        for (id, levels, spawnRate) in Item.spawnRates {
-            if levels.contains(area.position.z.sign) && Double.random(0...1) < spawnRate {
+        for (id, spawnInfo) in Item.spawnInfoMap {
+            if spawnInfo.levels.contains(area.position.z.sign) && Double.random(0...1) < spawnInfo.spawnRate {
                 addItem(Item(id: id))
             }
         }
     }
 
     func spawnCreatures() {
-        for (id, _, spawnRate) in Creature.spawnRates {
-            if Double.random(0...1) < spawnRate {
+        for (id, spawnInfo) in Creature.spawnInfoMap {
+            if Double.random(0...1) < spawnInfo.spawnRate {
                 _ = Creature(id: id, tile: self)
             }
         }

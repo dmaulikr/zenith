@@ -37,7 +37,7 @@ class Item: Object, Configurable, Spawnable, Hashable, Equatable {
         sprite.render()
     }
 
-    static var _spawnRates = SpawnRateArray()
+    static var _spawnInfoMap = SpawnInfoMap()
 
     var isEdible: Bool {
         return Item.config.bool(id, "isEdible") ?? false
