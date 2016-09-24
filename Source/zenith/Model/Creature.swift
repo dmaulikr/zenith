@@ -215,13 +215,42 @@ class Creature: Object, Configurable, Spawnable {
     }
 
     func hit(direction hitDirection: Direction4, style: AttackStyle) {
-        tileUnder.adjacentTile(hitDirection.vector)?.beHit(by: self, direction: hitDirection, style: style)
+        let damage = calculateDamage(style: style)
+        tileUnder.adjacentTile(hitDirection.vector)?.beHit(by: self, direction: hitDirection,
+                                                           style: style, damage: damage)
     }
 
-    func beHit(by attacker: Creature, direction hitDirection: Direction4, style: AttackStyle) {
+    func beHit(by attacker: Creature, direction hitDirection: Direction4,
+               style: AttackStyle, damage: Int) {
         attacker.addMessage("You \(style.verb) \(name(.definite)).")
         addMessage("\(attacker.name(.definite)) \(style.verbThirdPerson) you.")
-        // TODO: Deal damage.
+        dealDamage(damage)
+    }
+
+    private func calculateDamage(style: AttackStyle) -> Int {
+        switch style {
+            case .hit:  return armStrength
+            case .kick: return legStrength
+        }
+    }
+
+    func dealDamage(_ damage: Int) {
+        assert(damage > 0)
+        health -= Int((Double(damage) / Double(endurance)).rounded(.toNearestOrAwayFromZero))
+
+        if health <= 0 {
+            die()
+        }
+    }
+
+    func die() {
+        tileUnder.creature = nil
+        Creature.allCreatures.remove(at: Creature.allCreatures.index(where: { $0 === self })!)
+        Creature.allCreatures.forEach {
+            // TODO: If $0 can see self:
+            $0.addMessage("\(name(.definite, .capitalize)) dies.")
+        }
+        addMessage("You die.")
     }
 
     static var _spawnInfoMap = SpawnInfoMap()

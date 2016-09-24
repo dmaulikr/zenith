@@ -227,9 +227,10 @@ class Tile: Configurable {
         structure?.reactToMovementAttempt(of: mover)
     }
 
-    func beHit(by hitter: Creature, direction hitDirection: Direction4, style: AttackStyle) {
+    func beHit(by hitter: Creature, direction hitDirection: Direction4,
+               style: AttackStyle, damage: Int) {
         if let creatureOnTile = creature {
-            creatureOnTile.beHit(by: hitter, direction: hitDirection, style: style)
+            creatureOnTile.beHit(by: hitter, direction: hitDirection, style: style, damage: damage)
         } else if let structureOnTile = structure {
             structureOnTile.beHit(by: hitter, direction: hitDirection, style: style)
         } else if let topmostItemOnTile = items.last {
