@@ -60,9 +60,9 @@ class Item: Object, Configurable, Spawnable, Hashable, Equatable {
         return nil
     }
 
-    func beKicked(by kicker: Creature, direction kickDirection: Direction4) {
-        kicker.addMessage("You kick \(name(.definite)).")
-        fly(inDirection: kickDirection)
+    func beHit(by hitter: Creature, direction hitDirection: Direction4, style: AttackStyle) {
+        hitter.addMessage("You \(style.verb) \(name(.definite)).")
+        fly(inDirection: hitDirection)
     }
 
     var hashValue: Int { return id.hashValue }

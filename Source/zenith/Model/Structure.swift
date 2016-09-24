@@ -47,8 +47,8 @@ class Structure: Object, Configurable, Spawnable {
         }
     }
 
-    func beKicked(by kicker: Creature, direction kickDirection: Direction4) {
-        kicker.addMessage("You kick \(name(.definite)).")
+    func beHit(by hitter: Creature, direction hitDirection: Direction4, style: AttackStyle) {
+        hitter.addMessage("You \(style.verb) \(name(.definite)).")
     }
 
     static var _spawnInfoMap = SpawnInfoMap()

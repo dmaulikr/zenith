@@ -227,15 +227,15 @@ class Tile: Configurable {
         structure?.reactToMovementAttempt(of: mover)
     }
 
-    func beKicked(by kicker: Creature, direction kickDirection: Direction4) {
+    func beHit(by hitter: Creature, direction hitDirection: Direction4, style: AttackStyle) {
         if let creatureOnTile = creature {
-            creatureOnTile.beKicked(by: kicker, direction: kickDirection)
+            creatureOnTile.beHit(by: hitter, direction: hitDirection, style: style)
         } else if let structureOnTile = structure {
-            structureOnTile.beKicked(by: kicker, direction: kickDirection)
+            structureOnTile.beHit(by: hitter, direction: hitDirection, style: style)
         } else if let topmostItemOnTile = items.last {
-            topmostItemOnTile.beKicked(by: kicker, direction: kickDirection)
+            topmostItemOnTile.beHit(by: hitter, direction: hitDirection, style: style)
         } else {
-            kicker.addMessage("You kick the air.")
+            hitter.addMessage("You \(style.verb) the air.")
         }
     }
 

@@ -47,8 +47,8 @@ class Door: StructureComponent, Closeable {
         closer.addMessage("You close \(structure.name(.definite)).")
     }
 
-    func beKicked(by kicker: Creature) {
-        open(opener: kicker)
-        kicker.addMessage("You kick \(structure.name(.definite)) open.")
+    func beHit(by hitter: Creature, style: AttackStyle) {
+        open(opener: hitter)
+        hitter.addMessage("You \(style.verb) \(structure.name(.definite)) open.")
     }
 }

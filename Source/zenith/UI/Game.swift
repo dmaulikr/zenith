@@ -43,6 +43,7 @@ class Game: State {
             case SDLK_e:      performEat()
             case SDLK_d:      performDrop()
             case SDLK_c:      performClose()
+            case SDLK_a:      performAttack()
             case SDLK_k:      performKick()
             case SDLK_h:      performShowHelp()
             case SDLK_1:      performSpawnWall()
@@ -160,10 +161,20 @@ class Game: State {
         app.pushState(state)
     }
 
+    private func performAttack() {
+        let state = DirectionQuestion(gui: gui, title: "Attack in which direction?") {
+            if let direction = $0 {
+                self.player.hit(direction: direction, style: .hit)
+                self.world.update()
+            }
+        }
+        app.pushState(state)
+    }
+
     private func performKick() {
         let state = DirectionQuestion(gui: gui, title: "Kick in which direction?") {
             if let direction = $0 {
-                self.player.kick(direction: direction)
+                self.player.hit(direction: direction, style: .kick)
                 self.world.update()
             }
         }

@@ -208,13 +208,13 @@ class Creature: Object, Configurable, Spawnable {
         addMessage("You eat \(food.name(.definite)).")
     }
 
-    func kick(direction kickDirection: Direction4) {
-        tileUnder.adjacentTile(kickDirection.vector)?.beKicked(by: self, direction: kickDirection)
+    func hit(direction hitDirection: Direction4, style: AttackStyle) {
+        tileUnder.adjacentTile(hitDirection.vector)?.beHit(by: self, direction: hitDirection, style: style)
     }
 
-    func beKicked(by kicker: Creature, direction kickDirection: Direction4) {
-        kicker.addMessage("You kick \(name(.definite)).")
-        addMessage("\(kicker.name(.definite)) kicks you.")
+    func beHit(by attacker: Creature, direction hitDirection: Direction4, style: AttackStyle) {
+        attacker.addMessage("You \(style.verb) \(name(.definite)).")
+        addMessage("\(attacker.name(.definite)) \(style.verbThirdPerson) you.")
         // TODO: Deal damage.
     }
 
@@ -279,6 +279,25 @@ class Creature: Object, Configurable, Spawnable {
             case .dexterity: return [.rightArmDexterity, .leftArmDexterity]
             case .agility: return [.rightLegAgility, .leftLegAgility]
             default: return []
+        }
+    }
+}
+
+enum AttackStyle {
+    case hit
+    case kick
+
+    var verb: String {
+        switch self {
+            case .hit: return "hit";
+            case .kick: return "kick";
+        }
+    }
+
+    var verbThirdPerson: String {
+        switch self {
+            case .hit: return "hits";
+            case .kick: return "kicks";
         }
     }
 }

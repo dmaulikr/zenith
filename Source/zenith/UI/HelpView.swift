@@ -10,6 +10,7 @@ class HelpView: State {
         self.gui = gui
 
         commands = [
+            (key: "a", info: "attack"),
             (key: "c", info: "close"),
             (key: "d", info: "drop"),
             (key: "e", info: "eat"),
