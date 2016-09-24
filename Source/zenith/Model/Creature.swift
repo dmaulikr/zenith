@@ -9,7 +9,7 @@ class Creature: Object, Configurable, Spawnable {
     private(set) var wieldedItem: Item?
     private let messageStream: MessageStream?
 
-    private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Int!
+    private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Int
     private var attributes: Dictionary<Attribute, Int>
 
     private var sprite: Sprite
@@ -23,6 +23,12 @@ class Creature: Object, Configurable, Spawnable {
         sprite = Sprite(fileName: Assets.graphicsPath + "creature.bmp",
                         bitmapRegion: Creature.spriteRect(id: id))
         sprite.position = tileUnder.position * tileSize
+        health = 0
+        maxHealth = 0
+        energy = 0
+        maxEnergy = 0
+        mana = 0
+        maxMana = 0
         attributes = Creature.initAttributes(id: id)
         super.init(id: id)
         calculateDerivedStats()
