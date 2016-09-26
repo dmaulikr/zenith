@@ -64,7 +64,7 @@ class Area {
     }
 
     var globalLight: Color {
-        return position.z >= 0 ? world.sunlight : Color.black
+        return position.z >= 0 ? world.sunlight : Color(hue: 0.125, saturation: 0, lightness: 0.2)
     }
 
     private func connectStairs() {
