@@ -53,9 +53,8 @@ public class Application {
 
     private func handleEvents() {
         var event = SDL_Event()
-        while SDL_PollEvent(&event) != 0 {
-            handleEvent(event)
-        }
+        SDL_WaitEvent(&event)
+        handleEvent(event)
     }
 
     private func handleEvent(_ event: SDL_Event) {
