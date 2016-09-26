@@ -65,6 +65,10 @@ class Bitmap {
         self.surface = surface
     }
 
+    init(size: Vector2i) {
+        surface = SDL_CreateRGBSurface(0, Int32(size.x), Int32(size.y), 32, 0, 0, 0, 0)
+    }
+
     static func get(fileName: String) -> Bitmap {
         if let cachedBitmap = Bitmap.cache[fileName] {
             return cachedBitmap

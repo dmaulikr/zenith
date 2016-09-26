@@ -1,12 +1,6 @@
 class Item: Object, Configurable, Spawnable, Hashable, Equatable {
 
-    weak var tileUnder: Tile? {
-        didSet {
-            if let tile = tileUnder {
-                sprite.position = tile.position * tileSize
-            }
-        }
-    }
+    weak var tileUnder: Tile?
     static let config = Configuration.load(name: "item")
     var sprite: Sprite
     let wieldedSprite: Sprite

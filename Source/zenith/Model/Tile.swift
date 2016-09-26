@@ -8,32 +8,43 @@ class Tile: Configurable {
     private(set) var items: Array<Item>
     var structure: Structure? {
         didSet {
-            structure?.sprite.position = position * tileSize
+            structure?.tile = self
+            invalidateRenderCache()
         }
     }
     var creature: Creature?
     var lightColor: Color
     private var fogOfWar: Bool
     var groundId: String {
-        didSet { loadGroundSprite() }
+        didSet {
+            groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
+                                  bitmapRegion: Tile.spriteRect(id: groundId))
+        }
     }
     private var groundSprite: Sprite!
+    private var renderCache: Sprite
+    private var renderCacheIsInvalidated: Bool
     static let config = Configuration.load(name: "terrain")
     private static let fogOfWarSprite = Sprite(fileName: Assets.graphicsPath + "fogOfWar.bmp")
 
     init(area: Area, position: Vector2i) {
         self.area = area
         self.position = position
-        bounds = Rect(position: self.position * tileSize, size: tileSizeVector).asSDLRect()
+        bounds = Rect(position: Vector2(0, 0), size: tileSizeVector).asSDLRect()
         creature = nil
         lightColor = area.globalLight
         fogOfWar = false
         items = Array()
         groundId = area.position.z < 0 ? "dirtFloor" : "grass"
-        loadGroundSprite()
+        groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
+                              bitmapRegion: Tile.spriteRect(id: groundId))
+        renderCache = Sprite(image: Bitmap(size: tileSizeVector))
+        renderCache.position = position * tileSize
+        renderCacheIsInvalidated = true
 
         if area.position.z < 0 {
             structure = Structure(id: "ground")
+            structure!.tile = self
             structure!.sprite.position = position * tileSize
         } else {
             spawnStructures()
@@ -109,9 +120,10 @@ class Tile: Configurable {
                 var wasBlocked = false
 
                 for relativePosition in raycastIntegerBresenham(from: position, to: position + lightVector) {
-                    if wasBlocked { return }
                     let vector = relativePosition - self.position
                     if let tile = self.adjacentTile(vector) {
+                        tile.invalidateRenderCache()
+                        if wasBlocked { continue }
                         wasBlocked = tile.structure?.blocksSight == true
                         let lightIntensity = 1 - Double(vector.lengthSquared) / maxLengthSquared
                         var actualLight = lightColor
@@ -132,7 +144,19 @@ class Tile: Configurable {
         }
     }
 
+    func invalidateRenderCachesOfAdjacentTiles(illuminatedBy lightEmitter: Item) {
+        if structure?.blocksSight == true { return }
+        let distance = lightEmitter.lightRange
+
+        for dx in -distance...distance {
+            for dy in -distance...distance {
+                adjacentTile(Vector2(dx, dy))?.invalidateRenderCache()
+            }
+        }
+    }
+
     func updateFogOfWar(lineOfSight: Vector2i) {
+        let oldFogOfWar = fogOfWar
         fogOfWar = false
 
         for relativePosition in raycastIntegerBresenham(from: position - lineOfSight, to: position) {
@@ -140,25 +164,42 @@ class Tile: Configurable {
             if let tile = self.adjacentTile(relativePosition - self.position) {
                 if tile.structure?.blocksSight == true {
                     fogOfWar = true
+                    if !oldFogOfWar { invalidateRenderCache() }
                     return
                 }
             }
         }
-    }
-
-    private func loadGroundSprite() {
-        groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
-                              bitmapRegion: Tile.spriteRect(id: groundId))
-        groundSprite.position = position * tileSize
+        if oldFogOfWar { invalidateRenderCache() }
     }
 
     func render() {
-        if fogOfWar { return }
+        if renderCacheIsInvalidated {
+            let targetSurfaceBackup = targetSurface
+            let targetViewportBackup = targetViewport
+            targetSurface = renderCache.bitmap.surface
+            targetViewport = bounds
+            renderActual()
+            targetSurface = targetSurfaceBackup
+            targetViewport = targetViewportBackup
+            renderCacheIsInvalidated = false
+        }
+        renderCache.render()
+    }
+
+    private func renderActual() {
+        if fogOfWar {
+            SDL_FillRect(targetSurface, &bounds, SDL_MapRGB(targetSurface.pointee.format, 0, 0, 0))
+            return
+        }
         groundSprite.render()
         for item in items { item.render() }
         structure?.render()
         creature?.render()
         renderLight()
+    }
+
+    func invalidateRenderCache() {
+        renderCacheIsInvalidated = true
     }
 
     private func renderLight() {
@@ -208,17 +249,29 @@ class Tile: Configurable {
     }
 
     func addItem(_ item: Item) {
+        invalidateRenderCache()
         items.append(item)
         item.tileUnder = self
     }
 
     func removeTopItem() -> Item? {
-        items.last?.tileUnder = nil
-        return items.popLast()
+        guard let topItem = items.popLast() else {
+            return nil
+        }
+        invalidateRenderCache()
+        if topItem.emitsLight {
+            invalidateRenderCachesOfAdjacentTiles(illuminatedBy: topItem)
+        }
+        topItem.tileUnder = nil
+        return topItem
     }
 
     func removeItem(_ itemToBeRemoved: Item) {
         guard let index = items.index(where: { $0 === itemToBeRemoved }) else { return }
+        invalidateRenderCache()
+        if itemToBeRemoved.emitsLight {
+            invalidateRenderCachesOfAdjacentTiles(illuminatedBy: itemToBeRemoved)
+        }
         items[index].tileUnder = nil
         items.remove(at: index)
     }

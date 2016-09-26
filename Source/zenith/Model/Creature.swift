@@ -1,12 +1,12 @@
 class Creature: Object, Configurable, Spawnable {
 
-    private(set) var tileUnder: Tile {
+    private(set) var tileUnder: Tile
+    var backpack: Array<Item>
+    private(set) var wieldedItem: Item? {
         didSet {
-            sprite.position = tileUnder.position * tileSize
+            tileUnder.invalidateRenderCache()
         }
     }
-    var backpack: Array<Item>
-    private(set) var wieldedItem: Item?
     private let messageStream: MessageStream?
 
     private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Int
@@ -22,7 +22,6 @@ class Creature: Object, Configurable, Spawnable {
         self.messageStream = messageStream
         sprite = Sprite(fileName: Assets.graphicsPath + "creature.bmp",
                         bitmapRegion: Creature.spriteRect(id: id))
-        sprite.position = tileUnder.position * tileSize
         health = 0
         maxHealth = 0
         energy = 0
@@ -103,6 +102,9 @@ class Creature: Object, Configurable, Spawnable {
     }
 
     private func move(to destinationTile: Tile) {
+        tileUnder.invalidateRenderCache()
+        destinationTile.invalidateRenderCache()
+
         tileUnder.creature = nil
         tileUnder = destinationTile
         tileUnder.creature = self

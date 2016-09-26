@@ -1,6 +1,7 @@
 class Structure: Object, Configurable, Spawnable {
 
     var sprite: Sprite
+    weak var tile: Tile!
 
     static let config = Configuration.load(name: "structure")
 

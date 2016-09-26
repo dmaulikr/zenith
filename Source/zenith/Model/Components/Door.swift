@@ -35,6 +35,7 @@ class Door: StructureComponent, Closeable {
     func open(opener: Creature) {
         state = .open
         structure.sprite.bitmapRegion.position += openSpritePositionOffset
+        structure.tile.invalidateRenderCache()
     }
 
     func close(closer: Creature) {
@@ -44,6 +45,7 @@ class Door: StructureComponent, Closeable {
         }
         state = .closed
         structure.sprite.bitmapRegion.position -= openSpritePositionOffset
+        structure.tile.invalidateRenderCache()
         closer.addMessage("You close \(structure.name(.definite)).")
     }
 
