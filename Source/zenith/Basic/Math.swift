@@ -60,11 +60,10 @@ public extension Comparable {
     }
 }
 
-/// - Returns: an array containing the positions of each tile that a line from
-/// `startPoint` to `endPoint` would intersect as determined by [Bresenham's line
+/// - Returns: an array containing the positions of each tile that a line corresponding
+/// to the given direction vector would intersect as determined by [Bresenham's line
 /// algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm).
-public func raycastIntegerBresenham(from startPoint: Vector2i, to endPoint: Vector2i) -> Array<Vector2i> {
-    let delta = endPoint - startPoint
+public func raycastIntegerBresenham(direction delta: Vector2i) -> Array<Vector2i> {
     let absDelta = Vector2(abs(delta.x), abs(delta.y))
     let change1 = Vector2(delta.x.sign, delta.y.sign)
     let change2 = absDelta.x > absDelta.y ? Vector2(delta.x.sign, 0) : Vector2(0, delta.y.sign)
@@ -72,7 +71,7 @@ public func raycastIntegerBresenham(from startPoint: Vector2i, to endPoint: Vect
     let shortest = absDelta.x > absDelta.y ? absDelta.y : absDelta.x
 
     var numerator = longest / 2
-    var current = startPoint
+    var current = Vector2(0, 0)
     var results = Array<Vector2i>()
     results.reserveCapacity(longest + 1)
 

@@ -118,8 +118,7 @@ class Tile: Configurable {
             func raycast(lightVector: Vector2i) {
                 var wasBlocked = false
 
-                for relativePosition in raycastIntegerBresenham(from: position, to: position + lightVector) {
-                    let vector = relativePosition - self.position
+                for vector in raycastIntegerBresenham(direction: lightVector) {
                     if let tile = self.adjacentTile(vector) {
                         tile.invalidateRenderCache()
                         if wasBlocked { continue }
@@ -158,9 +157,10 @@ class Tile: Configurable {
         let oldFogOfWar = fogOfWar
         fogOfWar = false
 
-        for relativePosition in raycastIntegerBresenham(from: position - lineOfSight, to: position) {
-            if relativePosition == self.position { continue }
-            if let tile = self.adjacentTile(relativePosition - self.position) {
+        for relativePosition in raycastIntegerBresenham(direction: lineOfSight) {
+            let vector = relativePosition - lineOfSight
+            if vector == Vector2(0, 0) { continue }
+            if let tile = self.adjacentTile(vector) {
                 if tile.structure?.blocksSight == true {
                     fogOfWar = true
                     if !oldFogOfWar { invalidateRenderCache() }
