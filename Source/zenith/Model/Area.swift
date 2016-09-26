@@ -13,6 +13,7 @@ class Area {
         self.world = world
         self.position = position
         tiles = Array()
+        tiles.reserveCapacity(Area.size * Area.size)
         populationDensity = calculatePopulationDensity()
 
         for x in 0..<Area.size {
