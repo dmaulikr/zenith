@@ -64,6 +64,10 @@ public extension Comparable {
 /// to the given direction vector would intersect as determined by [Bresenham's line
 /// algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm).
 public func raycastIntegerBresenham(direction delta: Vector2i) -> Array<Vector2i> {
+    if let cachedResults = raycastIntegerBresenhamCache[delta] {
+        return cachedResults
+    }
+
     let absDelta = Vector2(abs(delta.x), abs(delta.y))
     let change1 = Vector2(delta.x.sign, delta.y.sign)
     let change2 = absDelta.x > absDelta.y ? Vector2(delta.x.sign, 0) : Vector2(0, delta.y.sign)
@@ -86,5 +90,8 @@ public func raycastIntegerBresenham(direction delta: Vector2i) -> Array<Vector2i
         }
     }
 
+    raycastIntegerBresenhamCache[delta] = results
     return results
 }
+
+private var raycastIntegerBresenhamCache = Dictionary<Vector2i, Array<Vector2i>>()
