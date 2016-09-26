@@ -9,7 +9,6 @@ class World {
     var player: Creature!
     private let areaGenerationDistance = 1
     private let areaUpdateDistance = 1
-    private let areaDrawDistance = 1
     private let lineOfSightUpdateDistance: Vector2i
 
     init(worldViewSize: Vector2i) {
@@ -80,19 +79,17 @@ class World {
         var newClipRect = destination.asSDLRect()
         SDL_SetClipRect(targetSurface, &newClipRect)
 
-        for dx in -areaDrawDistance...areaDrawDistance {
-            for dy in -areaDrawDistance...areaDrawDistance {
-                guard let area = area(at: player.area.position + Vector3(dx, dy, 0)) else { continue }
-                let areaRelativePosition = Vector2(player.area.position - area.position) * Area.size
-                let playerRelativePosition = areaRelativePosition + player.tileUnder.position
-                let playerMiddlePixelPosition = playerRelativePosition * tileSize + tileSizeVector / 2
-                var sdlRect = destination.asSDLRect()
-                sdlRect.x -= playerMiddlePixelPosition.x - destination.size.x / 2
-                sdlRect.y -= playerMiddlePixelPosition.y - destination.size.y / 2
-                sdlRect.w = Int32(Area.size * tileSize)
-                sdlRect.h = Int32(Area.size * tileSize)
-                targetViewport = sdlRect
-                area.render()
+        let tileDrawDistance = destination.size / tileSize / 2
+        var sdlRect = SDL_Rect(x: 0, y: 0, w: Int32(tileSize), h: Int32(tileSize))
+
+        for relativeTileX in -tileDrawDistance.x...tileDrawDistance.x {
+            for relativeTileY in -tileDrawDistance.y...tileDrawDistance.y {
+                if let tileToDraw = player.tileUnder.adjacentTile(Vector2(relativeTileX, relativeTileY)) {
+                    sdlRect.x = Int32(destination.left + (tileDrawDistance.x + relativeTileX) * tileSize)
+                    sdlRect.y = Int32(destination.top  + (tileDrawDistance.y + relativeTileY) * tileSize)
+                    targetViewport = sdlRect
+                    tileToDraw.render()
+                }
             }
         }
 

@@ -39,7 +39,6 @@ class Tile: Configurable {
         groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
                               bitmapRegion: Tile.spriteRect(id: groundId))
         renderCache = Sprite(image: Bitmap(size: tileSizeVector))
-        renderCache.position = position * tileSize
         renderCacheIsInvalidated = true
 
         if area.position.z < 0 {

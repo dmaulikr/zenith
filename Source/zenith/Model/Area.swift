@@ -34,10 +34,6 @@ class Area {
         for tile in tiles { tile.update() }
     }
 
-    func render() {
-        for tile in tiles { tile.render() }
-    }
-
     func tile(at position: Vector2i) -> Tile {
         return tiles[index(position)]
     }
