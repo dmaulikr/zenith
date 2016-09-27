@@ -250,7 +250,7 @@ class Creature: Object, Configurable, Spawnable {
         }
         attacker.addMessage("You \(style.verb) \(name(.definite))\(weaponDescription).")
         addMessage("\(attacker.name(.definite, .capitalize)) \(style.verbThirdPerson) you\(weaponDescription).")
-        dealDamage(damage)
+        takeDamage(damage)
     }
 
     private func calculateDamage(style: AttackStyle) -> Int {
@@ -261,7 +261,7 @@ class Creature: Object, Configurable, Spawnable {
         }
     }
 
-    func dealDamage(_ damage: Int) {
+    func takeDamage(_ damage: Int) {
         assert(damage > 0)
         health -= Int((Double(damage) / Double(endurance)).rounded(.toNearestOrAwayFromZero))
 
