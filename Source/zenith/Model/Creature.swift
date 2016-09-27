@@ -195,7 +195,21 @@ class Creature: Object, Configurable, Spawnable {
     }
 
     override func update() {
-        if !isPlayer {
+        if isPlayer { return }
+
+        // TODO: Move all of the following AI code to a dedicated AI class.
+
+        var didAttack = false
+
+        for direction in Direction4.allDirections {
+            if let enemy = tileUnder.adjacentTile(direction.vector)?.creature, enemy.id != id {
+                hit(direction: direction, style: attackStyle)
+                didAttack = true
+                break
+            }
+        }
+
+        if !didAttack {
             tryToMove(Direction4.random)
         }
     }
@@ -216,6 +230,10 @@ class Creature: Object, Configurable, Spawnable {
         addMessage("You eat \(food.name(.definite)).")
     }
 
+    var attackStyle: AttackStyle {
+        return AttackStyle(rawValue: Creature.config.string(id, "attackStyle")!)!
+    }
+
     func hit(direction hitDirection: Direction4, style: AttackStyle) {
         let damage = calculateDamage(style: style)
         tileUnder.adjacentTile(hitDirection.vector)?.beHit(by: self, direction: hitDirection,
@@ -224,9 +242,14 @@ class Creature: Object, Configurable, Spawnable {
 
     func beHit(by attacker: Creature, direction hitDirection: Direction4,
                style: AttackStyle, damage: Int) {
-        let weaponDescription = " with \(attacker.wieldedItem?.name(.definite) ?? "your fist")"
+        let weaponDescription: String
+        if style == .hit {
+            weaponDescription = " with \(attacker.wieldedItem?.name(.definite) ?? "your fist")"
+        } else {
+            weaponDescription = ""
+        }
         attacker.addMessage("You \(style.verb) \(name(.definite))\(weaponDescription).")
-        addMessage("\(attacker.name(.definite)) \(style.verbThirdPerson) you\(weaponDescription).")
+        addMessage("\(attacker.name(.definite, .capitalize)) \(style.verbThirdPerson) you\(weaponDescription).")
         dealDamage(damage)
     }
 
@@ -234,6 +257,7 @@ class Creature: Object, Configurable, Spawnable {
         switch style {
             case .hit:  return armStrength
             case .kick: return legStrength
+            case .bite: return Creature.config.int(id, "biteStrength")! // TODO: Use tooth material strength?
         }
     }
 
@@ -321,21 +345,20 @@ class Creature: Object, Configurable, Spawnable {
     }
 }
 
-enum AttackStyle {
+enum AttackStyle: String {
     case hit
     case kick
+    case bite
 
     var verb: String {
-        switch self {
-            case .hit: return "hit"
-            case .kick: return "kick"
-        }
+        return rawValue
     }
 
     var verbThirdPerson: String {
         switch self {
             case .hit: return "hits"
             case .kick: return "kicks"
+            case .bite: return "bites"
         }
     }
 }
