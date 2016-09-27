@@ -224,8 +224,9 @@ class Creature: Object, Configurable, Spawnable {
 
     func beHit(by attacker: Creature, direction hitDirection: Direction4,
                style: AttackStyle, damage: Int) {
-        attacker.addMessage("You \(style.verb) \(name(.definite)).")
-        addMessage("\(attacker.name(.definite)) \(style.verbThirdPerson) you.")
+        let weaponDescription = " with \(attacker.wieldedItem?.name(.definite) ?? "your fist")"
+        attacker.addMessage("You \(style.verb) \(name(.definite))\(weaponDescription).")
+        addMessage("\(attacker.name(.definite)) \(style.verbThirdPerson) you\(weaponDescription).")
         dealDamage(damage)
     }
 
