@@ -39,7 +39,7 @@ class MainMenu: State {
                 switch menu.selection! {
                     case .newGame:
                         if game == nil {
-                            game = Game()
+                            game = Game(mainMenu: self)
                         }
                         app.pushState(game!)
                     case .preferences:
@@ -52,5 +52,9 @@ class MainMenu: State {
             default:
                 break
         }
+    }
+
+    func deleteGame() {
+        game = nil
     }
 }

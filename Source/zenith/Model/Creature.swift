@@ -278,6 +278,14 @@ class Creature: Object, Configurable, Spawnable {
             $0.addMessage("\(name(.definite, .capitalize)) dies.")
         }
         addMessage("You die.")
+
+        if isPlayer {
+            addMessage("Press ESC to go to main menu.")
+        }
+    }
+
+    var isDead: Bool {
+        return health <= 0
     }
 
     static var _spawnInfoMap = SpawnInfoMap()

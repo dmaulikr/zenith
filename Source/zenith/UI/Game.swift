@@ -3,12 +3,14 @@ import CSDL2
 class Game: State {
 
     private let world: World
+    private unowned let mainMenu: MainMenu
     private var gui: GraphicalUserInterface
     private let messageStream: MessageStream
     private let sidebar: Sidebar
     private var player: Creature { return world.player }
 
-    init() {
+    init(mainMenu: MainMenu) {
+        self.mainMenu = mainMenu
         gui = GraphicalUserInterface(resolution: app.window.resolution)
         world = World(worldViewSize: gui.worldViewRect.size / tileSize)
         messageStream = MessageStream(world: world)
@@ -25,6 +27,13 @@ class Game: State {
     }
 
     func keyWasPressed(key: SDL_Keycode) {
+        if player.isDead {
+            if Int(key) != SDLK_ESCAPE {
+                return
+            }
+            mainMenu.deleteGame()
+        }
+
         messageStream.makeMessagesOld()
 
         switch Int(key) {
