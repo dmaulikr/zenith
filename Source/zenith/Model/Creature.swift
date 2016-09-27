@@ -327,15 +327,15 @@ enum AttackStyle {
 
     var verb: String {
         switch self {
-            case .hit: return "hit";
-            case .kick: return "kick";
+            case .hit: return "hit"
+            case .kick: return "kick"
         }
     }
 
     var verbThirdPerson: String {
         switch self {
-            case .hit: return "hits";
-            case .kick: return "kicks";
+            case .hit: return "hits"
+            case .kick: return "kicks"
         }
     }
 }
