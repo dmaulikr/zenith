@@ -1,5 +1,10 @@
 import Toml
 
+#if os(Linux)
+    import Glibc
+    srandom(UInt32(time(nil)))
+#endif
+
 struct Assets {
     static let assetsPath = #file.substring(to: #file.range(of: "/", options: .backwards)!.upperBound) + "../../../"
     static let configPath = assetsPath + "Config/"
