@@ -91,7 +91,7 @@ public class Window {
         var pitch: Int32 = 0
 
         SDL_LockTexture(frameTexture, nil, &pixels, &pitch)
-        memcpy(pixels, frameSurface.pointee.pixels, Int(pitch * frameSurface.pointee.h))
+        memcpy(pixels!, frameSurface.pointee.pixels, Int(pitch * frameSurface.pointee.h))
         SDL_UnlockTexture(frameTexture)
 
         SDL_RenderCopy(renderer, frameTexture, nil, nil)
