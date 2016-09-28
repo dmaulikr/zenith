@@ -36,16 +36,18 @@ class World {
         for c in Creature.allCreatures { c.update() }
 
         // TODO: Remove the following duplication.
-        for dx in -areaUpdateDistance...areaUpdateDistance {
-            for dy in -areaUpdateDistance...areaUpdateDistance {
-                guard let area = area(at: player.area.position + Vector3(dx, dy, 0)) else {
-                    continue
-                }
-                for tile in area.tiles {
-                    tile.lightColor = area.globalLight
-                }
-            }
-        }
+//        for dx in -areaUpdateDistance...areaUpdateDistance {
+//            for dy in -areaUpdateDistance...areaUpdateDistance {
+//                guard let area = area(at: player.area.position + Vector3(dx, dy, 0)) else {
+//                    continue
+//                }
+//                for tile in area.tiles {
+//                    if tile.lightEmissionIsInvalidated {
+//                        tile.lightColor = area.globalLight
+//                    }
+//                }
+//            }
+//        }
         for dx in -areaUpdateDistance...areaUpdateDistance {
             for dy in -areaUpdateDistance...areaUpdateDistance {
                 area(at: player.area.position + Vector3(dx, dy, 0))?.update()

@@ -3,9 +3,10 @@ class Area {
     unowned let world: World
     let position: Vector3i
     private(set) var tiles: Array<Tile>
+    var renderCache: Sprite
     var populationDensity: Double!
 
-    static let size = 16
+    static let size = 64
     static let sizeVector = Vector2(size, size)
     static let populationDensityRange = 0.1...0.99
 
@@ -14,6 +15,7 @@ class Area {
         self.position = position
         tiles = Array()
         tiles.reserveCapacity(Area.size * Area.size)
+        renderCache = Sprite(image: Bitmap(size: tileSizeVector * Area.size))
         populationDensity = calculatePopulationDensity()
 
         for x in 0..<Area.size {

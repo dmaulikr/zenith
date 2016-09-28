@@ -22,15 +22,15 @@ class Tile: Configurable {
         }
     }
     private var groundSprite: Sprite!
-    private var renderCache: Sprite
     private var renderCacheIsInvalidated: Bool
+    var lightEmissionIsInvalidated: Bool
     static let config = Configuration.load(name: "terrain")
     private static let fogOfWarSprite = Sprite(fileName: Assets.graphicsPath + "fogOfWar.bmp")
 
     init(area: Area, position: Vector2i) {
         self.area = area
         self.position = position
-        bounds = Rect(position: Vector2(0, 0), size: tileSizeVector).asSDLRect()
+        bounds = Rect(position: position * tileSize, size: tileSizeVector).asSDLRect()
         creature = nil
         lightColor = area.globalLight
         fogOfWar = false
@@ -38,8 +38,8 @@ class Tile: Configurable {
         groundId = area.position.z < 0 ? "dirtFloor" : "grass"
         groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
                               bitmapRegion: Tile.spriteRect(id: groundId))
-        renderCache = Sprite(image: Bitmap(size: tileSizeVector))
         renderCacheIsInvalidated = true
+        lightEmissionIsInvalidated = true
 
         if area.position.z < 0 {
             structure = Structure(id: "ground")
@@ -96,7 +96,10 @@ class Tile: Configurable {
     var tileAbove: Tile? { return area.areaAbove?.tile(at: position) }
 
     func update() {
-        calculateLights()
+        if lightEmissionIsInvalidated {
+            calculateLights()
+            lightEmissionIsInvalidated = false
+        }
     }
 
     private var lightEmitters: Array<Item> {
@@ -148,7 +151,10 @@ class Tile: Configurable {
 
         for dx in -distance...distance {
             for dy in -distance...distance {
-                adjacentTile(Vector2(dx, dy))?.invalidateRenderCache()
+                if let tile = adjacentTile(Vector2(dx, dy)) {
+                    tile.invalidateRenderCache()
+                    tile.lightColor = area.globalLight
+                }
             }
         }
     }
@@ -175,14 +181,17 @@ class Tile: Configurable {
         if renderCacheIsInvalidated {
             let targetSurfaceBackup = targetSurface
             let targetViewportBackup = targetViewport
-            targetSurface = renderCache.bitmap.surface
+            targetSurface = area.renderCache.bitmap.surface
             targetViewport = bounds
             renderActual()
             targetSurface = targetSurfaceBackup
             targetViewport = targetViewportBackup
             renderCacheIsInvalidated = false
         }
-        renderCache.render()
+        let b = area.renderCache.bitmapRegion
+        area.renderCache.bitmapRegion = Rect(position: position * tileSize, size: tileSizeVector)
+        area.renderCache.render()
+        area.renderCache.bitmapRegion = b
     }
 
     private func renderActual() {
@@ -201,15 +210,19 @@ class Tile: Configurable {
         renderCacheIsInvalidated = true
     }
 
+    func invalidateLightEmission() {
+        lightEmissionIsInvalidated = true
+    }
+
     private func renderLight() {
         var tileRect = bounds
-        if let viewport = targetViewport {
-            tileRect.x += viewport.x
-            tileRect.y += viewport.y
-        }
-        var clipRect = SDL_Rect()
-        SDL_GetClipRect(targetSurface, &clipRect)
-        SDL_IntersectRect(&tileRect, &clipRect, &tileRect)
+//        if let viewport = targetViewport {
+//            tileRect.x += viewport.x
+//            tileRect.y += viewport.y
+//        }
+//        var clipRect = SDL_Rect()
+//        SDL_GetClipRect(targetSurface, &clipRect)
+//        SDL_IntersectRect(&tileRect, &clipRect, &tileRect)
         if tileRect.w <= 0 || tileRect.h <= 0 { return }
 
         let lightR = Double(lightColor.red)   / 255
@@ -251,6 +264,9 @@ class Tile: Configurable {
         invalidateRenderCache()
         items.append(item)
         item.tileUnder = self
+        if item.emitsLight {
+            invalidateLightEmission()
+        }
     }
 
     func removeTopItem() -> Item? {
@@ -260,6 +276,7 @@ class Tile: Configurable {
         invalidateRenderCache()
         if topItem.emitsLight {
             invalidateRenderCachesOfAdjacentTiles(illuminatedBy: topItem)
+            invalidateLightEmission()
         }
         topItem.tileUnder = nil
         return topItem
@@ -270,6 +287,7 @@ class Tile: Configurable {
         invalidateRenderCache()
         if itemToBeRemoved.emitsLight {
             invalidateRenderCachesOfAdjacentTiles(illuminatedBy: itemToBeRemoved)
+            invalidateLightEmission()
         }
         items[index].tileUnder = nil
         items.remove(at: index)
