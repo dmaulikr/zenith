@@ -19,7 +19,11 @@ public extension Double {
 
     /// - returns: a uniformly distributed pseudo-random `Double` in the range `0...1`.
     private static var random: Double {
-        return Double(arc4random()) / Double(UInt32.max)
+        #if os(Linux)
+            return Double(Glibc.random()) / Double(RAND_MAX)
+        #else
+            return Double(arc4random()) / Double(UInt32.max)
+        #endif
     }
 
     /// - returns: a uniformly distributed pseudo-random `Double` in the given range.
@@ -33,7 +37,11 @@ public extension Float {
 
     /// - returns: a uniformly distributed pseudo-random `Float` in the range `0...1`.
     private static var random: Float {
-        return Float(arc4random()) / Float(UInt32.max)
+        #if os(Linux)
+            return Float(Glibc.random()) / Float(RAND_MAX)
+        #else
+            return Float(arc4random()) / Float(UInt32.max)
+        #endif
     }
 
     /// - returns: a uniformly distributed pseudo-random `Float` in the given range.
