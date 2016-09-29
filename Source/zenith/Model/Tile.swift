@@ -96,7 +96,7 @@ class Tile: Configurable {
     var tileAbove: Tile? { return area.areaAbove?.tile(at: position) }
 
     func update() {
-        calculateLights()
+        calculateLightEmission()
     }
 
     private var lightEmitters: Array<Item> {
@@ -107,7 +107,7 @@ class Tile: Configurable {
         return lightEmitters
     }
 
-    func calculateLights() {
+    func calculateLightEmission() {
         if structure?.blocksSight == true { return }
 
         for item in lightEmitters {
