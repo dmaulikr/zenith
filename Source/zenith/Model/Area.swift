@@ -2,7 +2,7 @@ class Area {
 
     unowned let world: World
     let position: Vector3i
-    private(set) var tiles: Array<Tile>
+    private(set) var tiles: [Tile]
     var populationDensity: Double!
 
     static let size = 16
@@ -12,7 +12,7 @@ class Area {
     init(world: World, position: Vector3i) {
         self.world = world
         self.position = position
-        tiles = Array()
+        tiles = []
         tiles.reserveCapacity(Area.size * Area.size)
         populationDensity = calculatePopulationDensity()
 
@@ -43,11 +43,11 @@ class Area {
         return world.area(at: position + Vector3(direction))
     }
 
-    var adjacent4Areas: Array<Area?> {
+    var adjacent4Areas: [Area?] {
         return Direction4.allDirections.map { adjacentArea(direction: $0.vector) }
     }
 
-    var adjacent8Areas: Array<Area?> {
+    var adjacent8Areas: [Area?] {
         return Direction8.allDirections.map { adjacentArea(direction: $0.vector) }
     }
 

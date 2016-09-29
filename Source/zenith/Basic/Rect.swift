@@ -71,7 +71,7 @@ public struct Rect<T: Numeric> {
     }
 
     /// An array containing the positions of all four corners.
-    public var corners: Array<Vector2<T>> {
+    public var corners: [Vector2<T>] {
         return [topLeft, topRight, bottomRight, bottomLeft]
     }
 

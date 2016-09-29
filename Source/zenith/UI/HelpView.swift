@@ -3,8 +3,8 @@ import CSDL2
 class HelpView: State {
 
     private let gui: GraphicalUserInterface
-    private let commands: Array<(key: String, info: String)>
-    private let debugCommands: Array<(key: String, info: String)>
+    private let commands: [(key: String, info: String)]
+    private let debugCommands: [(key: String, info: String)]
 
     init(gui: GraphicalUserInterface) {
         self.gui = gui
@@ -52,7 +52,7 @@ class HelpView: State {
         #endif
     }
 
-    private func renderCommands(commands: Array<(key: String, info: String)>,
+    private func renderCommands(commands: [(key: String, info: String)],
                                 heading: String, position: Vector2i) {
         let label = Label(font: font, text: heading)
         label.color = textColorHighlight

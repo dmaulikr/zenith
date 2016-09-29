@@ -3,7 +3,7 @@
 /// for defining behavior dynamically and enabling convenient code reuse.
 class Entity {
 
-    private(set) var components: Array<Component>
+    private(set) var components: [Component]
 
     init() {
         components = []

@@ -50,8 +50,8 @@ class Object: Entity, CustomStringConvertible {
 /// - `populationDensityFactor` defines how the population density of an area affects the
 ///   spawn rate of the object.
 ///   0 will prefer low-density areas, 1 will prefer high-density areas.
-typealias SpawnInfo = (levels: Array<Int>, spawnRate: Double, populationDensityFactor: Double)
-typealias SpawnInfoMap = Dictionary<String, SpawnInfo>
+typealias SpawnInfo = (levels: [Int], spawnRate: Double, populationDensityFactor: Double)
+typealias SpawnInfoMap = [String: SpawnInfo]
 
 protocol Spawnable: Configurable {
 

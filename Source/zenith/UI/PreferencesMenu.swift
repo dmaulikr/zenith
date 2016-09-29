@@ -3,10 +3,10 @@ import Toml
 
 class PreferencesMenu: State {
 
-    private let preferences: Dictionary<MenuItem, () -> String>
-    private let resolutions: Array<Vector2i>
+    private let preferences: [MenuItem: () -> String]
+    private let resolutions: [Vector2i]
     private var currentResolutionIndex: Int
-    private let scales: Array<Double>
+    private let scales: [Double]
     private var currentScaleIndex: Int
     private let menu: Menu<MenuItem>
     private let toml: Toml
@@ -28,7 +28,7 @@ class PreferencesMenu: State {
         ]
         resolutions = [Vector2(512, 384), Vector2(640, 480),
                        Vector2(800, 600), Vector2(1024, 768)]
-        if let resolutionPreference: Array<Int> = toml.array("resolution") {
+        if let resolutionPreference: [Int] = toml.array("resolution") {
             let resolutionPreferenceVector = Vector2(resolutionPreference[0], resolutionPreference[1])
             currentResolutionIndex = resolutions.index(of: resolutionPreferenceVector) ?? 0
         } else {

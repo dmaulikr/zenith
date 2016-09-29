@@ -5,7 +5,7 @@ class Tile: Configurable {
     unowned let area: Area
     let position: Vector2i
     private var bounds: SDL_Rect
-    private(set) var items: Array<Item>
+    private(set) var items: [Item]
     var structure: Structure? {
         didSet {
             structure?.tile = self
@@ -34,7 +34,7 @@ class Tile: Configurable {
         creature = nil
         lightColor = area.globalLight
         fogOfWar = false
-        items = Array()
+        items = []
         groundId = area.position.z < 0 ? "dirtFloor" : "grass"
         groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
                               bitmapRegion: Tile.spriteRect(id: groundId))
@@ -83,11 +83,11 @@ class Tile: Configurable {
         }
     }
 
-    var adjacent4Tiles: Array<Tile?> {
+    var adjacent4Tiles: [Tile?] {
         return Direction4.allDirections.map { adjacentTile($0.vector) }
     }
 
-    var adjacent8Tiles: Array<Tile?> {
+    var adjacent8Tiles: [Tile?] {
         return Direction8.allDirections.map { adjacentTile($0.vector) }
     }
 
@@ -99,7 +99,7 @@ class Tile: Configurable {
         calculateLightEmission()
     }
 
-    private var lightEmitters: Array<Item> {
+    private var lightEmitters: [Item] {
         var lightEmitters = items.filter { $0.emitsLight }
         if let wieldedItem = creature?.wieldedItem, wieldedItem.emitsLight {
             lightEmitters.append(wieldedItem)

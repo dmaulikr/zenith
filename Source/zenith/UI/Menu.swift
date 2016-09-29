@@ -1,8 +1,8 @@
 class Menu<T: CustomStringConvertible> {
 
-    let items: Array<T>
+    let items: [T]
     private var selectionIndex: Int
-    private(set) var labels: Array<Label>
+    private(set) var labels: [Label]
     private let labelColor: Color = textColor
     private let selectionColor: Color = textColorHighlight
 
@@ -10,10 +10,10 @@ class Menu<T: CustomStringConvertible> {
         return items.isEmpty ? nil : items[selectionIndex]
     }
 
-    init(items: Array<T>) {
+    init(items: [T]) {
         self.items = items
         selectionIndex = 0
-        labels = Array()
+        labels = []
 
         for (index, item) in items.enumerated() {
             let label = Label(font: font, text: item.description)
@@ -47,10 +47,10 @@ class Menu<T: CustomStringConvertible> {
 /*
 class SpriteMenu<T: CustomStringConvertible>: Menu<T> {
 
-    private let sprites: Array<Sprite>
+    private let sprites: [Sprite]
 
-    override init(items: Array<T>) {
-        sprites = Array()
+    override init(items: [T]) {
+        sprites = []
         super.init(items: items)
         for (item, label) in zip(items, labels) {
             label.position.x += 16

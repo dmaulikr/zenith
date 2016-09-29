@@ -63,7 +63,7 @@ public extension Comparable {
 /// - Returns: an array containing the positions of each tile that a line corresponding
 /// to the given direction vector would intersect as determined by [Bresenham's line
 /// algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm).
-public func raycastIntegerBresenham(direction delta: Vector2i) -> Array<Vector2i> {
+public func raycastIntegerBresenham(direction delta: Vector2i) -> [Vector2i] {
     if let cachedResults = raycastIntegerBresenhamCache[delta] {
         return cachedResults
     }
@@ -76,7 +76,7 @@ public func raycastIntegerBresenham(direction delta: Vector2i) -> Array<Vector2i
 
     var numerator = longest / 2
     var current = Vector2(0, 0)
-    var results = Array<Vector2i>()
+    var results = [Vector2i]()
     results.reserveCapacity(longest + 1)
 
     for _ in 0...longest {
@@ -94,4 +94,4 @@ public func raycastIntegerBresenham(direction delta: Vector2i) -> Array<Vector2i
     return results
 }
 
-private var raycastIntegerBresenhamCache = Dictionary<Vector2i, Array<Vector2i>>()
+private var raycastIntegerBresenhamCache = [Vector2i: [Vector2i]]()

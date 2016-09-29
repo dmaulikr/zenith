@@ -1,7 +1,7 @@
 class Creature: Object, Configurable, Spawnable {
 
     private(set) var tileUnder: Tile
-    var backpack: Array<Item>
+    var backpack: [Item]
     private(set) var wieldedItem: Item? {
         didSet {
             tileUnder.invalidateRenderCache()
@@ -10,15 +10,15 @@ class Creature: Object, Configurable, Spawnable {
     private let messageStream: MessageStream?
 
     private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Int
-    private var attributes: Dictionary<Attribute, Int>
+    private var attributes: [Attribute: Int]
 
     private var sprite: Sprite
     static let config = Configuration.load(name: "creature")
-    static var allCreatures = Array<Creature>()
+    static var allCreatures = [Creature]()
 
     init(id: String, tile: Tile, messageStream: MessageStream? = nil) {
         self.tileUnder = tile
-        backpack = Array()
+        backpack = []
         self.messageStream = messageStream
         sprite = Sprite(fileName: Assets.graphicsPath + "creature.bmp",
                         bitmapRegion: Creature.spriteRect(id: id))
@@ -163,12 +163,12 @@ class Creature: Object, Configurable, Spawnable {
         tileUnder.adjacentTile(direction.vector)?.structure?.tryToClose(closer: self)
     }
 
-    var inventory: Array<Item> {
+    var inventory: [Item] {
         return backpack
     }
 
-    var equipment: Array<(item: Item, amount: Int)> {
-        var result = Dictionary<Item, Int>()
+    var equipment: [(item: Item, amount: Int)] {
+        var result = [Item: Int]()
         for item in backpack {
             result[item] = (result[item] ?? 0) + 1
         }
@@ -294,10 +294,10 @@ class Creature: Object, Configurable, Spawnable {
         return messageStream != nil
     }
 
-    private static func initAttributes(id: String) -> Dictionary<Attribute, Int> {
-        var attributes = Dictionary<Attribute, Int>()
+    private static func initAttributes(id: String) -> [Attribute: Int] {
+        var attributes = [Attribute: Int]()
         let baseType = config.string(id, "basetype")!
-        let baseTypeAttributes: Array<String> = config.array(baseType, "attributes")!
+        let baseTypeAttributes: [String] = config.array(baseType, "attributes")!
 
         for attribute in baseTypeAttributes {
             let attributeEnum = Attribute(rawValue: attribute)!

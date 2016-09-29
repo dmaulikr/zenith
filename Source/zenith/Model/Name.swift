@@ -24,7 +24,7 @@ struct Name {
         self.nameBase = nameBase
     }
 
-    func name(flags: Array<NameFlag>) -> String {
+    func name(flags: [NameFlag]) -> String {
         var result = ""
 
         if flags.contains(.indefinite) {

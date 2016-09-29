@@ -55,7 +55,7 @@ class Bitmap {
     let surface: UnsafeMutablePointer<SDL_Surface>
 
     /// Bitmaps loaded from image files. Keys are file paths.
-    private static var cache = Dictionary<String, Bitmap>()
+    private static var cache = [String: Bitmap]()
 
     var size: Vector2i {
         return Vector2i(Int(surface.pointee.w), Int(surface.pointee.h))

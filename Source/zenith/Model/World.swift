@@ -5,7 +5,7 @@ class World {
     private(set) var tick: Int
     private let startTime = Time.random
     var sunlight = Color(hue: 0, saturation: 0, lightness: 0)
-    private var areas: Dictionary<Vector3i, Area>
+    private var areas: [Vector3i: Area]
     var player: Creature!
     private let areaGenerationDistance = 1
     private let areaUpdateDistance = 1

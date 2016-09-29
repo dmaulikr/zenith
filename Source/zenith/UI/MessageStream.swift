@@ -1,6 +1,6 @@
 class MessageStream: TextOutputStream {
 
-    private var messages = Array<Message>()
+    private var messages = [Message]()
     private unowned let world: World
 
     init(world: World) {

@@ -3,7 +3,7 @@ import CSDL2
 public class Application {
 
     public let window: Window
-    private var stateStack: Array<State>
+    private var stateStack: [State]
     private var activeState: State? { return stateStack.last }
     private var running: Bool
     private let frameTimer: Timer
@@ -15,7 +15,7 @@ public class Application {
 
     public init(size: Vector2i, title: String = "") {
         window = Window(size: size, title: title)
-        stateStack = Array<State>()
+        stateStack = [State]()
         running = false
         frameTimer = Timer()
     }

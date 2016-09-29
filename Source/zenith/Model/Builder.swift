@@ -41,9 +41,9 @@ class Builder {
     private static func tryToSpawnRoom(northWestCorner: Tile, roomSize: Vector2i)
         -> (allRoomTiles: [Tile], nonCornerTiles: [Tile], wallTiles: [Tile])? {
         let wallType = "brickWall"
-        var allRoomTiles = Array<Tile>()
-        var wallTiles = Array<Tile>()
-        var nonCornerTiles = Array<Tile>()
+        var allRoomTiles = [Tile]()
+        var wallTiles = [Tile]()
+        var nonCornerTiles = [Tile]()
 
         func isCorner(position: Vector2i) -> Bool {
             return (position.x == 0 || position.x == roomSize.x - 1)
