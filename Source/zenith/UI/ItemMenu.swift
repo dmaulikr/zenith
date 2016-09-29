@@ -9,14 +9,14 @@ struct OptionalItemWrapper: CustomStringConvertible {
 
 class ItemMenu: State {
 
-    private let items: Array<(Item, Int)>
+    private let items: Array<(item: Item, amount: Int)>
     private let menu: Menu<OptionalItemWrapper>
     private let allowNothingAsOption: Bool
     private let gui: GraphicalUserInterface
     private let title: String
     private let resultHandler: (Item??) -> Void
 
-    init(gui: GraphicalUserInterface, title: String, items: Array<(Item, Int)>,
+    init(gui: GraphicalUserInterface, title: String, items: Array<(item: Item, amount: Int)>,
          allowNothingAsOption: Bool = false, resultHandler: @escaping (Item??) -> Void) {
         self.items = items
 
