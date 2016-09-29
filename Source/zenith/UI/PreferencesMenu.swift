@@ -37,8 +37,8 @@ class PreferencesMenu: State {
 
         scales = app.window.isHighDPI ? [1, 1.5, 2] : [1, 2]
         let defaultScaleIndex = scales.index(of: 2)!
-        let filev = toml.double("scale")
-        currentScaleIndex = scales.index(of: filev ?? 2) ?? defaultScaleIndex
+        let scalePreference = toml.double("scale")
+        currentScaleIndex = scales.index(of: scalePreference ?? 2) ?? defaultScaleIndex
 
         menu = Menu(items: [.back, .resolution, .scale])
     }
