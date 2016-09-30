@@ -9,7 +9,7 @@ class Creature: Object, Configurable, Spawnable {
     }
     private let messageStream: MessageStream?
 
-    private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Int
+    private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Double
     private var attributes: [Attribute: Int]
 
     private var sprite: Sprite
@@ -263,7 +263,7 @@ class Creature: Object, Configurable, Spawnable {
 
     func takeDamage(_ damage: Int) {
         assert(damage > 0)
-        health -= Int((Double(damage) / Double(endurance)).rounded(.toNearestOrAwayFromZero))
+        health -= Double(damage) / Double(endurance)
 
         if health <= 0 {
             die()
@@ -322,9 +322,9 @@ class Creature: Object, Configurable, Spawnable {
     }
 
     private func calculateDerivedStats() {
-        maxHealth = 2 * endurance + strength / 2
-        maxEnergy = 2 * agility + dexterity / 2
-        maxMana = 2 * psyche + intelligence / 2
+        maxHealth = 2 * Double(endurance) + Double(strength) / 2
+        maxEnergy = 2 * Double(agility) + Double(dexterity) / 2
+        maxMana = 2 * Double(psyche) + Double(intelligence) / 2
         health = maxHealth
         energy = maxEnergy
         mana = maxMana

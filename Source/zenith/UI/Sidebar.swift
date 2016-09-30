@@ -21,9 +21,15 @@ class Sidebar {
             position.y += lineHeight
         }
 
-        drawStat(text: "HP", color: red,   currentValue: player.health, maxValue: player.maxHealth)
-        drawStat(text: "AP", color: green, currentValue: player.energy, maxValue: player.maxEnergy)
-        drawStat(text: "MP", color: blue,  currentValue: player.mana,   maxValue: player.maxMana)
+        drawStat(text: "HP", color: red,
+                 currentValue: Int(player.health.rounded(.up)),
+                 maxValue: Int(player.maxHealth.rounded(.up)))
+        drawStat(text: "AP", color: green,
+                 currentValue: Int(player.energy.rounded(.up)),
+                 maxValue: Int(player.maxEnergy.rounded(.up)))
+        drawStat(text: "MP", color: blue,
+                 currentValue: Int(player.mana.rounded(.up)),
+                 maxValue: Int(player.maxMana.rounded(.up)))
 
         position.y += lineHeight
 
