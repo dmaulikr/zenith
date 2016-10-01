@@ -141,6 +141,11 @@ class Game: State {
 
     private func performEat() {
         let edibleItems = player.equipment.filter { $0.item.isEdible }
+        if edibleItems.isEmpty {
+            player.addMessage("You have nothing to eat.")
+            return
+        }
+
         let state = ItemMenu(gui: gui, title: "Eat what?", items: edibleItems) {
             app.popState()
             if let selectedItem = $0 {
