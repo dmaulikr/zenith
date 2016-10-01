@@ -236,6 +236,9 @@ class Creature: Object, Configurable, Spawnable {
     }
 
     var attackStyle: AttackStyle {
+        if let attackStyleArray: [String] = Creature.config.array(id, "attackStyle") {
+            return AttackStyle(rawValue: attackStyleArray.randomElement()!)!
+        }
         return AttackStyle(rawValue: Creature.config.string(id, "attackStyle")!)!
     }
 
