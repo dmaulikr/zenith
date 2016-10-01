@@ -43,24 +43,3 @@ class Menu<T: CustomStringConvertible> {
         for l in labels { l.render() }
     }
 }
-
-/*
-class SpriteMenu<T: CustomStringConvertible>: Menu<T> {
-
-    private let sprites: [Sprite]
-
-    override init(items: [T]) {
-        sprites = []
-        super.init(items: items)
-        for (item, label) in zip(items, labels) {
-            label.position.x += 16
-            sprites.append(item.sprite)
-        }
-    }
-
-    override func render() {
-        for sprite in sprites { sprite.render() }
-        super.render()
-    }
-}
-*/
