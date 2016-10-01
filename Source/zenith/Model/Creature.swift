@@ -7,6 +7,7 @@ class Creature: Object, Configurable, Spawnable {
             tileUnder.invalidateRenderCache()
         }
     }
+    var currentAction: Action?
     private let messageStream: MessageStream?
 
     private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Double
@@ -250,6 +251,11 @@ class Creature: Object, Configurable, Spawnable {
         }
         attacker.addMessage("You \(style.verb) \(name(.definite))\(weaponDescription).")
         addMessage("\(attacker.name(.definite, .capitalize)) \(style.verbThirdPerson) you\(weaponDescription).")
+
+        if currentAction == .resting {
+            addMessage("The attack wakes you up.")
+            currentAction = nil
+        }
         takeDamage(damage)
     }
 
@@ -351,6 +357,10 @@ class Creature: Object, Configurable, Spawnable {
             default: return []
         }
     }
+}
+
+enum Action {
+    case resting
 }
 
 enum AttackStyle: String {

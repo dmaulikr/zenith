@@ -88,9 +88,14 @@ class Game: State {
     private func performRest() {
         let state = TimeQuestion(gui: gui, title: "Rest how long?") {
             if let timeToRest = $0 {
+                self.player.currentAction = .resting
                 for _ in 0..<timeToRest.ticks {
                     self.world.update(playerIsResting: true)
+                    if self.player.currentAction != .resting {
+                        break
+                    }
                 }
+                self.player.currentAction = nil
             }
         }
         app.pushState(state)
