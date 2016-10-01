@@ -288,8 +288,9 @@ class Creature: Object, Configurable, Spawnable {
         tileUnder.addItem(Item(corpseOf: self))
         Creature.allCreatures.remove(at: Creature.allCreatures.index(where: { $0 === self })!)
         Creature.allCreatures.forEach {
-            // TODO: If $0 can see self:
-            $0.addMessage("\(name(.definite, .capitalize)) dies.")
+            if $0.canSee(self) {
+                $0.addMessage("\(name(.definite, .capitalize)) dies.")
+            }
         }
         addMessage("You die.")
 
@@ -300,6 +301,16 @@ class Creature: Object, Configurable, Spawnable {
 
     var isDead: Bool {
         return health <= 0
+    }
+
+    func canSee(_ other: Creature) -> Bool {
+        let sightDirection = other.tileUnder.position - self.tileUnder.position
+        for vector in raycastIntegerBresenham(direction: sightDirection) {
+            if tileUnder.adjacentTile(vector)!.structure?.blocksSight == true {
+                return false
+            }
+        }
+        return true
     }
 
     static var _spawnInfoMap = SpawnInfoMap()
