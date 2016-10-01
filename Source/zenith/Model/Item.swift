@@ -27,6 +27,16 @@ class Item: Object, Configurable, Spawnable, Hashable, Equatable {
         addComponents(config: Item.config)
     }
 
+    init(corpseOf creature: Creature) {
+        // Assumes corpse sprites are located in the third grid column.
+        let spriteRect = Creature.spriteRect(id: creature.id).moved(by: Vector2(2 * tileSize, 0))
+        sprite = Sprite(fileName: Assets.graphicsPath + "creature.bmp", bitmapRegion: spriteRect)
+        wieldedSprite = sprite
+        lightColor = Color.black
+        lightRange = 0
+        super.init(id: creature.id + "Corpse")
+    }
+
     override func render() {
         sprite.render()
     }
@@ -34,7 +44,7 @@ class Item: Object, Configurable, Spawnable, Hashable, Equatable {
     static var _spawnInfoMap = SpawnInfoMap()
 
     var isEdible: Bool {
-        return Item.config.bool(id, "isEdible") ?? false
+        return Item.config.bool(id, "isEdible") ?? id.hasSuffix("Corpse")
     }
 
     var isUsable: Bool {

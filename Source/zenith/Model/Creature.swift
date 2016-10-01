@@ -285,6 +285,7 @@ class Creature: Object, Configurable, Spawnable {
 
     func die() {
         tileUnder.creature = nil
+        tileUnder.addItem(Item(corpseOf: self))
         Creature.allCreatures.remove(at: Creature.allCreatures.index(where: { $0 === self })!)
         Creature.allCreatures.forEach {
             // TODO: If $0 can see self:
