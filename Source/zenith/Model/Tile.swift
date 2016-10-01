@@ -23,6 +23,7 @@ class Tile: Configurable {
     private var groundSprite: Sprite!
     private var renderCache: Sprite
     private var renderCacheIsInvalidated: Bool
+    private var renderCacheLightColor: Color = Color.black
     static let config = Configuration.load(name: "terrain")
     private static let fogOfWarSprite = Sprite(fileName: Assets.graphicsPath + "fogOfWar.bmp")
     private static var bounds = Rect(position: Vector2(0, 0), size: tileSizeVector).asSDLRect()
@@ -171,7 +172,7 @@ class Tile: Configurable {
     }
 
     func render() {
-        if renderCacheIsInvalidated {
+        if renderCacheIsInvalidated || renderCacheLightColor != lightColor {
             let targetSurfaceBackup = targetSurface
             let targetViewportBackup = targetViewport
             targetSurface = renderCache.bitmap.surface
@@ -179,6 +180,7 @@ class Tile: Configurable {
             renderActual()
             targetSurface = targetSurfaceBackup
             targetViewport = targetViewportBackup
+            renderCacheLightColor = lightColor
             renderCacheIsInvalidated = false
         }
         renderCache.render()
