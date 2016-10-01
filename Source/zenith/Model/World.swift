@@ -3,7 +3,7 @@ import CSDL2
 class World {
 
     private(set) var tick: Int
-    private let startTime = Time.random
+    private let startTime = Time(hours: Int.random(7...17), minutes: Int.random(0...59))
     var sunlight = Color(hue: 0, saturation: 0, lightness: 0)
     private var areas: [Vector3i: Area]
     var player: Creature!
@@ -126,6 +126,12 @@ struct Time: CustomStringConvertible {
     var hours: Int
     var minutes: Int
     var seconds: Int
+
+    init(hours: Int = 0, minutes: Int = 0, seconds: Int = 0) {
+        self.hours = hours
+        self.minutes = minutes
+        self.seconds = seconds
+    }
 
     init(ticks: Int) {
         hours   = ticks * Time.secondsPerTick / 3600 % 24
