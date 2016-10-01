@@ -2,11 +2,11 @@ import CSDL2
 
 class HelpView: State {
 
-    private let gui: GraphicalUserInterface
+    private let gui: GameGUI
     private let commands: [(key: String, info: String)]
     private let debugCommands: [(key: String, info: String)]
 
-    init(gui: GraphicalUserInterface) {
+    init(gui: GameGUI) {
         self.gui = gui
 
         commands = [

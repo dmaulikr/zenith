@@ -4,14 +4,14 @@ class Game: State {
 
     private let world: World
     private unowned let mainMenu: MainMenu
-    private var gui: GraphicalUserInterface
+    private var gui: GameGUI
     private let messageStream: MessageStream
     private let sidebar: Sidebar
     private var player: Creature { return world.player }
 
     init(mainMenu: MainMenu) {
         self.mainMenu = mainMenu
-        gui = GraphicalUserInterface(resolution: app.window.resolution)
+        gui = GameGUI(resolution: app.window.resolution)
         world = World(worldViewSize: gui.worldViewRect.size / tileSize)
         messageStream = MessageStream(world: world)
         world.player = Creature(id: "human",
@@ -23,7 +23,7 @@ class Game: State {
     }
 
     func enter() {
-        gui = GraphicalUserInterface(resolution: app.window.resolution)
+        gui = GameGUI(resolution: app.window.resolution)
     }
 
     func keyWasPressed(key: SDL_Keycode) {

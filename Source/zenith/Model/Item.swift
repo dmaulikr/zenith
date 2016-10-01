@@ -41,7 +41,7 @@ class Item: Object, Configurable, Spawnable, Hashable, Equatable {
         return Item.config.bool(id, "isUsable") ?? false
     }
 
-    func use(world: World, gui: GraphicalUserInterface, user: Creature) {
+    func use(world: World, gui: GameGUI, user: Creature) {
         for component in components {
             (component as! ItemComponent).use(world: world, gui: gui, user: user)
         }

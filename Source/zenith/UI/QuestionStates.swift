@@ -2,12 +2,12 @@ import CSDL2
 
 class DirectionQuestion: State {
 
-    private let gui: GraphicalUserInterface
+    private let gui: GameGUI
     private let label: Label
     private let resultHandler: (Direction4?) -> Void
     private var result: Direction4?
 
-    init(gui: GraphicalUserInterface, title: String, resultHandler: @escaping (Direction4?) -> Void) {
+    init(gui: GameGUI, title: String, resultHandler: @escaping (Direction4?) -> Void) {
         self.gui = gui
         label = Label(font: font, text: title)
         label.position = gui.worldViewRect.topLeft + spacingVector
@@ -40,7 +40,7 @@ class DirectionQuestion: State {
 
 class TimeQuestion: State {
 
-    private let gui: GraphicalUserInterface
+    private let gui: GameGUI
     private let questionLabel: Label
     private let timeInputLabel: Label
     private let resultHandler: (Time?) -> Void
@@ -51,7 +51,7 @@ class TimeQuestion: State {
     }
     private static var initialValue = Time(ticks: 0)
 
-    init(gui: GraphicalUserInterface, title: String, resultHandler: @escaping (Time?) -> Void) {
+    init(gui: GameGUI, title: String, resultHandler: @escaping (Time?) -> Void) {
         self.gui = gui
         questionLabel = Label(font: font, text: title)
         questionLabel.position = gui.worldViewRect.topLeft + spacingVector

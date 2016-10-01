@@ -14,7 +14,7 @@ let lineHeight = 10
 let spacing = 10
 let spacingVector = Vector2(spacing, spacing)
 
-class GraphicalUserInterface {
+class GameGUI {
 
     let sidebarRect: Rect<Int>
     let zoomViewRect: Rect<Int>

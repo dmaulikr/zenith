@@ -12,11 +12,11 @@ class ItemMenu: State {
     private let items: [(item: Item, amount: Int)]
     private let menu: Menu<OptionalItemWrapper>
     private let allowNothingAsOption: Bool
-    private let gui: GraphicalUserInterface
+    private let gui: GameGUI
     private let title: String
     private let resultHandler: (Item??) -> Void
 
-    init(gui: GraphicalUserInterface, title: String, items: [(item: Item, amount: Int)],
+    init(gui: GameGUI, title: String, items: [(item: Item, amount: Int)],
          allowNothingAsOption: Bool = false, resultHandler: @escaping (Item??) -> Void) {
         self.items = items
 

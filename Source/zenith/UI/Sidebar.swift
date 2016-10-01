@@ -1,10 +1,10 @@
 class Sidebar {
 
-    private let gui: GraphicalUserInterface
+    private let gui: GameGUI
     private let player: Creature
     private unowned let world: World
 
-    init(gui: GraphicalUserInterface, world: World) {
+    init(gui: GameGUI, world: World) {
         self.gui = gui
         self.player = world.player
         self.world = world

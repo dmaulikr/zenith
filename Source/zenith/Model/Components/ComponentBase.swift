@@ -8,5 +8,5 @@ protocol StructureComponent: Component {
 
 protocol ItemComponent: Component {
 
-    func use(world: World, gui: GraphicalUserInterface, user: Creature)
+    func use(world: World, gui: GameGUI, user: Creature)
 }
