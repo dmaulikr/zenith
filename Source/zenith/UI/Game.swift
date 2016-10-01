@@ -171,6 +171,11 @@ class Game: State {
     }
 
     private func performClose() {
+        if !player.canOpenAndClose {
+            player.addMessage("You cannot close anything.")
+            return
+        }
+
         let state = DirectionQuestion(gui: gui, title: "Close what?") {
             if let direction = $0 {
                 self.player.tryToClose(direction: direction)

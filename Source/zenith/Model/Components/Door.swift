@@ -23,8 +23,12 @@ class Door: StructureComponent, Closeable {
 
     func reactToMovementAttempt(of mover: Creature) {
         if state == .closed {
-            open(opener: mover)
-            mover.addMessage("You open \(structure.name(.definite)).")
+            if mover.canOpenAndClose {
+                open(opener: mover)
+                mover.addMessage("You open \(structure.name(.definite)).")
+            } else {
+                mover.addMessage("You cannot open doors.")
+            }
         }
     }
 

@@ -160,6 +160,10 @@ class Creature: Object, Configurable, Spawnable {
         addMessage("You pick up \(item.name(.definite)).")
     }
 
+    var canOpenAndClose: Bool {
+        return Creature.config.bool(id, "canOpenAndClose") ?? true
+    }
+
     func tryToClose(direction: Direction4) {
         tileUnder.adjacentTile(direction.vector)?.structure?.tryToClose(closer: self)
     }
