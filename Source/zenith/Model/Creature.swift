@@ -208,7 +208,8 @@ class Creature: Object, Configurable, Spawnable {
 
         for direction in Direction4.allDirections {
             if let enemy = tileUnder.adjacentTile(direction.vector)?.creature, enemy.id != id {
-                hit(direction: direction, style: attackStyle)
+                let style = wieldedItem != nil ? .hit : attackStyles.randomElement()!
+                hit(direction: direction, style: style)
                 didAttack = true
                 break
             }
@@ -235,11 +236,8 @@ class Creature: Object, Configurable, Spawnable {
         addMessage("You eat \(food.name(.definite)).")
     }
 
-    var attackStyle: AttackStyle {
-        if let attackStyleArray: [String] = Creature.config.array(id, "attackStyle") {
-            return AttackStyle(rawValue: attackStyleArray.randomElement()!)!
-        }
-        return AttackStyle(rawValue: Creature.config.string(id, "attackStyle")!)!
+    var attackStyles: [AttackStyle] {
+        return Creature.config.array(id, "attackStyles")!.map { AttackStyle(rawValue: $0)! }
     }
 
     func hit(direction hitDirection: Direction4, style: AttackStyle) {

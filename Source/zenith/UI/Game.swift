@@ -188,7 +188,7 @@ class Game: State {
     private func performAttack() {
         let state = DirectionQuestion(gui: gui, title: "Attack in which direction?") {
             if let direction = $0 {
-                self.player.hit(direction: direction, style: .hit)
+                self.player.hit(direction: direction, style: self.player.attackStyles[0])
                 self.world.update()
             }
         }
