@@ -4,7 +4,6 @@ class Tile: Configurable {
 
     unowned let area: Area
     let position: Vector2i
-    private var bounds: SDL_Rect
     private(set) var items: [Item]
     var structure: Structure? {
         didSet {
@@ -26,11 +25,11 @@ class Tile: Configurable {
     private var renderCacheIsInvalidated: Bool
     static let config = Configuration.load(name: "terrain")
     private static let fogOfWarSprite = Sprite(fileName: Assets.graphicsPath + "fogOfWar.bmp")
+    private static var bounds = Rect(position: Vector2(0, 0), size: tileSizeVector).asSDLRect()
 
     init(area: Area, position: Vector2i) {
         self.area = area
         self.position = position
-        bounds = Rect(position: Vector2(0, 0), size: tileSizeVector).asSDLRect()
         creature = nil
         lightColor = area.globalLight
         fogOfWar = false
@@ -176,7 +175,7 @@ class Tile: Configurable {
             let targetSurfaceBackup = targetSurface
             let targetViewportBackup = targetViewport
             targetSurface = renderCache.bitmap.surface
-            targetViewport = bounds
+            targetViewport = Tile.bounds
             renderActual()
             targetSurface = targetSurfaceBackup
             targetViewport = targetViewportBackup
@@ -187,7 +186,7 @@ class Tile: Configurable {
 
     private func renderActual() {
         if fogOfWar {
-            SDL_FillRect(targetSurface, &bounds, SDL_MapRGB(targetSurface.pointee.format, 0, 0, 0))
+            SDL_FillRect(targetSurface, &Tile.bounds, SDL_MapRGB(targetSurface.pointee.format, 0, 0, 0))
             return
         }
         groundSprite.render()
@@ -202,7 +201,7 @@ class Tile: Configurable {
     }
 
     private func renderLight() {
-        var tileRect = bounds
+        var tileRect = Tile.bounds
         if let viewport = targetViewport {
             tileRect.x += viewport.x
             tileRect.y += viewport.y
