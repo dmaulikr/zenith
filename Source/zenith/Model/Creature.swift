@@ -251,8 +251,8 @@ class Creature: Object, Configurable, Spawnable {
     func beHit(by attacker: Creature, direction hitDirection: Direction4,
                style: AttackStyle, damage: Int) {
         let weaponDescription: String
-        if style == .hit {
-            weaponDescription = " with \(attacker.wieldedItem?.name(.definite) ?? "your fist")"
+        if style == .hit, let weapon = attacker.wieldedItem?.name(.definite) {
+            weaponDescription = " with \(weapon)"
         } else {
             weaponDescription = ""
         }
