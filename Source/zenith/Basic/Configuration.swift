@@ -27,7 +27,7 @@ extension Configurable {
         spritePosition *= tileSize
 
         let spriteRectData = (Rect(position: spritePosition, size: tileSizeVector),
-                              spriteMultiplicity ?? 0)
+                              spriteMultiplicity ?? 1)
         spriteRectCache[id] = spriteRectData
         return createSpriteRect(from: spriteRectData).moved(by: offset * tileSize)
     }
