@@ -3,7 +3,10 @@ import Foundation
 public extension Int {
 
     /// - returns: a uniformly distributed pseudo-random `Int` in the given range.
-    public static func random(_ range: Range<Int>) -> Int {
+    public static func random(_ range: Range<Int>) -> Int? {
+        if range.isEmpty {
+            return nil
+        }
         let distance = range.upperBound - range.lowerBound
         return range.lowerBound + Int(Double.random(0...1) * Double(distance))
     }
@@ -54,7 +57,9 @@ public extension Float {
 public extension Array {
     /// A randomly selected element from the array, or nil if the array is empty.
     public func randomElement() -> Element? {
-        if isEmpty { return nil }
-        return self[Int.random(0..<count)]
+        if let index = Int.random(0..<count) {
+            return self[index]
+        }
+        return nil
     }
 }

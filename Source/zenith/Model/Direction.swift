@@ -16,7 +16,7 @@ enum Direction4 {
     static var allDirections: [Direction4] = [.north, .east, .south, .west]
 
     static var random: Direction4 {
-        return allDirections[Int.random(0..<4)]
+        return allDirections[Int.random(0..<4)!]
     }
 }
 
@@ -46,6 +46,6 @@ enum Direction8 {
     static var allDirections: [Direction8] = [.north, .northEast, .east, .southEast,
                                                    .south, .southWest, .west, .northWest]
     static var random: Direction8 {
-        return allDirections[Int.random(0..<8)]
+        return allDirections[Int.random(0..<8)!]
     }
 }

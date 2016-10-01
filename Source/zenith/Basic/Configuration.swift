@@ -33,6 +33,6 @@ extension Configurable {
     }
 
     private static func createSpriteRect(from data: (Rect<Int>, Int)) -> Rect<Int> {
-        return data.0.moved(by: Vector2(Int.random(0..<data.1) * tileSize, 0))
+        return data.0.moved(by: Vector2(Int.random(0..<data.1)! * tileSize, 0))
     }
 }

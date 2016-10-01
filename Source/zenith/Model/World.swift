@@ -142,7 +142,7 @@ struct Time: CustomStringConvertible {
     }
 
     static var random: Time {
-        return Time(ticks: Int.random(0..<Time.ticksPerDay))
+        return Time(ticks: Int.random(0..<Time.ticksPerDay)!)
     }
 
     static let ticksPerDay = 60 * 60 * 24 / Time.secondsPerTick

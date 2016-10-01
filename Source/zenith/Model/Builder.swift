@@ -4,7 +4,7 @@ class Builder {
 
     static func spawnBuildings(to area: Area, withDensity density: Double) {
         while Double.random(0...1) < density {
-            let position = Vector2(Int.random(0..<Area.size), Int.random(0..<Area.size))
+            let position = Vector2(Int.random(0..<Area.size)!, Int.random(0..<Area.size)!)
             spawnBuilding(northWestCorner: area.tile(at: position))
         }
     }
