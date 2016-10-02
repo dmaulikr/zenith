@@ -28,7 +28,6 @@ class World {
     }
 
     func update(playerIsResting: Bool = false) {
-        tick += 1
         updateSunlight()
         generateAreas()
 
@@ -62,6 +61,8 @@ class World {
                 }
             }
         }
+
+        tick += 1
     }
 
     private func updateSunlight() {
