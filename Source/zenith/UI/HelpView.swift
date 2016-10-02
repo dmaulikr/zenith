@@ -18,6 +18,7 @@ class HelpView: State {
             (key: "h", info: "help"),
             (key: "i", info: "inventory"),
             (key: "k", info: "kick"),
+            (key: "r", info: "rest"),
             (key: "u", info: "use"),
             (key: ",", info: "pick up"),
             (key: ".", info: "wait"),
