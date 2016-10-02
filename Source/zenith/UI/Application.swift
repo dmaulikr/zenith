@@ -35,7 +35,6 @@ public class Application {
         running = true
 
         while running {
-            activeState?.update()
             deltaTime = Float(frameTimer.elapsedTime) / 1000
             frameTimer.restart()
             if activeState?.shouldRenderStateBelow ?? false {
@@ -45,6 +44,7 @@ public class Application {
             window.display()
             window.clear()
             SDL_Delay(2)
+            activeState?.update()
             handleEvents()
         }
     }
@@ -61,10 +61,24 @@ public class Application {
         running = false
     }
 
+    public func waitForKeyPress() -> SDL_Keycode {
+        var event = SDL_Event()
+        while true {
+            SDL_WaitEvent(&event)
+            switch SDL_EventType(event.type) {
+                case SDL_KEYDOWN:
+                    return event.key.keysym.sym
+                default:
+                    handleSystemEvent(event)
+            }
+        }
+    }
+
     private func handleEvents() {
         var event = SDL_Event()
-        SDL_WaitEvent(&event)
-        handleEvent(event)
+        while SDL_PollEvent(&event) != 0 {
+            handleEvent(event)
+        }
     }
 
     private func handleEvent(_ event: SDL_Event) {
@@ -73,12 +87,8 @@ public class Application {
                 handleKeyPressEvent(event)
             case SDL_KEYUP:
                 handleKeyReleaseEvent(event)
-            case SDL_WINDOWEVENT:
-                handleWindowEvent(event)
-            case SDL_QUIT:
-                running = false
             default:
-                break
+                handleSystemEvent(event)
         }
     }
 
@@ -88,6 +98,17 @@ public class Application {
 
     private func handleKeyReleaseEvent(_ event: SDL_Event) {
         activeState?.keyWasReleased(key: event.key.keysym.sym)
+    }
+
+    private func handleSystemEvent(_ event: SDL_Event) {
+        switch SDL_EventType(event.type) {
+            case SDL_WINDOWEVENT:
+                handleWindowEvent(event)
+            case SDL_QUIT:
+                running = false
+            default:
+                break
+        }
     }
 
     private func handleWindowEvent(_ event: SDL_Event) {

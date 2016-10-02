@@ -21,18 +21,44 @@ class World {
                 generateArea(position: Vector3(x, y, 0))
             }
         }
+
+        updateSunlight()
+
+        // TODO: Remove the following duplication.
+        for dx in -areaUpdateDistance...areaUpdateDistance {
+            for dy in -areaUpdateDistance...areaUpdateDistance {
+                guard let area = area(at: Vector3(dx, dy, 0)) else {
+                    continue
+                }
+                for tile in area.tiles {
+                    tile.lightColor = area.globalLight
+                }
+            }
+        }
+        for dx in -areaUpdateDistance...areaUpdateDistance {
+            for dy in -areaUpdateDistance...areaUpdateDistance {
+                area(at: Vector3(dx, dy, 0))?.update()
+            }
+        }
     }
 
     deinit {
         Creature.allCreatures.removeAll()
     }
 
-    func update(playerIsResting: Bool = false) {
+    var creatureUpdateStartIndex: Int = 0
+
+    func update(playerIsResting: Bool = false) throws {
         updateSunlight()
         generateAreas()
 
         // FIXME: Should only update creatures within areaUpdateDistance.
-        for c in Creature.allCreatures { c.update() }
+        let range = Creature.allCreatures[creatureUpdateStartIndex..<Creature.allCreatures.endIndex]
+        for creature in range {
+            try creature.update()
+            creatureUpdateStartIndex += 1
+        }
+        creatureUpdateStartIndex = 0
 
         // TODO: Remove the following duplication.
         for dx in -areaUpdateDistance...areaUpdateDistance {
@@ -53,16 +79,20 @@ class World {
         player.area.areaBelow?.update()
         player.area.areaAbove?.update()
 
-        if !playerIsResting {
-            for dx in -lineOfSightUpdateDistance.x...lineOfSightUpdateDistance.x {
-                for dy in -lineOfSightUpdateDistance.y...lineOfSightUpdateDistance.y {
-                    let vector = Vector2(dx, dy)
-                    player.tileUnder.adjacentTile(vector)?.updateFogOfWar(lineOfSight: vector)
-                }
-            }
+        if !player.isResting {
+            calculateFogOfWar()
         }
 
         tick += 1
+    }
+
+    func calculateFogOfWar() {
+        for dx in -lineOfSightUpdateDistance.x...lineOfSightUpdateDistance.x {
+            for dy in -lineOfSightUpdateDistance.y...lineOfSightUpdateDistance.y {
+                let vector = Vector2(dx, dy)
+                player.tileUnder.adjacentTile(vector)?.updateFogOfWar(lineOfSight: vector)
+            }
+        }
     }
 
     private func updateSunlight() {

@@ -17,6 +17,5 @@ class Dig: ItemComponent {
         } else {
             digger.addMessage("You dig the air.")
         }
-        world.update()
     }
 }

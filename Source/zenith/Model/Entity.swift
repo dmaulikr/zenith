@@ -31,7 +31,7 @@ class Entity {
     }
 
     /// Updates each component in this entity.
-    func update() {
+    func update() throws {
         for component in components { component.update() }
     }
 }

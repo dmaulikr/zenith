@@ -8,6 +8,7 @@ class Creature: Object, Configurable, Spawnable {
         }
     }
     var currentAction: Action?
+    private let controller: CreatureController
     private let messageStream: MessageStream?
 
     private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Double
@@ -17,9 +18,10 @@ class Creature: Object, Configurable, Spawnable {
     static let config = Configuration.load(name: "creature")
     static var allCreatures = [Creature]()
 
-    init(id: String, tile: Tile, messageStream: MessageStream? = nil) {
+    init(id: String, tile: Tile, controller: CreatureController, messageStream: MessageStream? = nil) {
         self.tileUnder = tile
         backpack = []
+        self.controller = controller
         self.messageStream = messageStream
         sprite = Sprite(fileName: Assets.graphicsPath + "creature.bmp",
                         bitmapRegion: Creature.spriteRect(id: id))
@@ -199,25 +201,16 @@ class Creature: Object, Configurable, Spawnable {
         backpack.remove(at: backpack.index(where: { $0 === item })!)
     }
 
-    override func update() {
-        if isPlayer { return }
-
-        // TODO: Move all of the following AI code to a dedicated AI class.
-
-        var didAttack = false
-
-        for direction in Direction4.allDirections {
-            if let enemy = tileUnder.adjacentTile(direction.vector)?.creature, enemy.id != id {
-                let style = wieldedItem != nil ? .hit : attackStyles.randomElement()!
-                hit(direction: direction, style: style)
-                didAttack = true
-                break
+    override func update() throws {
+        if case .some(.resting(let ticksLeft)) = currentAction {
+            if ticksLeft > 0 {
+                currentAction = .resting(ticksLeft: ticksLeft - 1)
+                return
+            } else {
+                currentAction = nil
             }
         }
-
-        if !didAttack {
-            tryToMove(Direction4.random)
-        }
+        try controller.control(self)
     }
 
     override func render() {
@@ -257,7 +250,7 @@ class Creature: Object, Configurable, Spawnable {
         attacker.addMessage("You \(style.verb) \(name(.definite))\(weaponDescription).")
         addMessage("\(attacker.name(.definite, .capitalize)) \(style.verbThirdPerson) you\(weaponDescription).")
 
-        if currentAction == .resting {
+        if isResting {
             addMessage("The attack wakes you up.")
             currentAction = nil
         }
@@ -299,6 +292,13 @@ class Creature: Object, Configurable, Spawnable {
 
     var isDead: Bool {
         return health <= 0
+    }
+
+    var isResting: Bool {
+        if case .some(.resting) = currentAction {
+            return true
+        }
+        return false
     }
 
     func canSee(_ other: Creature) -> Bool {
@@ -377,7 +377,7 @@ class Creature: Object, Configurable, Spawnable {
 }
 
 enum Action {
-    case resting
+    case resting(ticksLeft: Int)
 }
 
 enum AttackStyle: String {

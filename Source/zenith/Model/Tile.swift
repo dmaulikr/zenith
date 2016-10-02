@@ -317,7 +317,7 @@ class Tile: Configurable {
         for (id, spawnInfo) in Creature.spawnInfoMap {
             let spawnRateScale = 1.0 - abs(spawnInfo.populationDensityFactor - area.populationDensity)
             if Double.random(0...1) < spawnInfo.spawnRate * spawnRateScale {
-                _ = Creature(id: id, tile: self)
+                _ = Creature(id: id, tile: self, controller: AIController())
             }
         }
     }

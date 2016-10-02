@@ -12,8 +12,8 @@ class DirectionQuestion: State {
         label.position = gui.worldViewRect.topLeft + spacingVector
     }
 
-    func keyWasPressed(key: SDL_Keycode) {
-        switch Int(key) {
+    func update() {
+        switch Int(app.waitForKeyPress()) {
             case SDLK_UP:    result = .north
             case SDLK_RIGHT: result = .east
             case SDLK_DOWN:  result = .south
@@ -63,8 +63,8 @@ class TimeQuestion: State {
         timeInputLabel.position.x += (questionLabel.text.characters.count + 1) * font.glyphSize.x
     }
 
-    func keyWasPressed(key: SDL_Keycode) {
-        switch Int(key) {
+    func update() {
+        switch Int(app.waitForKeyPress()) {
             case SDLK_UP:
                 result.hours += 1
             case SDLK_DOWN:

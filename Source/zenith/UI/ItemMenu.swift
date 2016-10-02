@@ -31,8 +31,8 @@ class ItemMenu: State {
         self.title = title
     }
 
-    func keyWasPressed(key: SDL_Keycode) {
-        switch Int(key) {
+    func update() {
+        switch Int(app.waitForKeyPress()) {
             case SDLK_UP:
                 menu.selectPrevious()
             case SDLK_DOWN:

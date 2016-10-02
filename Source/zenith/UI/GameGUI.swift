@@ -54,12 +54,11 @@ class GameGUI {
 class Sidebar {
 
     private let gui: GameGUI
-    private let player: Creature
+    private var player: Creature { return world.player }
     private unowned let world: World
 
     init(gui: GameGUI, world: World) {
         self.gui = gui
-        self.player = world.player
         self.world = world
     }
 

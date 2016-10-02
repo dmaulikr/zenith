@@ -32,8 +32,8 @@ class HelpView: State {
         #endif
     }
 
-    func keyWasPressed(key: SDL_Keycode) {
-        switch Int(key) {
+    func update() {
+        switch Int(app.waitForKeyPress()) {
             case SDLK_ESCAPE:
                 app.popState()
             default:
