@@ -14,10 +14,10 @@ class ItemMenu: State {
     private let allowNothingAsOption: Bool
     private let gui: GameGUI
     private let title: String
-    private let resultHandler: (Item??) -> Void
+    private var result: Item??
 
     init(gui: GameGUI, title: String, items: [(item: Item, amount: Int)],
-         allowNothingAsOption: Bool = false, resultHandler: @escaping (Item??) -> Void) {
+         allowNothingAsOption: Bool = false) {
         self.items = items
 
         var menuItems = items.map { OptionalItemWrapper(item: $0.0) }
@@ -29,7 +29,6 @@ class ItemMenu: State {
         self.allowNothingAsOption = allowNothingAsOption
         self.gui = gui
         self.title = title
-        self.resultHandler = resultHandler
     }
 
     func keyWasPressed(key: SDL_Keycode) {
@@ -39,12 +38,20 @@ class ItemMenu: State {
             case SDLK_DOWN:
                 menu.selectNext()
             case SDLK_ESCAPE:
-                resultHandler(nil)
+                result = nil
+                app.popState()
             case SDLK_RETURN:
-                resultHandler(menu.selection?.item)
+                result = menu.selection?.item
+                app.popState()
             default:
                 break
         }
+    }
+
+    func waitForResult() -> Item?? {
+        app.pushState(self)
+        app.runTemporaryState()
+        return result
     }
 
     func render() {

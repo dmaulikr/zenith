@@ -4,14 +4,12 @@ class DirectionQuestion: State {
 
     private let gui: GameGUI
     private let label: Label
-    private let resultHandler: (Direction4?) -> Void
     private var result: Direction4?
 
-    init(gui: GameGUI, title: String, resultHandler: @escaping (Direction4?) -> Void) {
+    init(gui: GameGUI, title: String) {
         self.gui = gui
         label = Label(font: font, text: title)
         label.position = gui.worldViewRect.topLeft + spacingVector
-        self.resultHandler = resultHandler
     }
 
     func keyWasPressed(key: SDL_Keycode) {
@@ -24,7 +22,12 @@ class DirectionQuestion: State {
             default: return
         }
         app.popState()
-        resultHandler(result)
+    }
+
+    func waitForResult() -> Direction4? {
+        app.pushState(self)
+        app.runTemporaryState()
+        return result
     }
 
     func render() {
@@ -43,15 +46,14 @@ class TimeQuestion: State {
     private let gui: GameGUI
     private let questionLabel: Label
     private let timeInputLabel: Label
-    private let resultHandler: (Time?) -> Void
-    private var result: Time {
+    private var result: Time! {
         didSet {
             timeInputLabel.text = "\(result.hours) hours"
         }
     }
     private static var initialValue = Time(ticks: 0)
 
-    init(gui: GameGUI, title: String, resultHandler: @escaping (Time?) -> Void) {
+    init(gui: GameGUI, title: String) {
         self.gui = gui
         questionLabel = Label(font: font, text: title)
         questionLabel.position = gui.worldViewRect.topLeft + spacingVector
@@ -59,7 +61,6 @@ class TimeQuestion: State {
         timeInputLabel = Label(font: font, text: "\(result.hours) hours")
         timeInputLabel.position = gui.worldViewRect.topLeft + spacingVector
         timeInputLabel.position.x += (questionLabel.text.characters.count + 1) * font.glyphSize.x
-        self.resultHandler = resultHandler
     }
 
     func keyWasPressed(key: SDL_Keycode) {
@@ -73,14 +74,19 @@ class TimeQuestion: State {
             case SDLK_ESCAPE:
                 TimeQuestion.initialValue = result
                 app.popState()
-                resultHandler(nil)
+                result = nil
             case SDLK_RETURN:
                 TimeQuestion.initialValue = result
                 app.popState()
-                resultHandler(result)
             default:
                 return
         }
+    }
+
+    func waitForResult() -> Time? {
+        app.pushState(self)
+        app.runTemporaryState()
+        return result
     }
 
     func render() {

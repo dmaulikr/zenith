@@ -7,6 +7,7 @@ public class Application {
     private var activeState: State? { return stateStack.last }
     private var running: Bool
     private let frameTimer: Timer
+    private var runningTemporaryState: Bool = false
 
     /// The number of seconds since the last call to `update`, i.e. the time it
     /// took to process the last frame. Use this to scale the amount of updating
@@ -27,6 +28,7 @@ public class Application {
 
     public func popState() {
         stateStack.removeLast()
+        if runningTemporaryState { stop() }
     }
 
     public func run() {
@@ -45,6 +47,14 @@ public class Application {
             SDL_Delay(2)
             handleEvents()
         }
+    }
+
+    public func runTemporaryState() {
+        runningTemporaryState = true
+        let wasRunning = running
+        run()
+        running = wasRunning
+        runningTemporaryState = false
     }
 
     public func stop() {
