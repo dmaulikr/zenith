@@ -1,9 +1,10 @@
 import CSDL2
+import Foundation
 
-class World {
+class World: Serializable {
 
     private(set) var tick: Int
-    private let startTime = Time(hours: Int.random(7...17), minutes: Int.random(0...59))
+    private var startTime: Time
     var sunlight = Color(hue: 0, saturation: 0, lightness: 0)
     private var areas: [Vector3i: Area]
     var player: Creature!
@@ -13,33 +14,20 @@ class World {
 
     init(worldViewSize: Vector2i) {
         tick = 0
+        startTime = Time(hours: Int.random(7...17), minutes: Int.random(0...59))
         lineOfSightUpdateDistance = Vector2(Int(ceil(Double(worldViewSize.x) / 2)),
                                             Int(ceil(Double(worldViewSize.y) / 2)))
         areas = Dictionary()
+    }
+
+    func generate() {
         for x in -1...1 {
             for y in -1...1 {
                 generateArea(position: Vector3(x, y, 0))
             }
         }
 
-        updateSunlight()
-
-        // TODO: Remove the following duplication.
-        for dx in -areaUpdateDistance...areaUpdateDistance {
-            for dy in -areaUpdateDistance...areaUpdateDistance {
-                guard let area = area(at: Vector3(dx, dy, 0)) else {
-                    continue
-                }
-                for tile in area.tiles {
-                    tile.lightColor = area.globalLight
-                }
-            }
-        }
-        for dx in -areaUpdateDistance...areaUpdateDistance {
-            for dy in -areaUpdateDistance...areaUpdateDistance {
-                area(at: Vector3(dx, dy, 0))?.update()
-            }
-        }
+        updateLights()
     }
 
     deinit {
@@ -49,7 +37,6 @@ class World {
     var creatureUpdateStartIndex: Int = 0
 
     func update(playerIsResting: Bool = false) throws {
-        updateSunlight()
         generateAreas()
 
         // FIXME: Should only update creatures within areaUpdateDistance.
@@ -60,22 +47,8 @@ class World {
         }
         creatureUpdateStartIndex = 0
 
-        // TODO: Remove the following duplication.
-        for dx in -areaUpdateDistance...areaUpdateDistance {
-            for dy in -areaUpdateDistance...areaUpdateDistance {
-                guard let area = area(at: player.area.position + Vector3(dx, dy, 0)) else {
-                    continue
-                }
-                for tile in area.tiles {
-                    tile.lightColor = area.globalLight
-                }
-            }
-        }
-        for dx in -areaUpdateDistance...areaUpdateDistance {
-            for dy in -areaUpdateDistance...areaUpdateDistance {
-                area(at: player.area.position + Vector3(dx, dy, 0))?.update()
-            }
-        }
+        updateLights(relativeTo: player.area.position)
+
         player.area.areaBelow?.update()
         player.area.areaAbove?.update()
 
@@ -149,7 +122,56 @@ class World {
 
     private func generateArea(position: Vector3i) {
         areas[position] = Area(world: self, position: position)
+        areas[position]?.generate()
     }
+
+    func serialize(to file: FileHandle) {
+        file.write(tick)
+        file.write(startTime.ticks)
+        file.write(areas.count)
+        for (vector, area) in areas {
+            file.write(vector)
+            file.write(area)
+        }
+    }
+
+    func deserialize(from file: FileHandle) {
+        file.read(&tick)
+        var startTimeTicks = 0
+        file.read(&startTimeTicks)
+        startTime = Time(ticks: startTimeTicks)
+        areas = Dictionary()
+        var areaCount = 0
+        file.read(&areaCount)
+        for _ in 0..<areaCount {
+            var position = Vector3(0, 0, 0)
+            file.read(&position)
+            var area = Area(world: self, position: position)
+            file.read(&area)
+            areas[position] = area
+        }
+    }
+
+    func updateLights(relativeTo origin: Vector3i = Vector3(0, 0, 0)) {
+        updateSunlight()
+
+        for dx in -areaUpdateDistance...areaUpdateDistance {
+            for dy in -areaUpdateDistance...areaUpdateDistance {
+                guard let area = area(at: origin + Vector3(dx, dy, 0)) else {
+                    continue
+                }
+                for tile in area.tiles {
+                    tile.lightColor = area.globalLight
+                }
+            }
+        }
+        for dx in -areaUpdateDistance...areaUpdateDistance {
+            for dy in -areaUpdateDistance...areaUpdateDistance {
+                area(at: origin + Vector3(dx, dy, 0))?.update()
+            }
+        }
+    }
+
 }
 
 struct Time: CustomStringConvertible {

@@ -1,4 +1,5 @@
 import CSDL2
+import Foundation
 
 class Game: State {
 
@@ -9,17 +10,35 @@ class Game: State {
     private let sidebar: Sidebar
     private var player: Creature { return world.player }
 
-    init(mainMenu: MainMenu) {
+    init?(mainMenu: MainMenu, loadSavedGame: Bool = false) {
         self.mainMenu = mainMenu
         gui = GameGUI(resolution: app.window.resolution)
-        world = World(worldViewSize: gui.worldViewRect.size / tileSize)
-        messageStream = MessageStream(world: world)
-        sidebar = Sidebar(gui: gui, world: world)
-        world.player = Creature(id: "human",
-                                tile: world.area(at: Vector3(0, 0, 0))!
-                                           .tile(at: Area.sizeVector / 2),
-                                controller: PlayerController(game: self),
-                                messageStream: messageStream)
+
+        if loadSavedGame {
+            guard let savedGameFile = FileHandle(forReadingAtPath: Assets.savedGamePath) else {
+                return nil
+            }
+            // Load a saved game.
+            world = World(worldViewSize: gui.worldViewRect.size / tileSize)
+            world.deserialize(from: savedGameFile)
+            messageStream = MessageStream(world: world)
+            sidebar = Sidebar(gui: gui, world: world)
+            player.controller = PlayerController(game: self)
+            player.messageStream = messageStream
+            world.updateLights(relativeTo: player.area.position)
+        } else {
+            // Start a new game.
+            world = World(worldViewSize: gui.worldViewRect.size / tileSize)
+            world.generate()
+            messageStream = MessageStream(world: world)
+            sidebar = Sidebar(gui: gui, world: world)
+            world.player = Creature(id: "human",
+                                    tile: world.area(at: Vector3(0, 0, 0))!
+                                               .tile(at: Area.sizeVector / 2),
+                                    controller: PlayerController(game: self),
+                                    messageStream: messageStream)
+        }
+
         world.calculateFogOfWar()
     }
 
@@ -214,5 +233,13 @@ class Game: State {
         #else
             return false
         #endif
+    }
+
+    func saveToFile() {
+        let fileManager = FileManager()
+        fileManager.createFile(atPath: Assets.savedGamePath, contents: nil)
+        let file = FileHandle(forWritingAtPath: Assets.savedGamePath)
+        assert(file != nil)
+        file!.write(world)
     }
 }

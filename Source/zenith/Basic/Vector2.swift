@@ -130,3 +130,15 @@ extension Vector2: Hashable {
              ^ (y * T(19349663)).cast()
     }
 }
+
+extension Vector2: Serializable {
+    public func serialize(to file: FileHandle) {
+        file.write(x)
+        file.write(y)
+    }
+
+    public mutating func deserialize(from file: FileHandle) {
+        file.read(&x)
+        file.read(&y)
+    }
+}

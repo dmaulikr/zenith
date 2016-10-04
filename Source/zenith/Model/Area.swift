@@ -1,4 +1,6 @@
-class Area {
+import Foundation
+
+class Area: Serializable {
 
     unowned let world: World
     let position: Vector3i
@@ -14,11 +16,15 @@ class Area {
         self.position = position
         tiles = []
         tiles.reserveCapacity(Area.size * Area.size)
+    }
+
+    func generate() {
         populationDensity = calculatePopulationDensity()
 
         for x in 0..<Area.size {
             for y in 0..<Area.size {
                 tiles.append(Tile(area: self, position: Vector2(x, y)))
+                tiles.last!.generate()
             }
         }
 
@@ -98,5 +104,25 @@ class Area {
 
     private func index(_ position: Vector2i) -> Int {
         return position.y + position.x * Area.size
+    }
+
+    public func serialize(to file: FileHandle) {
+        for tile in tiles {
+            file.write(tile)
+        }
+        file.write(populationDensity!)
+    }
+
+    public func deserialize(from file: FileHandle) {
+        for x in 0..<Area.size {
+            for y in 0..<Area.size {
+                var tile = Tile(area: self, position: Vector2(x, y))
+                file.read(&tile)
+                tiles.append(tile)
+            }
+        }
+        var populationDensity = 0.0
+        file.read(&populationDensity)
+        self.populationDensity = populationDensity
     }
 }

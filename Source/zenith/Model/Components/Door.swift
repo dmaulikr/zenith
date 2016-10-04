@@ -1,3 +1,5 @@
+import Foundation
+
 protocol Closeable {
 
     func close(closer: Creature)
@@ -5,8 +7,8 @@ protocol Closeable {
 
 class Door: StructureComponent, Closeable {
 
-    private unowned let structure: Structure
-    private let openSpritePositionOffset: Vector2i
+    private weak var structure: Structure!
+    private var openSpritePositionOffset: Vector2i
     private var state: State
     var preventsMovement: Bool { return state == .closed }
 
@@ -56,5 +58,17 @@ class Door: StructureComponent, Closeable {
     func beHit(by hitter: Creature, style: AttackStyle) {
         open(opener: hitter)
         hitter.addMessage("You \(style.verb) \(structure.name(.definite)) open.")
+    }
+
+    func serialize(to file: FileHandle) {
+        file.write(openSpritePositionOffset)
+        file.write(state == .closed)
+    }
+
+    func deserialize(from file: FileHandle) {
+        file.read(&openSpritePositionOffset)
+        var closed = false
+        file.read(&closed)
+        state = closed ? .closed : .open
     }
 }

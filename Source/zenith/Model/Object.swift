@@ -1,4 +1,5 @@
 import Toml
+import Foundation
 
 /// A physical in-game object that has a name.
 class Object: Entity, CustomStringConvertible {
@@ -9,6 +10,7 @@ class Object: Entity, CustomStringConvertible {
     init(id: String) {
         self.id = id
         name = Name(id)
+        super.init()
     }
 
     var description: String {

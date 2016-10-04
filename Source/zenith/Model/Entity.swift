@@ -1,7 +1,9 @@
+import Foundation
+
 /// A general-purpose base object that is made up of `Component`s. Components
 /// can be added and modified at run-time, providing a flexible system
 /// for defining behavior dynamically and enabling convenient code reuse.
-class Entity {
+class Entity: Serializable {
 
     private(set) var components: [Component]
 
@@ -33,5 +35,26 @@ class Entity {
     /// Updates each component in this entity.
     func update() throws {
         for component in components { component.update() }
+    }
+
+    func serialize(to file: FileHandle) {
+        file.write(components.count)
+        for element in components {
+            file.write(String(describing: type(of: element)))
+            file.write(polymorphicSerializable: element)
+        }
+    }
+
+    func deserialize(from file: FileHandle) {
+        var componentCount = 0
+        file.read(&componentCount)
+        components = []
+        components.reserveCapacity(componentCount)
+        for _ in 0..<componentCount {
+            var componentClassName = ""
+            file.read(&componentClassName)
+            let _ = NSClassFromString(componentClassName)!
+            // TODO...
+        }
     }
 }

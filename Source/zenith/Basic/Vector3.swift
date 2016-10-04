@@ -124,3 +124,17 @@ extension Vector3: Hashable {
              ^ (z * T(83492791)).cast()
     }
 }
+
+extension Vector3: Serializable {
+    public func serialize(to file: FileHandle) {
+        file.write(x)
+        file.write(y)
+        file.write(z)
+    }
+
+    public mutating func deserialize(from file: FileHandle) {
+        file.read(&x)
+        file.read(&y)
+        file.read(&z)
+    }
+}

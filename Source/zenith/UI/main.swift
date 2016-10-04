@@ -10,6 +10,7 @@ struct Assets {
     static let configPath = assetsPath + "Config/"
     static let graphicsPath = assetsPath + "Graphics/"
     static let preferencesPath = assetsPath + "preferences.cfg"
+    static let savedGamePath = assetsPath + "savedgame.dat"
 }
 
 let preferences = (try? Toml(contentsOfFile: Assets.preferencesPath)) ?? Toml()

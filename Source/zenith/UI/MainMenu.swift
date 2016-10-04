@@ -15,6 +15,7 @@ class MainMenu: State {
 
     init(font: Font) {
         menu = Menu(items: [.newGame, .preferences, .quit])
+        game = Game(mainMenu: self, loadSavedGame: true)
     }
 
     func render() {
@@ -45,13 +46,20 @@ class MainMenu: State {
                     case .preferences:
                         app.pushState(PreferencesMenu())
                     case .quit:
-                        app.stop()
+                        saveAndQuit()
                 }
             case SDLK_ESCAPE:
-                app.stop()
+                saveAndQuit()
             default:
                 break
         }
+    }
+
+    func saveAndQuit() {
+        if let game = game {
+            game.saveToFile()
+        }
+        app.stop()
     }
 
     func deleteGame() {
