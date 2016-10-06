@@ -430,12 +430,6 @@ class Creature: Object, Configurable, Spawnable {
         file.write(backpack)
         file.write(wieldedItem)
         file.write(currentAction)
-        file.write(health)
-        file.write(maxHealth)
-        file.write(energy)
-        file.write(maxEnergy)
-        file.write(mana)
-        file.write(maxMana)
         file.write(attributes)
     }
 
@@ -443,12 +437,6 @@ class Creature: Object, Configurable, Spawnable {
         file.write(backpack)
         file.write(wieldedItem)
         file.write(currentAction)
-        file.write(health)
-        file.write(maxHealth)
-        file.write(energy)
-        file.write(maxEnergy)
-        file.write(mana)
-        file.write(maxMana)
         file.write(attributes)
     }
 }
