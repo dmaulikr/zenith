@@ -12,7 +12,7 @@ protocol Configurable {
     static var config: Toml { get }
 }
 
-private var spriteRectCache = Dictionary<String, (Rect<Int>, spriteMultiplicity: Int)>()
+private var spriteRectCache = [String: (Rect<Int>, spriteMultiplicity: Int)]()
 
 extension Configurable {
     

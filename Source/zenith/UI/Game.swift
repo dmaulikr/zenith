@@ -15,17 +15,17 @@ class Game: State {
         gui = GameGUI(resolution: app.window.resolution)
 
         if loadSavedGame {
-            guard let savedGameFile = FileHandle(forReadingAtPath: Assets.savedGamePath) else {
+            if !FileManager.default.fileExists(atPath: Assets.savedGamePath) {
                 return nil
             }
             // Load a saved game.
             world = World(worldViewSize: gui.worldViewRect.size / tileSize)
-            world.deserialize(from: savedGameFile)
+            world.deserialize(from: FileHandle(forReadingAtPath: Assets.worldFilePath)!)
+            world.updateAdjacentAreas(relativeTo: world.playerAreaPosition)
             messageStream = MessageStream(world: world)
             sidebar = Sidebar(gui: gui, world: world)
             player.controller = PlayerController(game: self)
             player.messageStream = messageStream
-            world.updateLights(relativeTo: player.area.position)
         } else {
             // Start a new game.
             world = World(worldViewSize: gui.worldViewRect.size / tileSize)
@@ -237,9 +237,10 @@ class Game: State {
 
     func saveToFile() {
         let fileManager = FileManager()
-        fileManager.createFile(atPath: Assets.savedGamePath, contents: nil)
-        let file = FileHandle(forWritingAtPath: Assets.savedGamePath)
-        assert(file != nil)
-        file!.write(world)
+        try? fileManager.createDirectory(atPath: Assets.savedGamePath,
+                                         withIntermediateDirectories: false)
+        fileManager.createFile(atPath: Assets.worldFilePath, contents: nil)
+        world.serialize(to: FileHandle(forWritingAtPath: Assets.worldFilePath)!)
+        world.serializeAreas(to: Assets.savedGamePath)
     }
 }

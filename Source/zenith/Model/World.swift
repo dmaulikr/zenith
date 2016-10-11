@@ -11,13 +11,14 @@ class World: Serializable {
     private let areaGenerationDistance = 1
     private let areaUpdateDistance = 1
     private let lineOfSightUpdateDistance: Vector2i
+    var playerAreaPosition = Vector3i(0, 0, 0)
 
     init(worldViewSize: Vector2i) {
         tick = 0
         startTime = Time(hours: Int.random(7...17), minutes: Int.random(0...59))
         lineOfSightUpdateDistance = Vector2(Int(ceil(Double(worldViewSize.x) / 2)),
                                             Int(ceil(Double(worldViewSize.y) / 2)))
-        areas = Dictionary()
+        areas = [:]
     }
 
     func generate() {
@@ -27,7 +28,7 @@ class World: Serializable {
             }
         }
 
-        updateLights()
+        updateAdjacentAreas()
     }
 
     deinit {
@@ -47,10 +48,7 @@ class World: Serializable {
         }
         creatureUpdateStartIndex = 0
 
-        updateLights(relativeTo: player.area.position)
-
-        player.area.areaBelow?.update()
-        player.area.areaAbove?.update()
+        updateAdjacentAreas(relativeTo: player.area.position)
 
         if !player.isResting {
             calculateFogOfWar()
@@ -106,7 +104,7 @@ class World: Serializable {
     }
 
     func area(at position: Vector3i) -> Area? {
-        return areas[position]
+        return areas[position] ?? tryToDeserializeArea(at: position)
     }
 
     private func generateAreas() {
@@ -128,9 +126,14 @@ class World: Serializable {
     func serialize(to file: FileHandle) {
         file.write(tick)
         file.write(startTime.ticks)
-        file.write(areas.count)
-        for (vector, area) in areas {
-            file.write(vector)
+        file.write(player.area.position)
+    }
+
+    func serializeAreas(to directory: String) {
+        for (position, area) in areas {
+            let fileName = Area.saveFileName(forPosition: position)
+            FileManager.default.createFile(atPath: directory + fileName, contents: nil)
+            let file = FileHandle(forWritingAtPath: directory + fileName)!
             file.write(area)
         }
     }
@@ -140,19 +143,33 @@ class World: Serializable {
         var startTimeTicks = 0
         file.read(&startTimeTicks)
         startTime = Time(ticks: startTimeTicks)
-        areas = Dictionary()
-        var areaCount = 0
-        file.read(&areaCount)
-        for _ in 0..<areaCount {
-            var position = Vector3(0, 0, 0)
-            file.read(&position)
-            var area = Area(world: self, position: position)
-            file.read(&area)
-            areas[position] = area
+        file.read(&playerAreaPosition)
+    }
+
+    func deserializeAreas(from directory: String) {
+        areas = [:]
+        let fileManager = FileManager()
+        for fileName in try! fileManager.contentsOfDirectory(atPath: directory) {
+            if fileName == "world.dat" { continue }
+            let components = fileName.components(separatedBy: ".")
+            assert(components[0] == "area" && components[4] == "dat")
+            let position = Vector3(Int(components[1])!, Int(components[2])!, Int(components[3])!)
+            _ = tryToDeserializeArea(at: position)!
         }
     }
 
-    func updateLights(relativeTo origin: Vector3i = Vector3(0, 0, 0)) {
+    func tryToDeserializeArea(at position: Vector3i) -> Area? {
+        let fileName = Area.saveFileName(forPosition: position)
+        guard let file = FileHandle(forReadingAtPath: Assets.savedGamePath + fileName) else {
+            return nil
+        }
+        var area = Area(world: self, position: position)
+        file.read(&area)
+        areas[position] = area
+        return area
+    }
+
+    func updateAdjacentAreas(relativeTo origin: Vector3i = Vector3(0, 0, 0)) {
         updateSunlight()
 
         for dx in -areaUpdateDistance...areaUpdateDistance {
@@ -170,8 +187,9 @@ class World: Serializable {
                 area(at: origin + Vector3(dx, dy, 0))?.update()
             }
         }
+        area(at: origin + Vector3(0, 0, -1))?.update()
+        area(at: origin + Vector3(0, 0,  1))?.update()
     }
-
 }
 
 struct Time: CustomStringConvertible {
