@@ -164,6 +164,8 @@ class World: Serializable {
     func saveArea(at position: Vector3i) {
         if let area = areas[position] {
             let fileName = Area.saveFileName(forPosition: position)
+            try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
+                                                     withIntermediateDirectories: false)
             FileManager.default.createFile(atPath: Assets.savedGamePath + fileName, contents: nil)
             let file = FileHandle(forWritingAtPath: Assets.savedGamePath + fileName)!
             area.serialize(to: file)
