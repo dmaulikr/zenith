@@ -38,6 +38,7 @@ class World: Serializable {
     var creatureUpdateStartIndex: Int = 0
 
     func update(playerIsResting: Bool = false) throws {
+        saveNonAdjacentAreas()
         generateAreas()
 
         // FIXME: Should only update creatures within areaUpdateDistance.
@@ -129,12 +130,43 @@ class World: Serializable {
         file.write(player.area.position)
     }
 
-    func serializeAreas(to directory: String) {
-        for (position, area) in areas {
+    func saveUnsavedAreas() {
+        for dx in -areaGenerationDistance...areaGenerationDistance {
+            for dy in -areaGenerationDistance...areaGenerationDistance {
+                saveArea(at: player.area.position + Vector3(dx, dy, 0))
+            }
+        }
+        saveArea(at: player.area.position + Vector3(0, 0, -1))
+        saveArea(at: player.area.position + Vector3(0, 0,  1))
+    }
+
+    func saveNonAdjacentAreas() {
+        if playerAreaPosition != player.area.position {
+            playerAreaPosition = player.area.position
+
+            for dx in -areaGenerationDistance - 1...areaGenerationDistance + 1 {
+                for dy in -areaGenerationDistance - 1...areaGenerationDistance + 1 {
+                    if -areaGenerationDistance...areaGenerationDistance ~= dx { continue }
+                    if -areaGenerationDistance...areaGenerationDistance ~= dy { continue }
+                    saveArea(at: player.area.position + Vector3(dx, dy, 0))
+                }
+            }
+            for dx in -areaGenerationDistance...areaGenerationDistance {
+                for dy in -areaGenerationDistance...areaGenerationDistance {
+                    if dx == 0 || dy == 0 { continue }
+                    saveArea(at: player.area.position + Vector3(dx, dy, -1))
+                    saveArea(at: player.area.position + Vector3(dx, dy,  1))
+                }
+            }
+        }
+    }
+
+    func saveArea(at position: Vector3i) {
+        if let area = areas[position] {
             let fileName = Area.saveFileName(forPosition: position)
-            FileManager.default.createFile(atPath: directory + fileName, contents: nil)
-            let file = FileHandle(forWritingAtPath: directory + fileName)!
-            file.write(area)
+            FileManager.default.createFile(atPath: Assets.savedGamePath + fileName, contents: nil)
+            let file = FileHandle(forWritingAtPath: Assets.savedGamePath + fileName)!
+            area.serialize(to: file)
         }
     }
 

@@ -241,6 +241,6 @@ class Game: State {
                                          withIntermediateDirectories: false)
         fileManager.createFile(atPath: Assets.worldFilePath, contents: nil)
         world.serialize(to: FileHandle(forWritingAtPath: Assets.worldFilePath)!)
-        world.serializeAreas(to: Assets.savedGamePath)
+        world.saveUnsavedAreas()
     }
 }
