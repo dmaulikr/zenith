@@ -125,4 +125,8 @@ class Area: Serializable {
         file.read(&populationDensity)
         self.populationDensity = populationDensity
     }
+
+    static func saveFileName(forPosition position: Vector3i) -> String {
+        return "area.\(position.x).\(position.y).\(position.z).dat"
+    }
 }

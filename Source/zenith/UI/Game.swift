@@ -21,12 +21,11 @@ class Game: State {
             // Load a saved game.
             world = World(worldViewSize: gui.worldViewRect.size / tileSize)
             world.deserialize(from: FileHandle(forReadingAtPath: Assets.worldFilePath)!)
-            world.deserializeAreas(from: Assets.savedGamePath)
+            world.updateAdjacentAreas(relativeTo: world.playerAreaPosition)
             messageStream = MessageStream(world: world)
             sidebar = Sidebar(gui: gui, world: world)
             player.controller = PlayerController(game: self)
             player.messageStream = messageStream
-            world.updateAdjacentAreas(relativeTo: player.area.position)
         } else {
             // Start a new game.
             world = World(worldViewSize: gui.worldViewRect.size / tileSize)
