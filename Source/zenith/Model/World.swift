@@ -128,9 +128,13 @@ class World: Serializable {
     func serialize(to file: FileHandle) {
         file.write(tick)
         file.write(startTime.ticks)
-        file.write(areas.count)
-        for (vector, area) in areas {
-            file.write(vector)
+    }
+
+    func serializeAreas(to directory: String) {
+        for (position, area) in areas {
+            let fileName = "area.\(position.x).\(position.y).\(position.z).dat"
+            FileManager.default.createFile(atPath: directory + fileName, contents: nil)
+            let file = FileHandle(forWritingAtPath: directory + fileName)!
             file.write(area)
         }
     }
@@ -140,12 +144,17 @@ class World: Serializable {
         var startTimeTicks = 0
         file.read(&startTimeTicks)
         startTime = Time(ticks: startTimeTicks)
-        areas = Dictionary()
-        var areaCount = 0
-        file.read(&areaCount)
-        for _ in 0..<areaCount {
-            var position = Vector3(0, 0, 0)
-            file.read(&position)
+    }
+
+    func deserializeAreas(from directory: String) {
+        areas = [:]
+        let fileManager = FileManager()
+        for fileName in try! fileManager.contentsOfDirectory(atPath: directory) {
+            if fileName == "world.dat" { continue }
+            let file = FileHandle(forReadingAtPath: directory + fileName)!
+            let components = fileName.components(separatedBy: ".")
+            assert(components[0] == "area" && components[4] == "dat")
+            let position = Vector3(Int(components[1])!, Int(components[2])!, Int(components[3])!)
             var area = Area(world: self, position: position)
             file.read(&area)
             areas[position] = area

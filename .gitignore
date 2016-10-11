@@ -2,4 +2,4 @@ Packages/
 .build/
 *.xcodeproj/
 preferences.cfg
-savedgame.dat
+SavedGame/
