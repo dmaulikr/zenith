@@ -17,7 +17,7 @@ class World: Serializable {
         startTime = Time(hours: Int.random(7...17), minutes: Int.random(0...59))
         lineOfSightUpdateDistance = Vector2(Int(ceil(Double(worldViewSize.x) / 2)),
                                             Int(ceil(Double(worldViewSize.y) / 2)))
-        areas = Dictionary()
+        areas = [:]
     }
 
     func generate() {
