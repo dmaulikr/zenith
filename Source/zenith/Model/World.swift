@@ -27,7 +27,7 @@ class World: Serializable {
             }
         }
 
-        updateLights()
+        updateAdjacentAreas()
     }
 
     deinit {
@@ -47,10 +47,7 @@ class World: Serializable {
         }
         creatureUpdateStartIndex = 0
 
-        updateLights(relativeTo: player.area.position)
-
-        player.area.areaBelow?.update()
-        player.area.areaAbove?.update()
+        updateAdjacentAreas(relativeTo: player.area.position)
 
         if !player.isResting {
             calculateFogOfWar()
@@ -161,7 +158,7 @@ class World: Serializable {
         }
     }
 
-    func updateLights(relativeTo origin: Vector3i = Vector3(0, 0, 0)) {
+    func updateAdjacentAreas(relativeTo origin: Vector3i = Vector3(0, 0, 0)) {
         updateSunlight()
 
         for dx in -areaUpdateDistance...areaUpdateDistance {
@@ -179,8 +176,9 @@ class World: Serializable {
                 area(at: origin + Vector3(dx, dy, 0))?.update()
             }
         }
+        area(at: origin + Vector3(0, 0, -1))?.update()
+        area(at: origin + Vector3(0, 0,  1))?.update()
     }
-
 }
 
 struct Time: CustomStringConvertible {

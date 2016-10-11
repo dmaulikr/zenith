@@ -26,7 +26,7 @@ class Game: State {
             sidebar = Sidebar(gui: gui, world: world)
             player.controller = PlayerController(game: self)
             player.messageStream = messageStream
-            world.updateLights(relativeTo: player.area.position)
+            world.updateAdjacentAreas(relativeTo: player.area.position)
         } else {
             // Start a new game.
             world = World(worldViewSize: gui.worldViewRect.size / tileSize)
