@@ -434,6 +434,11 @@ class Creature: Object, Configurable, Spawnable {
         }
 
         file.write(wieldedItem?.id)
+
+        file.write(attributes)
+        file.write(health)
+        file.write(energy)
+        file.write(mana)
     }
 
     override func deserialize(from file: FileHandle) {
@@ -450,6 +455,13 @@ class Creature: Object, Configurable, Spawnable {
         var wieldedItemId: String? = nil
         file.read(&wieldedItemId, elementInitializer: { "" })
         wieldedItem = backpack.first(where: { $0.id == wieldedItemId })
+
+        file.read(&attributes, keyInitializer: { .charisma }, valueInitializer: { 0 })
+        calculateDerivedStats()
+        file.read(&health)
+        file.read(&energy)
+        file.read(&mana)
+        assert(health <= maxHealth && energy <= maxEnergy && mana <= maxMana)
     }
 }
 
