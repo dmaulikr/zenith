@@ -28,11 +28,11 @@ class Object: Entity, CustomStringConvertible {
 
     func createComponent(_ name: String) -> Component {
         switch name {
-            case "wall":
+            case "Wall":
                 return Wall()
-            case "door":
+            case "Door":
                 return Door(structure: self as! Structure, openSpritePositionOffset: Vector2(1, 0))
-            case "dig":
+            case "Dig":
                 return Dig()
             default:
                 fatalError("unknown component type '\(name)'")

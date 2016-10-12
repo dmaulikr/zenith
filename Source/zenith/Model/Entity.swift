@@ -52,7 +52,7 @@ class Entity: Serializable {
         for _ in 0..<componentCount {
             var componentClassName = ""
             file.read(&componentClassName)
-            var component = (self as! Object).createComponent(componentClassName.lowercased())
+            var component = (self as! Object).createComponent(componentClassName)
             component.deserialize(from: file)
             components.append(component)
         }
