@@ -428,17 +428,28 @@ class Creature: Object, Configurable, Spawnable {
     }
 
     override func serialize(to file: FileHandle) {
-        file.write(backpack)
-        file.write(wieldedItem)
-        file.write(currentAction)
-        file.write(attributes)
+        file.write(backpack.count)
+        for item in backpack {
+            file.write(item.id)
+        }
+
+        file.write(wieldedItem?.id)
     }
 
     override func deserialize(from file: FileHandle) {
-        file.write(backpack)
-        file.write(wieldedItem)
-        file.write(currentAction)
-        file.write(attributes)
+        var backpackSize = 0
+        file.read(&backpackSize)
+        backpack.removeAll(keepingCapacity: true)
+        backpack.reserveCapacity(backpackSize)
+        for _ in 0..<backpackSize {
+            var itemId = ""
+            file.read(&itemId)
+            backpack.append(Item(id: itemId))
+        }
+
+        var wieldedItemId: String? = nil
+        file.read(&wieldedItemId, elementInitializer: { "" })
+        wieldedItem = backpack.first(where: { $0.id == wieldedItemId })
     }
 }
 
