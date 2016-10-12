@@ -55,15 +55,4 @@ class Structure: Object, Configurable, Spawnable {
     }
 
     static var _spawnInfoMap = SpawnInfoMap()
-
-    override func serialize(to file: FileHandle) {
-        super.serialize(to: file)
-    }
-
-    override func deserialize(from file: FileHandle) {
-        var id = ""
-        file.read(&id)
-        sprite = Sprite(fileName: Assets.graphicsPath + "structure.bmp",
-                        bitmapRegion: Structure.spriteRect(id: id))
-    }
 }
