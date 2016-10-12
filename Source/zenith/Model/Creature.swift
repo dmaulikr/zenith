@@ -353,14 +353,22 @@ class Creature: Object, Configurable, Spawnable {
         return false
     }
 
-    func canSee(_ other: Creature) -> Bool {
-        let sightDirection = other.tileUnder.position - self.tileUnder.position
-        for vector in raycastIntegerBresenham(direction: sightDirection) {
-            if tileUnder.adjacentTile(vector)!.structure?.blocksSight == true {
+    func canSee(_ tile: Tile) -> Bool {
+        let sightVector = tile.globalPosition - tileUnder.globalPosition
+
+        for vector in raycastIntegerBresenham(direction: sightVector) {
+            if vector == sightVector {
+                return true
+            }
+            if tileUnder.adjacentTile(vector)?.structure?.blocksSight == true {
                 return false
             }
         }
         return true
+    }
+
+    func canSee(_ other: Creature) -> Bool {
+        return other.tileUnder.structure?.blocksSight != true && canSee(other.tileUnder)
     }
 
     static var _spawnInfoMap = SpawnInfoMap()

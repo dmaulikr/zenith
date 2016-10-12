@@ -38,8 +38,6 @@ class Game: State {
                                     controller: PlayerController(game: self),
                                     messageStream: messageStream)
         }
-
-        world.calculateFogOfWar()
     }
 
     func enter() {

@@ -51,20 +51,7 @@ class World: Serializable {
 
         updateAdjacentAreas(relativeTo: player.area.position)
 
-        if !player.isResting {
-            calculateFogOfWar()
-        }
-
         tick += 1
-    }
-
-    func calculateFogOfWar() {
-        for dx in -lineOfSightUpdateDistance.x...lineOfSightUpdateDistance.x {
-            for dy in -lineOfSightUpdateDistance.y...lineOfSightUpdateDistance.y {
-                let vector = Vector2(dx, dy)
-                player.tileUnder.adjacentTile(vector)?.updateFogOfWar(lineOfSight: vector)
-            }
-        }
     }
 
     private func updateSunlight() {
@@ -88,6 +75,7 @@ class World: Serializable {
         for relativeTileX in -tileDrawDistance.x...tileDrawDistance.x {
             for relativeTileY in -tileDrawDistance.y...tileDrawDistance.y {
                 if let tileToDraw = player.tileUnder.adjacentTile(Vector2(relativeTileX, relativeTileY)) {
+                    if !player.canSee(tileToDraw) { continue }
                     sdlRect.x = Int32(destination.left + (tileDrawDistance.x + relativeTileX) * tileSize)
                     sdlRect.y = Int32(destination.top  + (tileDrawDistance.y + relativeTileY) * tileSize)
                     targetViewport = sdlRect

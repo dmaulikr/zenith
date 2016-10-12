@@ -5,6 +5,9 @@ class Tile: Configurable, Serializable {
 
     unowned let area: Area
     let position: Vector2i
+    var globalPosition: Vector2i {
+        return Vector2(area.position) * Area.size + position
+    }
     private(set) var items: [Item]
     var structure: Structure? {
         didSet {
@@ -14,7 +17,6 @@ class Tile: Configurable, Serializable {
     }
     var creature: Creature?
     var lightColor: Color
-    private var fogOfWar: Bool
     var groundId: String {
         didSet {
             groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
@@ -34,7 +36,6 @@ class Tile: Configurable, Serializable {
         self.position = position
         creature = nil
         lightColor = area.globalLight
-        fogOfWar = false
         items = []
         renderCache = Sprite(image: Bitmap(size: tileSizeVector))
         renderCacheIsInvalidated = true
@@ -156,24 +157,6 @@ class Tile: Configurable, Serializable {
         }
     }
 
-    func updateFogOfWar(lineOfSight: Vector2i) {
-        let oldFogOfWar = fogOfWar
-        fogOfWar = false
-
-        for relativePosition in raycastIntegerBresenham(direction: lineOfSight) {
-            let vector = relativePosition - lineOfSight
-            if vector == Vector2(0, 0) { continue }
-            if let tile = self.adjacentTile(vector) {
-                if tile.structure?.blocksSight == true {
-                    fogOfWar = true
-                    if !oldFogOfWar { invalidateRenderCache() }
-                    return
-                }
-            }
-        }
-        if oldFogOfWar { invalidateRenderCache() }
-    }
-
     func render() {
         if renderCacheIsInvalidated || renderCacheLightColor != lightColor {
             let targetSurfaceBackup = targetSurface
@@ -190,10 +173,6 @@ class Tile: Configurable, Serializable {
     }
 
     private func renderActual() {
-        if fogOfWar {
-            SDL_FillRect(targetSurface, &Tile.bounds, SDL_MapRGB(targetSurface.pointee.format, 0, 0, 0))
-            return
-        }
         groundSprite.render()
         for item in items { item.render() }
         structure?.render()
