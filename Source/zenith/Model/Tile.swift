@@ -1,6 +1,7 @@
 import CSDL2
+import Foundation
 
-class Tile: Configurable {
+class Tile: Configurable, Serializable {
 
     unowned let area: Area
     let position: Vector2i
@@ -35,11 +36,13 @@ class Tile: Configurable {
         lightColor = area.globalLight
         fogOfWar = false
         items = []
-        groundId = area.position.z < 0 ? "dirtFloor" : "grass"
-        groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
-                              bitmapRegion: Tile.spriteRect(id: groundId))
         renderCache = Sprite(image: Bitmap(size: tileSizeVector))
         renderCacheIsInvalidated = true
+        groundId = ""
+    }
+
+    func generate() {
+        groundId = area.position.z < 0 ? "dirtFloor" : "grass"
 
         if area.position.z < 0 {
             structure = Structure(id: "ground")
@@ -320,5 +323,71 @@ class Tile: Configurable {
                 _ = Creature(id: id, tile: self, controller: AIController())
             }
         }
+    }
+
+    func serialize(to file: FileHandle) {
+        file.write(items.count)
+        for item in items {
+            file.write(item.id)
+        }
+
+        if let structure = structure {
+            file.write(true)
+            file.write(structure.id)
+            file.write(structure)
+        } else {
+            file.write(false)
+        }
+
+        if let creature = creature {
+            file.write(true)
+            file.write(creature.id)
+            file.write(creature)
+            file.write(creature.isPlayer)
+        } else {
+            file.write(false)
+        }
+
+        file.write(groundId)
+    }
+
+    func deserialize(from file: FileHandle) {
+        var itemCount = 0
+        file.read(&itemCount)
+        items = []
+        for _ in 0..<itemCount {
+            var itemId = ""
+            file.read(&itemId)
+            items.append(Item(id: itemId))
+        }
+
+        var hasStructure = false
+        file.read(&hasStructure)
+        if hasStructure {
+            var structureId = ""
+            file.read(&structureId)
+            structure = Structure(id: structureId)
+            file.read(&structure!)
+        } else {
+            structure = nil
+        }
+
+        var hasCreature = false
+        file.read(&hasCreature)
+        if hasCreature {
+            var creatureId = ""
+            file.read(&creatureId)
+            creature = Creature(id: creatureId, tile: self, controller: AIController())
+            file.read(&creature!)
+            var isPlayer = false
+            file.read(&isPlayer)
+            if isPlayer {
+                area.world.player = creature
+            }
+        } else {
+            creature = nil
+        }
+
+        file.read(&groundId)
     }
 }

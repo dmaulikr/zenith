@@ -1,5 +1,3 @@
-import Foundation
-
 enum NameFlag {
     case indefinite
     case definite

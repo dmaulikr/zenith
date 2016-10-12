@@ -1,4 +1,8 @@
+import Foundation
+
 class Dig: ItemComponent {
+
+    init() {}
 
     func use(world: World, gui: GameGUI, user: Creature) {
         let state = DirectionQuestion(gui: gui, title: "Dig in which direction?")
@@ -18,4 +22,8 @@ class Dig: ItemComponent {
             digger.addMessage("You dig the air.")
         }
     }
+
+    func serialize(to file: FileHandle) {}
+
+    func deserialize(from file: FileHandle) {}
 }

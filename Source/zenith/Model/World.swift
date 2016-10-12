@@ -1,45 +1,34 @@
 import CSDL2
+import Foundation
 
-class World {
+class World: Serializable {
 
     private(set) var tick: Int
-    private let startTime = Time(hours: Int.random(7...17), minutes: Int.random(0...59))
+    private var startTime: Time
     var sunlight = Color(hue: 0, saturation: 0, lightness: 0)
     private var areas: [Vector3i: Area]
     var player: Creature!
     private let areaGenerationDistance = 1
     private let areaUpdateDistance = 1
     private let lineOfSightUpdateDistance: Vector2i
+    var playerAreaPosition = Vector3i(0, 0, 0)
 
     init(worldViewSize: Vector2i) {
         tick = 0
+        startTime = Time(hours: Int.random(7...17), minutes: Int.random(0...59))
         lineOfSightUpdateDistance = Vector2(Int(ceil(Double(worldViewSize.x) / 2)),
                                             Int(ceil(Double(worldViewSize.y) / 2)))
-        areas = Dictionary()
+        areas = [:]
+    }
+
+    func generate() {
         for x in -1...1 {
             for y in -1...1 {
                 generateArea(position: Vector3(x, y, 0))
             }
         }
 
-        updateSunlight()
-
-        // TODO: Remove the following duplication.
-        for dx in -areaUpdateDistance...areaUpdateDistance {
-            for dy in -areaUpdateDistance...areaUpdateDistance {
-                guard let area = area(at: Vector3(dx, dy, 0)) else {
-                    continue
-                }
-                for tile in area.tiles {
-                    tile.lightColor = area.globalLight
-                }
-            }
-        }
-        for dx in -areaUpdateDistance...areaUpdateDistance {
-            for dy in -areaUpdateDistance...areaUpdateDistance {
-                area(at: Vector3(dx, dy, 0))?.update()
-            }
-        }
+        updateAdjacentAreas()
     }
 
     deinit {
@@ -49,7 +38,7 @@ class World {
     var creatureUpdateStartIndex: Int = 0
 
     func update(playerIsResting: Bool = false) throws {
-        updateSunlight()
+        saveNonAdjacentAreas()
         generateAreas()
 
         // FIXME: Should only update creatures within areaUpdateDistance.
@@ -60,24 +49,7 @@ class World {
         }
         creatureUpdateStartIndex = 0
 
-        // TODO: Remove the following duplication.
-        for dx in -areaUpdateDistance...areaUpdateDistance {
-            for dy in -areaUpdateDistance...areaUpdateDistance {
-                guard let area = area(at: player.area.position + Vector3(dx, dy, 0)) else {
-                    continue
-                }
-                for tile in area.tiles {
-                    tile.lightColor = area.globalLight
-                }
-            }
-        }
-        for dx in -areaUpdateDistance...areaUpdateDistance {
-            for dy in -areaUpdateDistance...areaUpdateDistance {
-                area(at: player.area.position + Vector3(dx, dy, 0))?.update()
-            }
-        }
-        player.area.areaBelow?.update()
-        player.area.areaAbove?.update()
+        updateAdjacentAreas(relativeTo: player.area.position)
 
         if !player.isResting {
             calculateFogOfWar()
@@ -133,7 +105,7 @@ class World {
     }
 
     func area(at position: Vector3i) -> Area? {
-        return areas[position]
+        return areas[position] ?? tryToDeserializeArea(at: position)
     }
 
     private func generateAreas() {
@@ -149,6 +121,108 @@ class World {
 
     private func generateArea(position: Vector3i) {
         areas[position] = Area(world: self, position: position)
+        areas[position]?.generate()
+    }
+
+    func serialize(to file: FileHandle) {
+        file.write(tick)
+        file.write(startTime.ticks)
+        file.write(player.area.position)
+    }
+
+    func saveUnsavedAreas() {
+        for dx in -areaGenerationDistance...areaGenerationDistance {
+            for dy in -areaGenerationDistance...areaGenerationDistance {
+                saveArea(at: player.area.position + Vector3(dx, dy, 0))
+            }
+        }
+        saveArea(at: player.area.position + Vector3(0, 0, -1))
+        saveArea(at: player.area.position + Vector3(0, 0,  1))
+    }
+
+    func saveNonAdjacentAreas() {
+        if playerAreaPosition != player.area.position {
+            playerAreaPosition = player.area.position
+
+            for dx in -areaGenerationDistance - 1...areaGenerationDistance + 1 {
+                for dy in -areaGenerationDistance - 1...areaGenerationDistance + 1 {
+                    if -areaGenerationDistance...areaGenerationDistance ~= dx { continue }
+                    if -areaGenerationDistance...areaGenerationDistance ~= dy { continue }
+                    saveArea(at: player.area.position + Vector3(dx, dy, 0))
+                }
+            }
+            for dx in -areaGenerationDistance...areaGenerationDistance {
+                for dy in -areaGenerationDistance...areaGenerationDistance {
+                    if dx == 0 || dy == 0 { continue }
+                    saveArea(at: player.area.position + Vector3(dx, dy, -1))
+                    saveArea(at: player.area.position + Vector3(dx, dy,  1))
+                }
+            }
+        }
+    }
+
+    func saveArea(at position: Vector3i) {
+        if let area = areas[position] {
+            let fileName = Area.saveFileName(forPosition: position)
+            try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
+                                                     withIntermediateDirectories: false)
+            FileManager.default.createFile(atPath: Assets.savedGamePath + fileName, contents: nil)
+            let file = FileHandle(forWritingAtPath: Assets.savedGamePath + fileName)!
+            area.serialize(to: file)
+        }
+    }
+
+    func deserialize(from file: FileHandle) {
+        file.read(&tick)
+        var startTimeTicks = 0
+        file.read(&startTimeTicks)
+        startTime = Time(ticks: startTimeTicks)
+        file.read(&playerAreaPosition)
+    }
+
+    func deserializeAreas(from directory: String) {
+        areas = [:]
+        let fileManager = FileManager()
+        for fileName in try! fileManager.contentsOfDirectory(atPath: directory) {
+            if fileName == "world.dat" { continue }
+            let components = fileName.components(separatedBy: ".")
+            assert(components[0] == "area" && components[4] == "dat")
+            let position = Vector3(Int(components[1])!, Int(components[2])!, Int(components[3])!)
+            _ = tryToDeserializeArea(at: position)!
+        }
+    }
+
+    func tryToDeserializeArea(at position: Vector3i) -> Area? {
+        let fileName = Area.saveFileName(forPosition: position)
+        guard let file = FileHandle(forReadingAtPath: Assets.savedGamePath + fileName) else {
+            return nil
+        }
+        var area = Area(world: self, position: position)
+        file.read(&area)
+        areas[position] = area
+        return area
+    }
+
+    func updateAdjacentAreas(relativeTo origin: Vector3i = Vector3(0, 0, 0)) {
+        updateSunlight()
+
+        for dx in -areaUpdateDistance...areaUpdateDistance {
+            for dy in -areaUpdateDistance...areaUpdateDistance {
+                guard let area = area(at: origin + Vector3(dx, dy, 0)) else {
+                    continue
+                }
+                for tile in area.tiles {
+                    tile.lightColor = area.globalLight
+                }
+            }
+        }
+        for dx in -areaUpdateDistance...areaUpdateDistance {
+            for dy in -areaUpdateDistance...areaUpdateDistance {
+                area(at: origin + Vector3(dx, dy, 0))?.update()
+            }
+        }
+        area(at: origin + Vector3(0, 0, -1))?.update()
+        area(at: origin + Vector3(0, 0,  1))?.update()
     }
 }
 

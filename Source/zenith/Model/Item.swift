@@ -1,3 +1,5 @@
+import Foundation
+
 class Item: Object, Configurable, Spawnable, Hashable, Equatable {
 
     weak var tileUnder: Tile?
@@ -9,6 +11,17 @@ class Item: Object, Configurable, Spawnable, Hashable, Equatable {
     let lightRange: Int
 
     override init(id: String) {
+        if id.hasSuffix("Corpse") {
+            let creatureId = id.replacingOccurrences(of: "Corpse", with: "")
+            // Assumes corpse sprites are located in the third grid column.
+            let spriteRect = Creature.spriteRect(id: creatureId).moved(by: Vector2(2 * tileSize, 0))
+            sprite = Sprite(fileName: Assets.graphicsPath + "creature.bmp", bitmapRegion: spriteRect)
+            wieldedSprite = sprite
+            lightColor = Color.black
+            lightRange = 0
+            super.init(id: creatureId + "Corpse")
+            return
+        }
         assert(Item.config.hasTable(id))
         sprite = Sprite(fileName: Assets.graphicsPath + "item.bmp",
                         bitmapRegion: Item.spriteRect(id: id))
@@ -25,16 +38,6 @@ class Item: Object, Configurable, Spawnable, Hashable, Equatable {
         }
         super.init(id: id)
         addComponents(config: Item.config)
-    }
-
-    init(corpseOf creature: Creature) {
-        // Assumes corpse sprites are located in the third grid column.
-        let spriteRect = Creature.spriteRect(id: creature.id).moved(by: Vector2(2 * tileSize, 0))
-        sprite = Sprite(fileName: Assets.graphicsPath + "creature.bmp", bitmapRegion: spriteRect)
-        wieldedSprite = sprite
-        lightColor = Color.black
-        lightRange = 0
-        super.init(id: creature.id + "Corpse")
     }
 
     override func render() {
@@ -78,6 +81,16 @@ class Item: Object, Configurable, Spawnable, Hashable, Equatable {
 
         tileUnder.removeItem(self)
         destinationTile.addItem(self)
+    }
+
+    override func serialize(to file: FileHandle) {
+        super.serialize(to: file)
+    }
+
+    required convenience init(deserializedFrom file: FileHandle) {
+        var id = ""
+        file.read(&id)
+        self.init(id: id)
     }
 }
 

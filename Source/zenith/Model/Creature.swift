@@ -1,3 +1,5 @@
+import Foundation
+
 class Creature: Object, Configurable, Spawnable {
 
     private(set) var tileUnder: Tile
@@ -8,8 +10,8 @@ class Creature: Object, Configurable, Spawnable {
         }
     }
     var currentAction: Action?
-    private let controller: CreatureController
-    private let messageStream: MessageStream?
+    var controller: CreatureController
+    var messageStream: MessageStream?
 
     private(set) var health, maxHealth, energy, maxEnergy, mana, maxMana: Double
     private var attributes: [Attribute: Int]
@@ -44,7 +46,7 @@ class Creature: Object, Configurable, Spawnable {
         }
     }
 
-    enum Attribute: String {
+    enum Attribute: String, Serializable {
         case rightArmStrength
         case leftArmStrength
         case armStrength
@@ -63,6 +65,55 @@ class Creature: Object, Configurable, Spawnable {
         case intelligence
         case psyche
         case charisma
+
+        func serialize(to file: FileHandle) {
+            switch self {
+                case .rightArmStrength:  file.write(0)
+                case .leftArmStrength:   file.write(1)
+                case .armStrength:       file.write(2)
+                case .rightLegStrength:  file.write(3)
+                case .leftLegStrength:   file.write(4)
+                case .legStrength:       file.write(5)
+                case .strength:          file.write(6)
+                case .rightArmDexterity: file.write(7)
+                case .leftArmDexterity:  file.write(8)
+                case .dexterity:         file.write(9)
+                case .rightLegAgility:   file.write(10)
+                case .leftLegAgility:    file.write(11)
+                case .agility:           file.write(12)
+                case .endurance:         file.write(13)
+                case .perception:        file.write(14)
+                case .intelligence:      file.write(15)
+                case .psyche:            file.write(16)
+                case .charisma:          file.write(17)
+            }
+        }
+
+        mutating func deserialize(from file: FileHandle) {
+            var number = 0
+            file.read(&number)
+            switch number {
+                case 0:  self = .rightArmStrength
+                case 1:  self = .leftArmStrength
+                case 2:  self = .armStrength
+                case 3:  self = .rightLegStrength
+                case 4:  self = .leftLegStrength
+                case 5:  self = .legStrength
+                case 6:  self = .strength
+                case 7:  self = .rightArmDexterity
+                case 8:  self = .leftArmDexterity
+                case 9:  self = .dexterity
+                case 10: self = .rightLegAgility
+                case 11: self = .leftLegAgility
+                case 12: self = .agility
+                case 13: self = .endurance
+                case 14: self = .perception
+                case 15: self = .intelligence
+                case 16: self = .psyche
+                case 17: self = .charisma
+                default: assert(false)
+            }
+        }
     }
 
     private func attributeValue(_ attribute: Attribute) -> Int {
@@ -276,7 +327,7 @@ class Creature: Object, Configurable, Spawnable {
 
     func die() {
         tileUnder.creature = nil
-        tileUnder.addItem(Item(corpseOf: self))
+        tileUnder.addItem(Item(id: id + "Corpse"))
         Creature.allCreatures.remove(at: Creature.allCreatures.index(where: { $0 === self })!)
         Creature.allCreatures.forEach {
             if $0.canSee(self) {
@@ -287,6 +338,7 @@ class Creature: Object, Configurable, Spawnable {
 
         if isPlayer {
             addMessage("Press ESC to go to main menu.")
+            try? FileManager.default.removeItem(atPath: Assets.savedGamePath)
         }
     }
 
@@ -313,7 +365,7 @@ class Creature: Object, Configurable, Spawnable {
 
     static var _spawnInfoMap = SpawnInfoMap()
 
-    private var isPlayer: Bool {
+    var isPlayer: Bool {
         return messageStream != nil
     }
 
@@ -374,10 +426,68 @@ class Creature: Object, Configurable, Spawnable {
             default: return []
         }
     }
+
+    override func serialize(to file: FileHandle) {
+        file.write(backpack.count)
+        for item in backpack {
+            file.write(item.id)
+        }
+
+        file.write(wieldedItem?.id)
+
+        file.write(attributes)
+        file.write(health)
+        file.write(energy)
+        file.write(mana)
+    }
+
+    override func deserialize(from file: FileHandle) {
+        var backpackSize = 0
+        file.read(&backpackSize)
+        backpack.removeAll(keepingCapacity: true)
+        backpack.reserveCapacity(backpackSize)
+        for _ in 0..<backpackSize {
+            var itemId = ""
+            file.read(&itemId)
+            backpack.append(Item(id: itemId))
+        }
+
+        var wieldedItemId: String? = nil
+        file.read(&wieldedItemId, elementInitializer: { "" })
+        wieldedItem = backpack.first(where: { $0.id == wieldedItemId })
+
+        file.read(&attributes, keyInitializer: { .charisma }, valueInitializer: { 0 })
+        calculateDerivedStats()
+        file.read(&health)
+        file.read(&energy)
+        file.read(&mana)
+        assert(health <= maxHealth && energy <= maxEnergy && mana <= maxMana)
+    }
 }
 
-enum Action {
+enum Action: Serializable {
     case resting(ticksLeft: Int)
+
+    func serialize(to file: FileHandle) {
+        switch self {
+            case .resting(let ticksLeft):
+                file.write(0)
+                file.write(ticksLeft)
+        }
+    }
+
+    mutating func deserialize(from file: FileHandle) {
+        var whichCase = 0
+        file.read(&whichCase)
+        switch whichCase {
+            case 0:
+                var ticksLeft = 0
+                file.read(&ticksLeft)
+                self = .resting(ticksLeft: ticksLeft)
+            default:
+                assert(false)
+        }
+    }
 }
 
 enum AttackStyle: String {

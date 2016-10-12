@@ -9,6 +9,8 @@ struct Assets {
     static let assetsPath = #file.substring(to: #file.range(of: "/", options: .backwards)!.upperBound) + "../../../"
     static let configPath = assetsPath + "Config/"
     static let graphicsPath = assetsPath + "Graphics/"
+    static let savedGamePath = assetsPath + "SavedGame/"
+    static let worldFilePath = savedGamePath + "world.dat"
     static let preferencesPath = assetsPath + "preferences.cfg"
 }
 

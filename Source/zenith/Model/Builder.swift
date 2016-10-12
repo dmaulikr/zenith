@@ -1,6 +1,6 @@
 class Builder {
 
-    private static var cellarPlan = Dictionary<Vector2i, Rect<Int>>()
+    private static var cellarPlan = [Vector2i: Rect<Int>]()
 
     static func spawnBuildings(to area: Area, withDensity density: Double) {
         while Double.random(0...1) < density {
