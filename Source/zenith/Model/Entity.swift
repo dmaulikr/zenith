@@ -40,7 +40,6 @@ class Entity: Serializable {
     func serialize(to file: FileHandle) {
         file.write(components.count)
         for element in components {
-            file.write(String(describing: type(of: element)))
             file.write(polymorphicSerializable: element)
         }
     }
@@ -53,8 +52,9 @@ class Entity: Serializable {
         for _ in 0..<componentCount {
             var componentClassName = ""
             file.read(&componentClassName)
-            let _ = NSClassFromString(componentClassName)!
-            // TODO...
+            var component = (self as! Object).createComponent(componentClassName.lowercased())
+            component.deserialize(from: file)
+            components.append(component)
         }
     }
 }

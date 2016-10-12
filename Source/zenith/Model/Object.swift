@@ -27,7 +27,7 @@ class Object: Entity, CustomStringConvertible {
         }
     }
 
-    private func createComponent(_ name: String) -> Component {
+    func createComponent(_ name: String) -> Component {
         switch name {
             case "wall":
                 return Wall()

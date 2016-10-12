@@ -70,5 +70,8 @@ class Door: StructureComponent, Closeable {
         var closed = false
         file.read(&closed)
         state = closed ? .closed : .open
+        if !closed {
+            structure.sprite.bitmapRegion.position += openSpritePositionOffset
+        }
     }
 }

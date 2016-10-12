@@ -334,6 +334,7 @@ class Tile: Configurable, Serializable {
         if let structure = structure {
             file.write(true)
             file.write(structure.id)
+            file.write(structure)
         } else {
             file.write(false)
         }
@@ -366,6 +367,7 @@ class Tile: Configurable, Serializable {
             var structureId = ""
             file.read(&structureId)
             structure = Structure(id: structureId)
+            file.read(&structure!)
         } else {
             structure = nil
         }
