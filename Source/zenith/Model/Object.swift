@@ -1,5 +1,4 @@
 import Toml
-import Foundation
 
 /// A physical in-game object that has a name.
 class Object: Entity, CustomStringConvertible {

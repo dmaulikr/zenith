@@ -1,5 +1,3 @@
-import Foundation
-
 class Structure: Object, Configurable, Spawnable {
 
     var sprite: Sprite
