@@ -10,14 +10,11 @@ class World: Serializable {
     var player: Creature!
     private let areaGenerationDistance = 1
     private let areaUpdateDistance = 1
-    private let lineOfSightUpdateDistance: Vector2i
     var playerAreaPosition = Vector3i(0, 0, 0)
 
-    init(worldViewSize: Vector2i) {
+    init() {
         tick = 0
         startTime = Time(hours: Int.random(7...17), minutes: Int.random(0...59))
-        lineOfSightUpdateDistance = Vector2(Int(ceil(Double(worldViewSize.x) / 2)),
-                                            Int(ceil(Double(worldViewSize.y) / 2)))
         areas = [:]
     }
 

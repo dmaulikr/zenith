@@ -19,7 +19,7 @@ class Game: State {
                 return nil
             }
             // Load a saved game.
-            world = World(worldViewSize: gui.worldViewRect.size / tileSize)
+            world = World()
             world.deserialize(from: FileHandle(forReadingAtPath: Assets.worldFilePath)!)
             world.updateAdjacentAreas(relativeTo: world.playerAreaPosition)
             messageStream = MessageStream(world: world)
@@ -28,7 +28,7 @@ class Game: State {
             player.messageStream = messageStream
         } else {
             // Start a new game.
-            world = World(worldViewSize: gui.worldViewRect.size / tileSize)
+            world = World()
             world.generate()
             messageStream = MessageStream(world: world)
             sidebar = Sidebar(gui: gui, world: world)
