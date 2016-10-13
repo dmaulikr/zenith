@@ -1,12 +1,12 @@
 import CSDL2
 
-public class Application {
+public struct Application {
 
     public let window: Window
     private var stateStack: [State]
     private var activeState: State? { return stateStack.last }
     private var running: Bool
-    private let frameTimer: Timer
+    private var frameTimer: Timer
     private var runningTemporaryState: Bool = false
 
     /// The number of seconds since the last call to `update`, i.e. the time it
@@ -21,17 +21,17 @@ public class Application {
         frameTimer = Timer()
     }
 
-    public func pushState(_ state: State) {
+    public mutating func pushState(_ state: State) {
         stateStack.append(state)
         state.enter()
     }
 
-    public func popState() {
+    public mutating func popState() {
         stateStack.removeLast()
         if runningTemporaryState { stop() }
     }
 
-    public func run() {
+    public mutating func run() {
         running = true
 
         while running {
@@ -49,7 +49,7 @@ public class Application {
         }
     }
 
-    public func runTemporaryState() {
+    public mutating func runTemporaryState() {
         runningTemporaryState = true
         let wasRunning = running
         run()
@@ -57,11 +57,11 @@ public class Application {
         runningTemporaryState = false
     }
 
-    public func stop() {
+    public mutating func stop() {
         running = false
     }
 
-    public func waitForKeyPress() -> SDL_Keycode {
+    public mutating func waitForKeyPress() -> SDL_Keycode {
         var event = SDL_Event()
         while true {
             SDL_WaitEvent(&event)
@@ -74,14 +74,14 @@ public class Application {
         }
     }
 
-    private func handleEvents() {
+    private mutating func handleEvents() {
         var event = SDL_Event()
         while SDL_PollEvent(&event) != 0 {
             handleEvent(event)
         }
     }
 
-    private func handleEvent(_ event: SDL_Event) {
+    private mutating func handleEvent(_ event: SDL_Event) {
         switch SDL_EventType(event.type) {
             case SDL_KEYDOWN:
                 handleKeyPressEvent(event)
@@ -100,7 +100,7 @@ public class Application {
         activeState?.keyWasReleased(key: event.key.keysym.sym)
     }
 
-    private func handleSystemEvent(_ event: SDL_Event) {
+    private mutating func handleSystemEvent(_ event: SDL_Event) {
         switch SDL_EventType(event.type) {
             case SDL_WINDOWEVENT:
                 handleWindowEvent(event)
@@ -111,7 +111,7 @@ public class Application {
         }
     }
 
-    private func handleWindowEvent(_ event: SDL_Event) {
+    private mutating func handleWindowEvent(_ event: SDL_Event) {
         switch SDL_WindowEventID(UInt32(event.window.event)) {
             case SDL_WINDOWEVENT_CLOSE:
                 running = false

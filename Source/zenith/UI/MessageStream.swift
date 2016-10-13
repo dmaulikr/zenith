@@ -16,7 +16,7 @@ class MessageStream: TextOutputStream {
 
         for message in messages.reversed() {
             let line = "- \(message.text)\(message.countString)"
-            let label = Label(font: font, text: line)
+            var label = Label(font: font, text: line)
             label.position = position
             label.color = message.isNew ? textColorHighlight : textColor
             label.render()

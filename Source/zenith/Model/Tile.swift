@@ -42,6 +42,10 @@ class Tile: Configurable, Serializable {
         groundId = ""
     }
 
+    deinit {
+        renderCache.bitmap.deallocate()
+    }
+
     func generate() {
         groundId = area.position.z < 0 ? "dirtFloor" : "grass"
 

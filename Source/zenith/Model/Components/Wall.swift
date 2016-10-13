@@ -1,6 +1,6 @@
 import Foundation
 
-class Wall: StructureComponent {
+struct Wall: StructureComponent {
 
     var blocksSight: Bool = true
     var preventsMovement: Bool = true

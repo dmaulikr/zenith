@@ -14,7 +14,7 @@ let lineHeight = 10
 let spacing = 10
 let spacingVector = Vector2(spacing, spacing)
 
-class GameGUI {
+struct GameGUI {
 
     let sidebarRect: Rect<Int>
     let zoomViewRect: Rect<Int>
@@ -51,7 +51,7 @@ class GameGUI {
     }
 }
 
-class Sidebar {
+struct Sidebar {
 
     private let gui: GameGUI
     private var player: Creature { return world.player }
@@ -66,7 +66,7 @@ class Sidebar {
         var position = region.topLeft
 
         func drawStat(text: String, color: Color, currentValue: Int, maxValue: Int) {
-            let label = Label(font: font, text: text + " \(currentValue)/\(maxValue)")
+            var label = Label(font: font, text: text + " \(currentValue)/\(maxValue)")
             label.position = position
             label.color = color
             label.render()
@@ -86,7 +86,7 @@ class Sidebar {
         position.y += lineHeight
 
         func drawAttribute(text: String, value: Int) {
-            let label = Label(font: font, text: text + " \(value)")
+            var label = Label(font: font, text: text + " \(value)")
             label.position = position
             label.color = textColorHighlight
             label.render()

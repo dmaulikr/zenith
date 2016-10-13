@@ -18,7 +18,7 @@ let preferences = (try? Toml(contentsOfFile: Assets.preferencesPath)) ?? Toml()
 let resolution = preferences.array("resolution") ?? [512, 384]
 let scale = preferences.double("scale") ?? 2
 
-let app = Application(size: Vector2(resolution[0], resolution[1]), title: "Zenith")
+var app = Application(size: Vector2(resolution[0], resolution[1]), title: "Zenith")
 app.window.scale = scale
 
 Sprite.transparentColor = Color(r: 0x5a, g: 0x52, b: 0x68)

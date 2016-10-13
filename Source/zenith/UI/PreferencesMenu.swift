@@ -8,7 +8,7 @@ class PreferencesMenu: State {
     private var currentResolutionIndex: Int
     private let scales: [Double]
     private var currentScaleIndex: Int
-    private let menu: Menu<MenuItem>
+    private var menu: Menu<MenuItem>
     private let toml: Toml
 
     private enum MenuItem: String, CustomStringConvertible {

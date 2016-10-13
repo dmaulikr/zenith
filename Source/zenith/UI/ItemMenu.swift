@@ -10,7 +10,7 @@ struct OptionalItemWrapper: CustomStringConvertible {
 class ItemMenu: State {
 
     private let items: [(item: Item, amount: Int)]
-    private let menu: Menu<OptionalItemWrapper>
+    private var menu: Menu<OptionalItemWrapper>
     private let allowNothingAsOption: Bool
     private let gui: GameGUI
     private let title: String

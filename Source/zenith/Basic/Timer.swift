@@ -1,6 +1,6 @@
 import CSDL2
 
-public class Timer {
+public struct Timer {
 
     public typealias TimeType = Int
 
@@ -15,7 +15,7 @@ public class Timer {
         startTime = Timer.currentTime
     }
 
-    public func restart() {
+    public mutating func restart() {
         startTime = Timer.currentTime
     }
 

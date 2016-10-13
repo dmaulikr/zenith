@@ -1,4 +1,4 @@
-class Menu<T: CustomStringConvertible> {
+struct Menu<T: CustomStringConvertible> {
 
     let items: [T]
     private var selectionIndex: Int
@@ -16,14 +16,14 @@ class Menu<T: CustomStringConvertible> {
         labels = []
 
         for (index, item) in items.enumerated() {
-            let label = Label(font: font, text: item.description)
+            var label = Label(font: font, text: item.description)
             label.color = index == selectionIndex ? selectionColor : labelColor
             label.position = Vector2(0, index * font.glyphSize.y)
             labels.append(label)
         }
     }
 
-    func selectNext() {
+    mutating func selectNext() {
         if items.isEmpty { return }
         if selectionIndex == items.count - 1 { return }
         labels[selectionIndex].color = labelColor
@@ -31,7 +31,7 @@ class Menu<T: CustomStringConvertible> {
         labels[selectionIndex].color = selectionColor
     }
 
-    func selectPrevious() {
+    mutating func selectPrevious() {
         if items.isEmpty { return }
         if selectionIndex == 0 { return }
         labels[selectionIndex].color = labelColor

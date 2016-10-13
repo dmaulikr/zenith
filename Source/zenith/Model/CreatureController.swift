@@ -5,7 +5,7 @@ protocol CreatureController {
     func control(_ controlledCreature: Creature) throws
 }
 
-class PlayerController: CreatureController {
+struct PlayerController: CreatureController {
 
     private unowned let game: Game
     static var initialized = false
@@ -38,7 +38,7 @@ enum CreatureUpdateInterruption: Error {
     case quitToMainMenu
 }
 
-class AIController: CreatureController {
+struct AIController: CreatureController {
 
     func control(_ npc: Creature) {
         var didAttack = false

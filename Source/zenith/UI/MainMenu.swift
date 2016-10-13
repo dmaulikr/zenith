@@ -2,7 +2,7 @@ import CSDL2
 
 class MainMenu: State {
 
-    private let menu: Menu<MenuItem>
+    private var menu: Menu<MenuItem>
     private var game: Game?
 
     private enum MenuItem: String, CustomStringConvertible {

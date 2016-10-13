@@ -39,18 +39,13 @@ public struct Sprite {
         }
         SDL_UpperBlit(bitmap.surface, &src, targetSurface, &dst)
     }
-
-    init(fromSDLSurface surface: UnsafeMutablePointer<SDL_Surface>) {
-        bitmap = Bitmap(surface)
-        bitmapRegion = Rect(position: Vector2(0, 0), size: bitmap.size)
-    }
 }
 
 var targetSurface: UnsafeMutablePointer<SDL_Surface>!
 var targetViewport: SDL_Rect?
 
 /// Memory-managing wrapper around `SDL_Surface`.
-class Bitmap {
+struct Bitmap {
 
     let surface: UnsafeMutablePointer<SDL_Surface>
 
@@ -97,7 +92,7 @@ class Bitmap {
         return surface
     }
 
-    deinit {
+    func deallocate() {
         SDL_FreeSurface(surface)
     }
 }

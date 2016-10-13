@@ -8,7 +8,7 @@ public protocol Font {
 }
 
 /// A font that renders character sprites loaded from a bitmap.
-public class BitmapFont: Font {
+public struct BitmapFont: Font {
 
     private let bitmap: Bitmap
     public let glyphSize: Vector2i

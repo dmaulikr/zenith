@@ -1,6 +1,6 @@
 import Foundation
 
-class Dig: ItemComponent {
+struct Dig: ItemComponent {
 
     init() {}
 

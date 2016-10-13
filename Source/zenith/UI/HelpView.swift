@@ -55,7 +55,7 @@ class HelpView: State {
 
     private func renderCommands(commands: [(key: String, info: String)],
                                 heading: String, position: Vector2i) {
-        let label = Label(font: font, text: heading)
+        var label = Label(font: font, text: heading)
         label.color = textColorHighlight
         label.position = position
         label.render()

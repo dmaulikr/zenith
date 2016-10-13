@@ -3,7 +3,7 @@ import CSDL2
 class DirectionQuestion: State {
 
     private let gui: GameGUI
-    private let label: Label
+    private var label: Label
     private var result: Direction4?
 
     init(gui: GameGUI, title: String) {
@@ -44,8 +44,8 @@ class DirectionQuestion: State {
 class TimeQuestion: State {
 
     private let gui: GameGUI
-    private let questionLabel: Label
-    private let timeInputLabel: Label
+    private var questionLabel: Label
+    private var timeInputLabel: Label
     private var result: Time! {
         didSet {
             timeInputLabel.text = "\(result.hours) hours"
