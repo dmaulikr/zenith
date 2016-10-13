@@ -139,8 +139,7 @@ class World {
 
     func deserializeAreas(from directory: String) {
         areas = [:]
-        let fileManager = FileManager()
-        for fileName in try! fileManager.contentsOfDirectory(atPath: directory) {
+        for fileName in try! FileManager.default.contentsOfDirectory(atPath: directory) {
             if fileName == "world.dat" { continue }
             let components = fileName.components(separatedBy: ".")
             assert(components[0] == "area" && components[4] == "dat")

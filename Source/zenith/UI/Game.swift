@@ -248,10 +248,9 @@ class Game: State, Serializable {
     }
 
     func saveToFile() {
-        let fileManager = FileManager()
-        try? fileManager.createDirectory(atPath: Assets.savedGamePath,
-                                         withIntermediateDirectories: false)
-        fileManager.createFile(atPath: Assets.globalSavePath, contents: nil)
+        try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
+                                                 withIntermediateDirectories: false)
+        FileManager.default.createFile(atPath: Assets.globalSavePath, contents: nil)
         serialize(to: FileHandle(forWritingAtPath: Assets.globalSavePath)!)
         world.saveUnsavedAreas(player: player)
     }
