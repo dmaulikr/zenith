@@ -1,21 +1,16 @@
 import CSDL2
 import Foundation
 
-class World: Serializable {
+class World {
 
-    private(set) var tick: Int
-    private var startTime: Time
+    var currentTime: Time
     var sunlight = Color(hue: 0, saturation: 0, lightness: 0)
-    private var areas: [Vector3i: Area]
-    var player: Creature!
+    private var areas = [Vector3i: Area]()
     private let areaGenerationDistance = 1
     private let areaUpdateDistance = 1
-    var playerAreaPosition = Vector3i(0, 0, 0)
 
-    init() {
-        tick = 0
-        startTime = Time(hours: Int.random(7...17), minutes: Int.random(0...59))
-        areas = [:]
+    init(startTime: Time) {
+        currentTime = startTime
     }
 
     func generate() {
@@ -34,9 +29,8 @@ class World: Serializable {
 
     var creatureUpdateStartIndex: Int = 0
 
-    func update(playerIsResting: Bool = false) throws {
-        saveNonAdjacentAreas()
-        generateAreas()
+    func update(player: Creature) throws {
+        generateAreas(player: player)
 
         // FIXME: Should only update creatures within areaUpdateDistance.
         let range = Creature.allCreatures[creatureUpdateStartIndex..<Creature.allCreatures.endIndex]
@@ -48,7 +42,7 @@ class World: Serializable {
 
         updateAdjacentAreas(relativeTo: player.area.position)
 
-        tick += 1
+        currentTime = Time(ticks: currentTime.ticks + 1)
     }
 
     private func updateSunlight() {
@@ -59,7 +53,7 @@ class World: Serializable {
         sunlight = Color(hue: 0.125, saturation: 0.1, lightness: 0.2 + brightness * 0.35)
     }
 
-    func render(destination: Rect<Int>) {
+    func render(destination: Rect<Int>, player: Creature) {
         let viewport = targetViewport
         var oldClipRect = SDL_Rect()
         SDL_GetClipRect(targetSurface, &oldClipRect)
@@ -85,15 +79,11 @@ class World: Serializable {
         targetViewport = viewport
     }
 
-    var currentTime: Time {
-        return Time(ticks: startTime.ticks + tick)
-    }
-
     func area(at position: Vector3i) -> Area? {
         return areas[position] ?? tryToDeserializeArea(at: position)
     }
 
-    private func generateAreas() {
+    private func generateAreas(player: Creature) {
         for dx in -areaGenerationDistance...areaGenerationDistance {
             for dy in -areaGenerationDistance...areaGenerationDistance {
                 var position = player.area.position + Vector3(dx, dy, 0)
@@ -109,13 +99,7 @@ class World: Serializable {
         areas[position]?.generate()
     }
 
-    func serialize(to file: FileHandle) {
-        file.write(tick)
-        file.write(startTime.ticks)
-        file.write(player.area.position)
-    }
-
-    func saveUnsavedAreas() {
+    func saveUnsavedAreas(player: Creature) {
         for dx in -areaGenerationDistance...areaGenerationDistance {
             for dy in -areaGenerationDistance...areaGenerationDistance {
                 saveArea(at: player.area.position + Vector3(dx, dy, 0))
@@ -125,23 +109,19 @@ class World: Serializable {
         saveArea(at: player.area.position + Vector3(0, 0,  1))
     }
 
-    func saveNonAdjacentAreas() {
-        if playerAreaPosition != player.area.position {
-            playerAreaPosition = player.area.position
-
-            for dx in -areaGenerationDistance - 1...areaGenerationDistance + 1 {
-                for dy in -areaGenerationDistance - 1...areaGenerationDistance + 1 {
-                    if -areaGenerationDistance...areaGenerationDistance ~= dx { continue }
-                    if -areaGenerationDistance...areaGenerationDistance ~= dy { continue }
-                    saveArea(at: player.area.position + Vector3(dx, dy, 0))
-                }
+    func saveNonAdjacentAreas(player: Creature) {
+        for dx in -areaGenerationDistance - 1...areaGenerationDistance + 1 {
+            for dy in -areaGenerationDistance - 1...areaGenerationDistance + 1 {
+                if -areaGenerationDistance...areaGenerationDistance ~= dx { continue }
+                if -areaGenerationDistance...areaGenerationDistance ~= dy { continue }
+                saveArea(at: player.area.position + Vector3(dx, dy, 0))
             }
-            for dx in -areaGenerationDistance...areaGenerationDistance {
-                for dy in -areaGenerationDistance...areaGenerationDistance {
-                    if dx == 0 || dy == 0 { continue }
-                    saveArea(at: player.area.position + Vector3(dx, dy, -1))
-                    saveArea(at: player.area.position + Vector3(dx, dy,  1))
-                }
+        }
+        for dx in -areaGenerationDistance...areaGenerationDistance {
+            for dy in -areaGenerationDistance...areaGenerationDistance {
+                if dx == 0 || dy == 0 { continue }
+                saveArea(at: player.area.position + Vector3(dx, dy, -1))
+                saveArea(at: player.area.position + Vector3(dx, dy,  1))
             }
         }
     }
@@ -155,14 +135,6 @@ class World: Serializable {
             let file = FileHandle(forWritingAtPath: Assets.savedGamePath + fileName)!
             area.serialize(to: file)
         }
-    }
-
-    func deserialize(from file: FileHandle) {
-        file.read(&tick)
-        var startTimeTicks = 0
-        file.read(&startTimeTicks)
-        startTime = Time(ticks: startTimeTicks)
-        file.read(&playerAreaPosition)
     }
 
     func deserializeAreas(from directory: String) {

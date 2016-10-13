@@ -54,12 +54,12 @@ struct GameGUI {
 struct Sidebar {
 
     private let gui: GameGUI
-    private var player: Creature { return world.player }
-    private unowned let world: World
+    private var player: Creature { return game.player }
+    private unowned let game: Game
 
-    init(gui: GameGUI, world: World) {
+    init(gui: GameGUI, game: Game) {
         self.gui = gui
-        self.world = world
+        self.game = game
     }
 
     func render(region: Rect<Int>) {
@@ -104,6 +104,6 @@ struct Sidebar {
 
         position.y += lineHeight
 
-        font.renderText("Time \(world.currentTime)", at: position, color: textColorHighlight)
+        font.renderText("Time \(game.world.currentTime)", at: position, color: textColorHighlight)
     }
 }

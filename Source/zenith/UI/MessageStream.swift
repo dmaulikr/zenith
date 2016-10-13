@@ -1,10 +1,10 @@
 class MessageStream: TextOutputStream {
 
     private var messages = [Message]()
-    private unowned let world: World
+    private unowned let game: Game
 
-    init(world: World) {
-        self.world = world
+    init(game: Game) {
+        self.game = game
     }
 
     func render(region: Rect<Int>) {
@@ -27,12 +27,12 @@ class MessageStream: TextOutputStream {
     }
 
     func write(_ message: String) {
-        if messages.last?.tick == world.tick {
+        if messages.last?.tick == game.tick {
             messages.last!.text += " \(message)"
         } else if messages.last?.text == message {
             messages.last!.addRepetition()
         } else {
-            messages.append(Message(text: message, tick: world.tick))
+            messages.append(Message(text: message, tick: game.tick))
         }
     }
 

@@ -326,7 +326,6 @@ class Tile: Configurable, Serializable {
             file.write(true)
             file.write(creature.id)
             file.write(creature)
-            file.write(creature.isPlayer)
         } else {
             file.write(false)
         }
@@ -362,11 +361,6 @@ class Tile: Configurable, Serializable {
             file.read(&creatureId)
             creature = Creature(id: creatureId, tile: self, controller: AIController())
             file.read(&creature!)
-            var isPlayer = false
-            file.read(&isPlayer)
-            if isPlayer {
-                area.world.player = creature
-            }
         } else {
             creature = nil
         }

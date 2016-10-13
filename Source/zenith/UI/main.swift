@@ -10,7 +10,7 @@ struct Assets {
     static let configPath = assetsPath + "Config/"
     static let graphicsPath = assetsPath + "Graphics/"
     static let savedGamePath = assetsPath + "SavedGame/"
-    static let worldFilePath = savedGamePath + "world.dat"
+    static let globalSavePath = savedGamePath + "global.dat"
     static let preferencesPath = assetsPath + "preferences.cfg"
 }
 

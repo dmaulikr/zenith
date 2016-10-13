@@ -1,14 +1,17 @@
 import CSDL2
 import Foundation
 
-class Game: State {
+class Game: State, Serializable {
 
-    private let world: World
+    private(set) var world: World!
+    private(set) var tick: Int = 0
+    private var startTime: Time = Time(hours: Int.random(7...17), minutes: Int.random(0...59))
     private unowned let mainMenu: MainMenu
     private var gui: GameGUI
-    private let messageStream: MessageStream
-    private let sidebar: Sidebar
-    private var player: Creature { return world.player }
+    private var messageStream: MessageStream!
+    private var sidebar: Sidebar!
+    private(set) var player: Creature!
+    private var playerAreaPosition = Vector3i(0, 0, 0)
 
     init?(mainMenu: MainMenu, loadSavedGame: Bool = false) {
         self.mainMenu = mainMenu
@@ -19,24 +22,28 @@ class Game: State {
                 return nil
             }
             // Load a saved game.
-            world = World()
-            world.deserialize(from: FileHandle(forReadingAtPath: Assets.worldFilePath)!)
-            world.updateAdjacentAreas(relativeTo: world.playerAreaPosition)
-            messageStream = MessageStream(world: world)
-            sidebar = Sidebar(gui: gui, world: world)
+            let saveFile = FileHandle(forReadingAtPath: Assets.globalSavePath)!
+            deserialize(from: saveFile)
+            world = World(startTime: startTime)
+            world.updateAdjacentAreas(relativeTo: playerAreaPosition)
+            messageStream = MessageStream(game: self)
+            sidebar = Sidebar(gui: gui, game: self)
+            var playerTilePosition = Vector2(0, 0)
+            saveFile.read(&playerTilePosition)
+            player = world.area(at: playerAreaPosition)?.tile(at: playerTilePosition).creature!
             player.controller = PlayerController(game: self)
             player.messageStream = messageStream
         } else {
             // Start a new game.
-            world = World()
+            world = World(startTime: startTime)
             world.generate()
-            messageStream = MessageStream(world: world)
-            sidebar = Sidebar(gui: gui, world: world)
-            world.player = Creature(id: "human",
-                                    tile: world.area(at: Vector3(0, 0, 0))!
-                                               .tile(at: Area.sizeVector / 2),
-                                    controller: PlayerController(game: self),
-                                    messageStream: messageStream)
+            messageStream = MessageStream(game: self)
+            sidebar = Sidebar(gui: gui, game: self)
+            player = Creature(id: "human",
+                              tile: world.area(at: Vector3(0, 0, 0))!
+                                         .tile(at: Area.sizeVector / 2),
+                              controller: PlayerController(game: self),
+                              messageStream: messageStream)
         }
     }
 
@@ -49,11 +56,18 @@ class Game: State {
             messageStream.makeMessagesOld()
         }
 
+        if playerAreaPosition != player.area.position {
+            playerAreaPosition = player.area.position
+            world.saveNonAdjacentAreas(player: player)
+        }
+
         do {
-            try world.update()
+            try world.update(player: player)
         } catch CreatureUpdateInterruption.quitToMainMenu {
             app.popState()
         } catch {}
+
+        tick += 1
     }
 
     func keyWasPressed(key: SDL_Keycode) {
@@ -87,7 +101,7 @@ class Game: State {
     }
 
     func render() {
-        world.render(destination: gui.worldViewRect)
+        world.render(destination: gui.worldViewRect, player: player)
         sidebar.render(region: gui.sidebarRect)
         messageStream.render(region: gui.messageViewRect)
     }
@@ -237,8 +251,23 @@ class Game: State {
         let fileManager = FileManager()
         try? fileManager.createDirectory(atPath: Assets.savedGamePath,
                                          withIntermediateDirectories: false)
-        fileManager.createFile(atPath: Assets.worldFilePath, contents: nil)
-        world.serialize(to: FileHandle(forWritingAtPath: Assets.worldFilePath)!)
-        world.saveUnsavedAreas()
+        fileManager.createFile(atPath: Assets.globalSavePath, contents: nil)
+        serialize(to: FileHandle(forWritingAtPath: Assets.globalSavePath)!)
+        world.saveUnsavedAreas(player: player)
+    }
+
+    func serialize(to file: FileHandle) {
+        file.write(tick)
+        file.write(startTime.ticks)
+        file.write(player.area.position)
+        file.write(player.tileUnder.position)
+    }
+
+    func deserialize(from file: FileHandle) {
+        file.read(&tick)
+        var startTimeTicks = 0
+        file.read(&startTimeTicks)
+        startTime = Time(ticks: startTimeTicks)
+        file.read(&playerAreaPosition)
     }
 }
