@@ -22,6 +22,7 @@ struct PlayerController: CreatureController {
 
             switch Int(key) {
                 case SDLK_ESCAPE: throw CreatureUpdateInterruption.quitToMainMenu
+                case SDLK_BACKQUOTE: game.openConsole()
                 case SDLK_i: game.performShowInventory()
                 case SDLK_h: game.performShowHelp()
                 default: if game.handlePlayerCommand(key: key) { return }

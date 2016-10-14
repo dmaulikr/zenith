@@ -221,6 +221,11 @@ class Game: State, Serializable {
         app.runTemporaryState()
     }
 
+    func openConsole() {
+        app.pushState(Console(gui: gui))
+//        app.runTemporaryState()
+    }
+
     private func performSpawnWall() -> Bool {
         #if !release
             if player.tileUnder.structure != nil {
