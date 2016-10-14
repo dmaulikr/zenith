@@ -52,7 +52,6 @@ class Tile: Configurable, Serializable {
         if area.position.z < 0 {
             structure = Structure(type: "ground")
             structure!.tile = self
-            structure!.sprite.position = position * tileSize
         } else {
             spawnStructures()
         }
