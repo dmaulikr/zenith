@@ -338,6 +338,7 @@ class Creature: Object, Configurable, Spawnable {
 
         if isPlayer {
             addMessage("Press ESC to go to main menu.")
+            PlayerController.initialized = false
             try? FileManager.default.removeItem(atPath: Assets.savedGamePath)
         }
     }
