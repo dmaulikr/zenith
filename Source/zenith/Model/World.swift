@@ -87,16 +87,17 @@ class World {
         for dx in -areaGenerationDistance...areaGenerationDistance {
             for dy in -areaGenerationDistance...areaGenerationDistance {
                 var position = player.area.position + Vector3(dx, dy, 0)
-                if areas[position] == nil { generateArea(position: position) }
+                if area(at: position) == nil { generateArea(position: position) }
                 position.z = -1
-                if areas[position] == nil { generateArea(position: position) }
+                if area(at: position) == nil { generateArea(position: position) }
             }
         }
     }
 
     private func generateArea(position: Vector3i) {
+        assert(area(at: position) == nil)
         areas[position] = Area(world: self, position: position)
-        areas[position]?.generate()
+        areas[position]!.generate()
     }
 
     func saveUnsavedAreas(player: Creature) {
