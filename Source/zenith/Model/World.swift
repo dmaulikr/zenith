@@ -138,17 +138,6 @@ class World {
         }
     }
 
-    func deserializeAreas(from directory: String) {
-        areas = [:]
-        for fileName in try! FileManager.default.contentsOfDirectory(atPath: directory) {
-            if fileName == "world.dat" { continue }
-            let components = fileName.components(separatedBy: ".")
-            assert(components[0] == "area" && components[4] == "dat")
-            let position = Vector3(Int(components[1])!, Int(components[2])!, Int(components[3])!)
-            _ = tryToDeserializeArea(at: position)!
-        }
-    }
-
     func tryToDeserializeArea(at position: Vector3i) -> Area? {
         let fileName = Area.saveFileName(forPosition: position)
         guard let file = FileHandle(forReadingAtPath: Assets.savedGamePath + fileName) else {
