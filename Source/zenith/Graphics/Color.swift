@@ -1,6 +1,6 @@
 import CSDL2
 
-public struct Color {
+public struct Color: Equatable {
 
     public var red: UInt8
     public var green: UInt8
@@ -169,8 +169,4 @@ public func ==(left: Color, right: Color) -> Bool {
         && left.green == right.green
         && left.blue == right.blue
         && left.alpha == right.alpha
-}
-
-public func !=(left: Color, right: Color) -> Bool {
-    return !(left == right)
 }
