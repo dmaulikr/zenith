@@ -20,21 +20,21 @@ class Creature: Object, Configurable, Spawnable {
     static let config = Configuration.load(name: "creature")
     static var allCreatures = [Creature]()
 
-    init(id: String, tile: Tile, controller: CreatureController, messageStream: MessageStream? = nil) {
+    init(type: String, tile: Tile, controller: CreatureController, messageStream: MessageStream? = nil) {
         self.tileUnder = tile
         backpack = []
         self.controller = controller
         self.messageStream = messageStream
         sprite = Sprite(fileName: Assets.graphicsPath + "creature.bmp",
-                        bitmapRegion: Creature.spriteRect(id: id))
+                        bitmapRegion: Creature.spriteRect(forObjectType: type))
         health = 0
         maxHealth = 0
         energy = 0
         maxEnergy = 0
         mana = 0
         maxMana = 0
-        attributes = Creature.initAttributes(id: id)
-        super.init(id: id)
+        attributes = Creature.initAttributes(forCreatureType: type)
+        super.init(type: type)
         calculateDerivedStats()
         tile.creature = self
         Creature.allCreatures.append(self)
@@ -166,7 +166,7 @@ class Creature: Object, Configurable, Spawnable {
     }
 
     func useStairs() -> Bool {
-        switch tileUnder.structure?.id {
+        switch tileUnder.structure?.type {
             case .some("stairsDown"):
                 goDownStairs()
                 return true
@@ -180,14 +180,14 @@ class Creature: Object, Configurable, Spawnable {
 
     private func goDownStairs() {
         let destinationTile = tileUnder.tileBelow!
-        destinationTile.structure = Structure(id: "stairsUp")
+        destinationTile.structure = Structure(type: "stairsUp")
         addMessage("You go down the stairs.")
         move(to: destinationTile)
     }
 
     private func goUpStairs() {
         let destinationTile = tileUnder.tileAbove!
-        destinationTile.structure = Structure(id: "stairsDown")
+        destinationTile.structure = Structure(type: "stairsDown")
         addMessage("You go up the stairs.")
         move(to: destinationTile)
     }
@@ -214,7 +214,7 @@ class Creature: Object, Configurable, Spawnable {
     }
 
     var canOpenAndClose: Bool {
-        return Creature.config.bool(id, "canOpenAndClose") ?? true
+        return Creature.config.bool(type, "canOpenAndClose") ?? true
     }
 
     func tryToClose(direction: Direction4) {
@@ -281,7 +281,7 @@ class Creature: Object, Configurable, Spawnable {
     }
 
     var attackStyles: [AttackStyle] {
-        return Creature.config.array(id, "attackStyles")!.map { AttackStyle(rawValue: $0)! }
+        return Creature.config.array(type, "attackStyles")!.map { AttackStyle(rawValue: $0)! }
     }
 
     func hit(direction hitDirection: Direction4, style: AttackStyle) {
@@ -312,7 +312,7 @@ class Creature: Object, Configurable, Spawnable {
         switch style {
             case .hit:  return armStrength
             case .kick: return legStrength
-            case .bite: return Creature.config.int(id, "biteStrength")! // TODO: Use tooth material strength?
+            case .bite: return Creature.config.int(type, "biteStrength")! // TODO: Use tooth material strength?
         }
     }
 
@@ -327,7 +327,7 @@ class Creature: Object, Configurable, Spawnable {
 
     func die() {
         tileUnder.creature = nil
-        tileUnder.addItem(Item(id: id + "Corpse"))
+        tileUnder.addItem(Item(type: type + "Corpse"))
         Creature.allCreatures.remove(at: Creature.allCreatures.index(where: { $0 === self })!)
         Creature.allCreatures.forEach {
             if $0.canSee(self) {
@@ -377,27 +377,27 @@ class Creature: Object, Configurable, Spawnable {
         return messageStream != nil
     }
 
-    private static func initAttributes(id: String) -> [Attribute: Int] {
+    private static func initAttributes(forCreatureType type: String) -> [Attribute: Int] {
         var attributes = [Attribute: Int]()
-        let baseType = config.string(id, "basetype")!
+        let baseType = config.string(type, "basetype")!
         let baseTypeAttributes: [String] = config.array(baseType, "attributes")!
 
         for attribute in baseTypeAttributes {
             let attributeEnum = Attribute(rawValue: attribute)!
 
-            if let attributeValue = config.int(id, attribute) {
+            if let attributeValue = config.int(type, attribute) {
                 attributes[attributeEnum] = attributeValue
             } else {
                 guard var superAttribute = Creature.superAttribute(of: attributeEnum) else {
                     fatalError() // TODO: Look up baseType attribute.
                 }
 
-                if config.int(id, superAttribute.rawValue) == nil {
+                if config.int(type, superAttribute.rawValue) == nil {
                     superAttribute = Creature.superAttribute(of: superAttribute)!
-                    assert(config.hasKey(id, superAttribute.rawValue))
+                    assert(config.hasKey(type, superAttribute.rawValue))
                 }
 
-                attributes[attributeEnum] = config.int(id, superAttribute.rawValue)!
+                attributes[attributeEnum] = config.int(type, superAttribute.rawValue)!
             }
         }
 
@@ -438,10 +438,10 @@ class Creature: Object, Configurable, Spawnable {
     override func serialize(to file: FileHandle) {
         file.write(backpack.count)
         for item in backpack {
-            file.write(item.id)
+            file.write(item.type)
         }
 
-        file.write(wieldedItem?.id)
+        file.write(wieldedItem?.type)
 
         file.write(attributes)
         file.write(health)
@@ -455,14 +455,14 @@ class Creature: Object, Configurable, Spawnable {
         backpack.removeAll(keepingCapacity: true)
         backpack.reserveCapacity(backpackSize)
         for _ in 0..<backpackSize {
-            var itemId = ""
-            file.read(&itemId)
-            backpack.append(Item(id: itemId))
+            var itemType = ""
+            file.read(&itemType)
+            backpack.append(Item(type: itemType))
         }
 
-        var wieldedItemId: String? = nil
-        file.read(&wieldedItemId, elementInitializer: { "" })
-        wieldedItem = backpack.first(where: { $0.id == wieldedItemId })
+        var wieldedItemType: String? = nil
+        file.read(&wieldedItemType, elementInitializer: { "" })
+        wieldedItem = backpack.first(where: { $0.type == wieldedItemType })
 
         file.read(&attributes, keyInitializer: { .charisma }, valueInitializer: { 0 })
         calculateDerivedStats()

@@ -3,12 +3,12 @@ import Toml
 /// A physical in-game object that has a name.
 class Object: Entity, CustomStringConvertible {
 
-    let id: String
+    let type: String
     private let name: Name
 
-    init(id: String) {
-        self.id = id
-        name = Name(id)
+    init(type: String) {
+        self.type = type
+        name = Name(type)
         super.init()
     }
 
@@ -21,7 +21,7 @@ class Object: Entity, CustomStringConvertible {
     }
 
     func addComponents(config: Toml) {
-        config.array(id, "components")?.forEach {
+        config.array(type, "components")?.forEach {
             addComponent(createComponent($0))
         }
     }
@@ -64,10 +64,10 @@ extension Spawnable {
     static var spawnInfoMap: SpawnInfoMap {
         if _spawnInfoMap.isEmpty {
             // Initialize from config file
-            for (id, data) in config.tables() {
+            for (type, data) in config.tables() {
                 if let spawnRate = data.double("spawnRate") {
                     let levels = data.array("levels") ?? [-1, 0, 1]
-                    _spawnInfoMap[id] = (
+                    _spawnInfoMap[type] = (
                         levels: levels,
                         spawnRate: spawnRate,
                         populationDensityFactor: data.double("spawnRatePopulationDensityFactor") ?? 0.5

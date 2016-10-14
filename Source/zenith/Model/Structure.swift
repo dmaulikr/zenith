@@ -5,10 +5,10 @@ class Structure: Object, Configurable, Spawnable {
 
     static let config = Configuration.load(name: "structure")
 
-    override init(id: String) {
+    override init(type: String) {
         sprite = Sprite(fileName: Assets.graphicsPath + "structure.bmp",
-                        bitmapRegion: Structure.spriteRect(id: id))
-        super.init(id: id)
+                        bitmapRegion: Structure.spriteRect(forObjectType: type))
+        super.init(type: type)
         addComponents(config: Structure.config)
     }
 

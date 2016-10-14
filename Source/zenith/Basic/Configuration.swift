@@ -16,19 +16,19 @@ private var spriteRectCache = [String: (Rect<Int>, spriteMultiplicity: Int)]()
 
 extension Configurable {
     
-    static func spriteRect(id: String, offset: Vector2i = Vector2(0, 0)) -> Rect<Int> {
-        if let spriteRectData = spriteRectCache[id] {
+    static func spriteRect(forObjectType type: String, offset: Vector2i = Vector2(0, 0)) -> Rect<Int> {
+        if let spriteRectData = spriteRectCache[type] {
             return createSpriteRect(from: spriteRectData).moved(by: offset * tileSize)
         }
 
-        let positionArray: [Int] = Self.config.array(id, "spritePosition")!
+        let positionArray: [Int] = Self.config.array(type, "spritePosition")!
         var spritePosition = Vector2(positionArray[0], positionArray[1])
-        let spriteMultiplicity = Self.config.int(id, "spriteMultiplicity")
+        let spriteMultiplicity = Self.config.int(type, "spriteMultiplicity")
         spritePosition *= tileSize
 
         let spriteRectData = (Rect(position: spritePosition, size: tileSizeVector),
                               spriteMultiplicity ?? 1)
-        spriteRectCache[id] = spriteRectData
+        spriteRectCache[type] = spriteRectData
         return createSpriteRect(from: spriteRectData).moved(by: offset * tileSize)
     }
 

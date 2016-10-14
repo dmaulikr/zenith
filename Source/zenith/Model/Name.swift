@@ -9,9 +9,9 @@ struct Name {
     private let nameBase: String
     private static let vowels = ["a", "e", "i", "o", "u"]
 
-    init(_ id: String) {
+    init(_ type: String) {
         var nameBase = ""
-        for character in id.characters {
+        for character in type.characters {
             if String(character).lowercased() != String(character) {
                 nameBase += " "
                 nameBase += String(character).lowercased()

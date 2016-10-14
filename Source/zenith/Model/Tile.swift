@@ -17,10 +17,10 @@ class Tile: Configurable, Serializable {
     }
     var creature: Creature?
     var lightColor: Color
-    var groundId: String {
+    var groundType: String {
         didSet {
             groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
-                                  bitmapRegion: Tile.spriteRect(id: groundId))
+                                  bitmapRegion: Tile.spriteRect(forObjectType: groundType))
         }
     }
     private var groundSprite: Sprite!
@@ -39,7 +39,7 @@ class Tile: Configurable, Serializable {
         items = []
         renderCache = Sprite(image: Bitmap(size: tileSizeVector))
         renderCacheIsInvalidated = true
-        groundId = ""
+        groundType = ""
     }
 
     deinit {
@@ -47,10 +47,10 @@ class Tile: Configurable, Serializable {
     }
 
     func generate() {
-        groundId = area.position.z < 0 ? "dirtFloor" : "grass"
+        groundType = area.position.z < 0 ? "dirtFloor" : "grass"
 
         if area.position.z < 0 {
-            structure = Structure(id: "ground")
+            structure = Structure(type: "ground")
             structure!.tile = self
             structure!.sprite.position = position * tileSize
         } else {
@@ -280,30 +280,30 @@ class Tile: Configurable, Serializable {
     }
 
     func spawnStructures() {
-        for (id, spawnInfo) in Structure.spawnInfoMap {
+        for (type, spawnInfo) in Structure.spawnInfoMap {
             let spawnRateScale = 1.0 - abs(spawnInfo.populationDensityFactor - area.populationDensity)
             if spawnInfo.levels.contains(area.position.z.sign)
                 && Double.random(0...1) < spawnInfo.spawnRate * spawnRateScale {
-                structure = Structure(id: id)
+                structure = Structure(type: type)
             }
         }
     }
 
     func spawnItems() {
-        for (id, spawnInfo) in Item.spawnInfoMap {
+        for (type, spawnInfo) in Item.spawnInfoMap {
             let spawnRateScale = 1.0 - abs(spawnInfo.populationDensityFactor - area.populationDensity)
             if spawnInfo.levels.contains(area.position.z.sign)
                 && Double.random(0...1) < spawnInfo.spawnRate * spawnRateScale {
-                addItem(Item(id: id))
+                addItem(Item(type: type))
             }
         }
     }
 
     func spawnCreatures() {
-        for (id, spawnInfo) in Creature.spawnInfoMap {
+        for (type, spawnInfo) in Creature.spawnInfoMap {
             let spawnRateScale = 1.0 - abs(spawnInfo.populationDensityFactor - area.populationDensity)
             if Double.random(0...1) < spawnInfo.spawnRate * spawnRateScale {
-                _ = Creature(id: id, tile: self, controller: AIController())
+                _ = Creature(type: type, tile: self, controller: AIController())
             }
         }
     }
@@ -311,22 +311,22 @@ class Tile: Configurable, Serializable {
     func serialize(to file: FileHandle) {
         file.write(items.count)
         for item in items {
-            file.write(item.id)
+            file.write(item.type)
         }
 
         file.write(structure != nil)
         if let structure = structure {
-            file.write(structure.id)
+            file.write(structure.type)
             file.write(structure)
         }
 
         file.write(creature != nil)
         if let creature = creature {
-            file.write(creature.id)
+            file.write(creature.type)
             file.write(creature)
         }
 
-        file.write(groundId)
+        file.write(groundType)
     }
 
     func deserialize(from file: FileHandle) {
@@ -334,17 +334,17 @@ class Tile: Configurable, Serializable {
         file.read(&itemCount)
         items = []
         for _ in 0..<itemCount {
-            var itemId = ""
-            file.read(&itemId)
-            items.append(Item(id: itemId))
+            var itemType = ""
+            file.read(&itemType)
+            items.append(Item(type: itemType))
         }
 
         var hasStructure = false
         file.read(&hasStructure)
         if hasStructure {
-            var structureId = ""
-            file.read(&structureId)
-            structure = Structure(id: structureId)
+            var structureType = ""
+            file.read(&structureType)
+            structure = Structure(type: structureType)
             file.read(&structure!)
         } else {
             structure = nil
@@ -353,14 +353,14 @@ class Tile: Configurable, Serializable {
         var hasCreature = false
         file.read(&hasCreature)
         if hasCreature {
-            var creatureId = ""
-            file.read(&creatureId)
-            creature = Creature(id: creatureId, tile: self, controller: AIController())
+            var creatureType = ""
+            file.read(&creatureType)
+            creature = Creature(type: creatureType, tile: self, controller: AIController())
             file.read(&creature!)
         } else {
             creature = nil
         }
 
-        file.read(&groundId)
+        file.read(&groundType)
     }
 }

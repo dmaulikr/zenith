@@ -44,7 +44,7 @@ struct AIController: CreatureController {
         var didAttack = false
 
         for direction in Direction4.allDirections {
-            if let enemy = npc.tileUnder.adjacentTile(direction.vector)?.creature, enemy.id != npc.id {
+            if let enemy = npc.tileUnder.adjacentTile(direction.vector)?.creature, enemy.type != npc.type {
                 let attackStyle = npc.wieldedItem != nil ? .hit : npc.attackStyles.randomElement()!
                 npc.hit(direction: direction, style: attackStyle)
                 didAttack = true

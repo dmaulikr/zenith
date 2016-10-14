@@ -16,19 +16,19 @@ class Builder {
         let (allRoomTiles, nonCornerTiles, wallTiles) = result!
 
         // Spawn door
-        nonCornerTiles.randomElement()!.structure = Structure(id: "door")
+        nonCornerTiles.randomElement()!.structure = Structure(type: "door")
 
         // Spawn stairs to cellar
         if Float.random(0...1) < 0.3 {
             let stairwayTile = allRoomTiles.filter { tile in !wallTiles.contains { $0 === tile } }.randomElement()!
-            stairwayTile.structure = Structure(id: "stairsDown")
+            stairwayTile.structure = Structure(type: "stairsDown")
             Builder.cellarPlan[stairwayTile.position] = Rect(position: northWestCorner.position,
                                                              size: buildingSize)
         }
     }
 
     static func generateCellars(to area: Area) {
-        let stairwayTiles = area.tiles.filter { $0.structure?.id == "stairsUp" }
+        let stairwayTiles = area.tiles.filter { $0.structure?.type == "stairsUp" }
         for tile in stairwayTiles {
             guard let rect = cellarPlan.removeValue(forKey: tile.position) else {
                 // FIXME: removeValue should not return nil here.
@@ -54,13 +54,13 @@ class Builder {
             guard let targetTile = northWestCorner.adjacentTile(position) else {
                 return false // Going outside the generated world
             }
-            if let id = targetTile.structure?.id, [wallType, "stairsUp"].contains(id) {
+            if let type = targetTile.structure?.type, [wallType, "stairsUp"].contains(type) {
                 return false
             }
 
             if !isCorner(position: position) {
                 for tile in targetTile.adjacent4Tiles {
-                    if tile?.structure?.id == wallType { return false }
+                    if tile?.structure?.type == wallType { return false }
                 }
                 nonCornerTiles.append(targetTile)
             }
@@ -97,8 +97,8 @@ class Builder {
         for x in 0..<roomSize.x {
             for y in 0..<roomSize.y {
                 let targetTile = northWestCorner.adjacentTile(Vector2(x, y))!
-                targetTile.groundId = "woodenFloor"
-                if let id = targetTile.structure?.id, ["tree", "ground"].contains(id) {
+                targetTile.groundType = "woodenFloor"
+                if let type = targetTile.structure?.type, ["tree", "ground"].contains(type) {
                     targetTile.structure = nil // Remove natural obstacles, like trees.
                 }
                 allRoomTiles.append(targetTile)
@@ -106,7 +106,7 @@ class Builder {
         }
 
         // Spawn walls
-        wallTiles.forEach { $0.structure = Structure(id: wallType) }
+        wallTiles.forEach { $0.structure = Structure(type: wallType) }
         return (allRoomTiles: allRoomTiles, nonCornerTiles: nonCornerTiles, wallTiles: wallTiles)
     }
 }

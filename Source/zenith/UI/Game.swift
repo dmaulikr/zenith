@@ -39,7 +39,7 @@ class Game: State, Serializable {
             world.generate()
             messageStream = MessageStream(game: self)
             sidebar = Sidebar(gui: gui, game: self)
-            player = Creature(id: "human",
+            player = Creature(type: "human",
                               tile: world.area(at: Vector3(0, 0, 0))!
                                          .tile(at: Area.sizeVector / 2),
                               controller: PlayerController(game: self),
@@ -226,7 +226,7 @@ class Game: State, Serializable {
             if player.tileUnder.structure != nil {
                 player.tileUnder.structure = nil
             } else {
-                player.tileUnder.structure = Structure(id: "brickWall")
+                player.tileUnder.structure = Structure(type: "brickWall")
             }
             return true
         #else
@@ -239,7 +239,7 @@ class Game: State, Serializable {
             if player.tileUnder.structure != nil {
                 player.tileUnder.structure = nil
             } else {
-                player.tileUnder.structure = Structure(id: "door")
+                player.tileUnder.structure = Structure(type: "door")
             }
             return true
         #else

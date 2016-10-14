@@ -76,15 +76,15 @@ class Area: Serializable {
     private func connectStairs() {
         if let areaAbove = areaAbove {
             for tile in areaAbove.tiles {
-                if tile.structure?.id == "stairsDown" {
-                    self.tile(at: tile.position).structure = Structure(id: "stairsUp")
+                if tile.structure?.type == "stairsDown" {
+                    self.tile(at: tile.position).structure = Structure(type: "stairsUp")
                 }
             }
         }
         if let areaBelow = areaBelow {
             for tile in areaBelow.tiles {
-                if tile.structure?.id == "stairsUp" {
-                    self.tile(at: tile.position).structure = Structure(id: "stairsDown")
+                if tile.structure?.type == "stairsUp" {
+                    self.tile(at: tile.position).structure = Structure(type: "stairsDown")
                 }
             }
         }
