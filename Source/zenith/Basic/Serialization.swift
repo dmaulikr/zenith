@@ -33,11 +33,9 @@ extension FileHandle {
     }
 
     func write<T: Serializable>(_ optional: T?) {
+        write(optional != nil)
         if let wrapped = optional {
-            write(true)
             write(wrapped)
-        } else {
-            write(false)
         }
     }
 

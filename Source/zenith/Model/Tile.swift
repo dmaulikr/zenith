@@ -314,20 +314,16 @@ class Tile: Configurable, Serializable {
             file.write(item.id)
         }
 
+        file.write(structure != nil)
         if let structure = structure {
-            file.write(true)
             file.write(structure.id)
             file.write(structure)
-        } else {
-            file.write(false)
         }
 
+        file.write(creature != nil)
         if let creature = creature {
-            file.write(true)
             file.write(creature.id)
             file.write(creature)
-        } else {
-            file.write(false)
         }
 
         file.write(groundId)
