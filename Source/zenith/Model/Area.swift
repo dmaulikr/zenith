@@ -5,6 +5,7 @@ class Area: Serializable {
     unowned let world: World
     let position: Vector3i
     private(set) var tiles: [Tile]
+    private(set) var creatures: [Creature]
     var populationDensity: Double!
 
     static let size = 16
@@ -16,6 +17,7 @@ class Area: Serializable {
         self.position = position
         tiles = []
         tiles.reserveCapacity(Area.size * Area.size)
+        creatures = []
     }
 
     func generate() {
@@ -71,6 +73,15 @@ class Area: Serializable {
 
     var globalLight: Color {
         return position.z >= 0 ? world.sunlight : Color(hue: 0.125, saturation: 0, lightness: 0.2)
+    }
+
+    func registerCreature(_ creature: Creature) {
+        assert(!creatures.contains { $0 === creature })
+        creatures.append(creature)
+    }
+
+    func unregisterCreature(_ creature: Creature) {
+        creatures.remove(at: creatures.index { $0 === creature }!)
     }
 
     private func connectStairs() {

@@ -15,7 +15,15 @@ class Tile: Configurable, Serializable {
             invalidateRenderCache()
         }
     }
-    var creature: Creature?
+    var creature: Creature? {
+        willSet {
+            if let newCreature = newValue {
+                area.registerCreature(newCreature)
+            } else if let oldCreature = creature {
+                area.unregisterCreature(oldCreature)
+            }
+        }
+    }
     var lightColor: Color
     var groundType: String {
         didSet {

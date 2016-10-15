@@ -18,7 +18,6 @@ class Creature: Object, Configurable, Spawnable {
 
     private var sprite: Sprite
     static let config = Configuration.load(name: "creature")
-    static var allCreatures = [Creature]()
 
     init(type: String, tile: Tile, controller: CreatureController, messageStream: MessageStream? = nil) {
         self.tileUnder = tile
@@ -37,13 +36,6 @@ class Creature: Object, Configurable, Spawnable {
         super.init(type: type)
         calculateDerivedStats()
         tile.creature = self
-        Creature.allCreatures.append(self)
-    }
-
-    deinit {
-        if let index = Creature.allCreatures.index(where: { $0 === self }) {
-            Creature.allCreatures.remove(at: index)
-        }
     }
 
     enum Attribute: String, Serializable {
@@ -328,10 +320,14 @@ class Creature: Object, Configurable, Spawnable {
     func die() {
         tileUnder.creature = nil
         tileUnder.addItem(Item(type: type + "Corpse"))
-        Creature.allCreatures.remove(at: Creature.allCreatures.index(where: { $0 === self })!)
-        Creature.allCreatures.forEach {
-            if $0.canSee(self) {
-                $0.addMessage("\(name(.definite, .capitalize)) dies.")
+
+        for area in [.some(area)] + area.adjacent8Areas {
+            if let area = area {
+                for observer in area.creatures {
+                    if observer.canSee(self) {
+                        observer.addMessage("\(name(.definite, .capitalize)) dies.")
+                    }
+                }
             }
         }
         addMessage("You die.")

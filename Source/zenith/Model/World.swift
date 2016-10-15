@@ -23,17 +23,22 @@ class World {
         updateAdjacentAreas()
     }
 
-    deinit {
-        Creature.allCreatures.removeAll()
-    }
-
     var creatureUpdateStartIndex: Int = 0
 
     func update(player: Creature) throws {
         generateAreas(player: player)
 
-        // FIXME: Should only update creatures within areaUpdateDistance.
-        let range = Creature.allCreatures[creatureUpdateStartIndex..<Creature.allCreatures.endIndex]
+        var creaturesToUpdate = [Creature]()
+
+        for dx in -areaUpdateDistance...areaUpdateDistance {
+            for dy in -areaUpdateDistance...areaUpdateDistance {
+                if let area = area(at: player.area.position + Vector3(dx, dy, 0)) {
+                    creaturesToUpdate.append(contentsOf: area.creatures)
+                }
+            }
+        }
+
+        let range = creaturesToUpdate[creatureUpdateStartIndex..<creaturesToUpdate.endIndex]
         for creature in range {
             try creature.update()
             creatureUpdateStartIndex += 1
