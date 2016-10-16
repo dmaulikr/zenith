@@ -21,7 +21,7 @@ struct Menu<T: CustomStringConvertible> {
         for (index, item) in items.enumerated() {
             var label = Label(font: font, text: item.description)
             label.color = index == selectionIndex ? selectionColor : labelColor
-            label.position = Vector2(0, index * font.glyphSize.y)
+            label.position = Vector2(0, index * font.height)
             labels.append(label)
         }
     }

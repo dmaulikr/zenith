@@ -141,4 +141,4 @@ public struct Application {
 }
 
 public var app: Application!
-public var font: BitmapFont! // FIXME: Should be of type Font.
+public var font: Font! // FIXME: Should be of type Font.

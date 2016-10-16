@@ -35,7 +35,7 @@ class DirectionQuestion: State {
 
     func render() {
         let rect = Rect(position: gui.worldViewRect.topLeft,
-                        size: Vector2(label.text.characters.count * font.glyphSize.x + 2 * spacing,
+                        size: Vector2(font.textWidth(label.text) + 2 * spacing,
                                       lineHeight + 2 * spacing))
         drawFilledRectangle(rect, color: Color.black)
         label.render()
@@ -64,7 +64,7 @@ class TimeQuestion: State {
         result = TimeQuestion.initialValue
         timeInputLabel = Label(font: font, text: "\(result.hours) hours")
         timeInputLabel.position = gui.worldViewRect.topLeft + spacingVector
-        timeInputLabel.position.x += (questionLabel.text.characters.count + 1) * font.glyphSize.x
+        timeInputLabel.position.x += font.textWidth(questionLabel.text + " ")
     }
 
     func update() {
@@ -94,8 +94,7 @@ class TimeQuestion: State {
     }
 
     func render() {
-        let width = (questionLabel.text.characters.count + 1 + timeInputLabel.text.characters.count)
-                    * font.glyphSize.x + 2 * spacing
+        let width = font.textWidth(questionLabel.text + " " + timeInputLabel.text) + 2 * spacing
         let rect = Rect(position: gui.worldViewRect.topLeft,
                         size: Vector2(width, lineHeight + 2 * spacing))
         drawFilledRectangle(rect, color: Color.black)

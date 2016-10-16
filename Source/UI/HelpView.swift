@@ -64,9 +64,9 @@ class HelpView: State {
         label.render()
         label.color = textColor
 
-        let yOffset = lineHeight * 2 + (tileSize - font.glyphSize.y) / 2
+        let yOffset = lineHeight * 2 + (tileSize - font.height) / 2
         var keyPosition = position + Vector2(0, yOffset)
-        var infoPosition = keyPosition + Vector2(font.glyphSize.x * 3, 0)
+        var infoPosition = keyPosition + Vector2(font.textWidth("   "), 0)
 
         for (key, info) in commands {
             label.text = key

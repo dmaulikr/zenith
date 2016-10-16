@@ -66,7 +66,7 @@ class ItemMenu: State {
 
         var spritePosition = position
         var textPosition = position
-        textPosition += Vector2(tileSize + spacing, (tileSize - font.glyphSize.y) / 2)
+        textPosition += Vector2(tileSize + spacing, (tileSize - font.height) / 2)
 
         if allowNothingAsOption {
             let color = menu.selection!.item == nil ? textColorHighlight : textColor

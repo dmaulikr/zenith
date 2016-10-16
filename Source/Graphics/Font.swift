@@ -3,9 +3,13 @@ import Basic
 
 public protocol Font {
 
+    func renderText(_: String, at: Vector2i, color: Color)
+
     func renderText(_: String, at: Vector2i, color: Color, align: Alignment)
 
     func textWidth(_: String) -> Int
+
+    var height: Int { get }
 }
 
 /// A font that renders character sprites loaded from a bitmap.
@@ -21,8 +25,11 @@ public struct BitmapFont: Font {
         self.glyphSize = self.bitmap.size / glyphCount
     }
 
-    public func renderText(_ text: String, at position: Vector2i,
-                           color: Color, align alignment: Alignment = .left) {
+    public func renderText(_ text: String, at position: Vector2i, color: Color) {
+        renderText(text, at: position, color: color, align: .left)
+    }
+
+    public func renderText(_ text: String, at position: Vector2i, color: Color, align alignment: Alignment) {
         var position = Vector2<Int32>(position)
         switch alignment {
             case .left:   break
@@ -44,6 +51,10 @@ public struct BitmapFont: Font {
 
     public func textWidth(_ text: String) -> Int {
         return text.characters.count * glyphSize.x
+    }
+
+    public var height: Int {
+        return glyphSize.y
     }
 }
 
