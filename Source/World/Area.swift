@@ -116,6 +116,8 @@ public class Area: Serializable {
     }
 
     private func index(_ position: Vector2i) -> Int {
+        assert(position.x >= 0 && position.x < Area.size)
+        assert(position.y >= 0 && position.y < Area.size)
         return position.y + position.x * Area.size
     }
 
@@ -127,6 +129,8 @@ public class Area: Serializable {
     }
 
     public func deserialize(from file: FileHandle) {
+        assert(tiles.isEmpty)
+
         for x in 0..<Area.size {
             for y in 0..<Area.size {
                 var tile = Tile(area: self, position: Vector2(x, y))
