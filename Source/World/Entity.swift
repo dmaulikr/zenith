@@ -28,11 +28,6 @@ public class Entity: Serializable {
         return nil
     }
 
-    /// Renders each component in this entity.
-    func render() {
-        for component in components { component.render() }
-    }
-
     /// Updates each component in this entity.
     func update() throws {
         for component in components { component.update() }

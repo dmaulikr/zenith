@@ -42,7 +42,7 @@ public class Item: Object, Configurable, Spawnable, Hashable, Equatable {
         addComponents(config: Item.config)
     }
 
-    override func render() {
+    func render() {
         sprite.render()
     }
 

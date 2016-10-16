@@ -15,7 +15,7 @@ public class Structure: Object, Configurable, Spawnable {
         addComponents(config: Structure.config)
     }
 
-    override func render() {
+    func render() {
         sprite.render()
     }
 

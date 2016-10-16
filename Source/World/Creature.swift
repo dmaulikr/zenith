@@ -263,7 +263,7 @@ public class Creature: Object, Configurable, Spawnable {
         try controller.control(self)
     }
 
-    override func render() {
+    func render() {
         sprite.render()
         wieldedItem?.wieldedSprite.render(at: sprite.position)
     }
