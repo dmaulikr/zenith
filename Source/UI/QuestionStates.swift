@@ -51,6 +51,7 @@ class TimeQuestion: State {
     private var timeInputLabel: Label
     private var result: Time! {
         didSet {
+            if result == nil { return }
             timeInputLabel.text = "\(result.hours) hours"
         }
     }
