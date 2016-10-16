@@ -113,7 +113,7 @@ class Game: State, Serializable {
     private func performMoveOrAttack(_ direction: Direction4) -> Bool {
         if let otherCreature = player.tileUnder.adjacentTile(direction.vector)?.creature {
             if player.relationship(to: otherCreature) == .hostile {
-                player.hit(direction: direction, style: player.attackStyles.randomElement()!)
+                player.hit(direction: direction, style: player.attackStyles.randomElement!)
                 return true
             }
         }

@@ -56,7 +56,7 @@ public extension Float {
 
 public extension Array {
     /// A randomly selected element from the array, or nil if the array is empty.
-    public func randomElement() -> Element? {
+    public var randomElement: Element? {
         if let index = Int.random(0..<count) {
             return self[index]
         }

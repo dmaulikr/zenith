@@ -18,11 +18,11 @@ class Builder {
         let (allRoomTiles, nonCornerTiles, wallTiles) = result!
 
         // Spawn door
-        nonCornerTiles.randomElement()!.structure = Structure(type: "door")
+        nonCornerTiles.randomElement!.structure = Structure(type: "door")
 
         // Spawn stairs to cellar
         if Float.random(0...1) < 0.3 {
-            let stairwayTile = allRoomTiles.filter { tile in !wallTiles.contains { $0 === tile } }.randomElement()!
+            let stairwayTile = allRoomTiles.filter { tile in !wallTiles.contains { $0 === tile } }.randomElement!
             stairwayTile.structure = Structure(type: "stairsDown")
             Builder.cellarPlan[stairwayTile.position] = Rect(position: northWestCorner.position,
                                                              size: buildingSize)

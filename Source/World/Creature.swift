@@ -284,7 +284,7 @@ public class Creature: Object, Configurable, Spawnable {
     }
 
     public func hit(direction hitDirection: Direction4, style: AttackStyle? = nil) {
-        let style = style ?? (wieldedItem != nil ? .hit : attackStyles.randomElement()!)
+        let style = style ?? (wieldedItem != nil ? .hit : attackStyles.randomElement!)
         let damage = calculateDamage(style: style)
         tileUnder.adjacentTile(hitDirection.vector)?.beHit(by: self, direction: hitDirection,
                                                            style: style, damage: damage)

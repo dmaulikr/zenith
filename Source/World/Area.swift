@@ -70,7 +70,7 @@ public class Area: Serializable {
     }
 
     var randomTile: Tile {
-        return tiles.randomElement()!
+        return tiles.randomElement!
     }
 
     var globalLight: Color {
