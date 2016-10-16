@@ -108,8 +108,6 @@ public struct Application {
         switch SDL_EventType(event.type) {
             case SDL_KEYDOWN:
                 return handleKeyPressEvent(event)
-            case SDL_KEYUP:
-                return handleKeyReleaseEvent(event)
             default:
                 return handleSystemEvent(event)
         }
@@ -117,10 +115,6 @@ public struct Application {
 
     private func handleKeyPressEvent(_ event: SDL_Event) -> Bool {
         return activeState?.keyWasPressed(key: event.key.keysym.sym) ?? false
-    }
-
-    private func handleKeyReleaseEvent(_ event: SDL_Event) -> Bool {
-        return activeState?.keyWasReleased(key: event.key.keysym.sym) ?? false
     }
 
     private mutating func handleSystemEvent(_ event: SDL_Event) -> Bool {
