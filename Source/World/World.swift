@@ -112,11 +112,11 @@ public class World {
 
         for dx in -areaGenerationDistance...areaGenerationDistance {
             for dy in -areaGenerationDistance...areaGenerationDistance {
-                saveArea(at: playerAreaPosition + Vector3(dx, dy, 0))
+                moveAreaToFile(at: playerAreaPosition + Vector3(dx, dy, 0))
             }
         }
-        saveArea(at: playerAreaPosition + Vector3(0, 0, -1))
-        saveArea(at: playerAreaPosition + Vector3(0, 0,  1))
+        moveAreaToFile(at: playerAreaPosition + Vector3(0, 0, -1))
+        moveAreaToFile(at: playerAreaPosition + Vector3(0, 0,  1))
     }
 
     public func saveNonAdjacentAreas(player: Creature) {
@@ -124,19 +124,20 @@ public class World {
             for dy in -areaGenerationDistance - 1...areaGenerationDistance + 1 {
                 if -areaGenerationDistance...areaGenerationDistance ~= dx { continue }
                 if -areaGenerationDistance...areaGenerationDistance ~= dy { continue }
-                saveArea(at: player.area.position + Vector3(dx, dy, 0))
+                moveAreaToFile(at: player.area.position + Vector3(dx, dy, 0))
             }
         }
         for dx in -areaGenerationDistance...areaGenerationDistance {
             for dy in -areaGenerationDistance...areaGenerationDistance {
                 if dx == 0 || dy == 0 { continue }
-                saveArea(at: player.area.position + Vector3(dx, dy, -1))
-                saveArea(at: player.area.position + Vector3(dx, dy,  1))
+                moveAreaToFile(at: player.area.position + Vector3(dx, dy, -1))
+                moveAreaToFile(at: player.area.position + Vector3(dx, dy,  1))
             }
         }
     }
 
-    func saveArea(at position: Vector3i) {
+    /// Saves the area at the given position to disk and removes it from memory.
+    func moveAreaToFile(at position: Vector3i) {
         if let area = areas[position] {
             let fileName = Area.saveFileName(forPosition: position)
             try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
@@ -144,6 +145,7 @@ public class World {
             FileManager.default.createFile(atPath: Assets.savedGamePath + fileName, contents: nil)
             let file = FileHandle(forWritingAtPath: Assets.savedGamePath + fileName)!
             area.serialize(to: file)
+            areas[position] = nil
         }
     }
 
