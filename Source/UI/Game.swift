@@ -289,6 +289,13 @@ class PlayerController: CreatureController {
     }
 
     func control(_ player: Creature) throws {
+        if player.isResting {
+            if app.pollForKeyPress() == SDL_Keycode(SDLK_ESCAPE) {
+                player.currentAction = nil
+            }
+            return
+        }
+
         while true {
             let key = app.waitForKeyPress()
 

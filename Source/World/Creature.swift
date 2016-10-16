@@ -11,7 +11,13 @@ public class Creature: Object, Configurable, Spawnable {
             tileUnder.invalidateRenderCache()
         }
     }
-    public var currentAction: Action?
+    public var currentAction: Action? {
+        willSet {
+            if newValue == nil, let stoppedAction = currentAction {
+                addMessage("You stop \(stoppedAction).")
+            }
+        }
+    }
     public var controller: CreatureController
     public var messageStream: TextOutputStream?
 
@@ -250,7 +256,6 @@ public class Creature: Object, Configurable, Spawnable {
         if case .some(.resting(let ticksLeft)) = currentAction {
             if ticksLeft > 0 {
                 currentAction = .resting(ticksLeft: ticksLeft - 1)
-                return
             } else {
                 currentAction = nil
             }
@@ -344,7 +349,7 @@ public class Creature: Object, Configurable, Spawnable {
         return health <= 0
     }
 
-    var isResting: Bool {
+    public var isResting: Bool {
         if case .some(.resting) = currentAction {
             return true
         }
@@ -471,7 +476,7 @@ public class Creature: Object, Configurable, Spawnable {
     }
 }
 
-public enum Action: Serializable {
+public enum Action: Serializable, CustomStringConvertible {
 
     case resting(ticksLeft: Int)
 
@@ -493,6 +498,12 @@ public enum Action: Serializable {
                 self = .resting(ticksLeft: ticksLeft)
             default:
                 assert(false)
+        }
+    }
+
+    public var description: String {
+        switch self {
+            case .resting: return "resting"
         }
     }
 }

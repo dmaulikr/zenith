@@ -76,6 +76,22 @@ public struct Application {
         }
     }
 
+    public func pollForKeyPress() -> SDL_Keycode? {
+        var event = SDL_Event()
+        var removedEvents = [SDL_Event]()
+        var result: SDL_Keycode? = nil
+
+        while SDL_PollEvent(&event) != 0 {
+            if SDL_EventType(event.type) == SDL_KEYDOWN {
+                result = event.key.keysym.sym
+                break
+            }
+            removedEvents.append(event)
+        }
+        for var event in removedEvents { SDL_PushEvent(&event) }
+        return result
+    }
+
     private mutating func handleEvents() {
         var event = SDL_Event()
         while SDL_PollEvent(&event) != 0 {

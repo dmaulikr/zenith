@@ -14,6 +14,8 @@ public enum CreatureUpdateInterruption: Error {
 struct AIController: CreatureController {
 
     func control(_ npc: Creature) {
+        if npc.isResting { return }
+
         var didAttack = false
 
         for direction in Direction4.allDirections {
