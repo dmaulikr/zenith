@@ -108,13 +108,15 @@ public class World {
     }
 
     public func saveUnsavedAreas(player: Creature) {
+        let playerAreaPosition = player.area.position
+
         for dx in -areaGenerationDistance...areaGenerationDistance {
             for dy in -areaGenerationDistance...areaGenerationDistance {
-                saveArea(at: player.area.position + Vector3(dx, dy, 0))
+                saveArea(at: playerAreaPosition + Vector3(dx, dy, 0))
             }
         }
-        saveArea(at: player.area.position + Vector3(0, 0, -1))
-        saveArea(at: player.area.position + Vector3(0, 0,  1))
+        saveArea(at: playerAreaPosition + Vector3(0, 0, -1))
+        saveArea(at: playerAreaPosition + Vector3(0, 0,  1))
     }
 
     public func saveNonAdjacentAreas(player: Creature) {

@@ -4,7 +4,7 @@ import Graphics
 
 public class Creature: Object, Configurable, Spawnable {
 
-    public private(set) var tileUnder: Tile
+    public private(set) unowned var tileUnder: Tile
     var backpack: [Item]
     private(set) var wieldedItem: Item? {
         didSet {
