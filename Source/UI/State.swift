@@ -14,10 +14,10 @@ public protocol State {
     func enter()
 
     /// Called immediately when a key is pressed while the state is active.
-    func keyWasPressed(key: SDL_Keycode)
+    func keyWasPressed(key: SDL_Keycode) -> Bool
 
     /// Called immediately when a key is released while the state is active.
-    func keyWasReleased(key: SDL_Keycode)
+    func keyWasReleased(key: SDL_Keycode) -> Bool
 
     /// Determines whether the state below this state should be drawn before
     /// drawing this state. The default is `false`.
@@ -29,7 +29,7 @@ public extension State {
     func render() {}
     func update() {}
     func enter() {}
-    func keyWasPressed(key: SDL_Keycode) {}
-    func keyWasReleased(key: SDL_Keycode) {}
+    func keyWasPressed(key: SDL_Keycode) -> Bool { return false }
+    func keyWasReleased(key: SDL_Keycode) -> Bool { return false }
     var shouldRenderStateBelow: Bool { return false }
 }

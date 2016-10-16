@@ -71,7 +71,7 @@ public struct Application {
                 case SDL_KEYDOWN:
                     return event.key.keysym.sym
                 default:
-                    handleSystemEvent(event)
+                    _ = handleSystemEvent(event)
             }
         }
     }
@@ -94,47 +94,54 @@ public struct Application {
 
     private mutating func handleEvents() {
         var event = SDL_Event()
+        var unhandledEvents = [SDL_Event]()
+
         while SDL_PollEvent(&event) != 0 {
-            handleEvent(event)
+            if !handleEvent(event) {
+                unhandledEvents.append(event)
+            }
         }
+        for var event in unhandledEvents { SDL_PushEvent(&event) }
     }
 
-    private mutating func handleEvent(_ event: SDL_Event) {
+    private mutating func handleEvent(_ event: SDL_Event) -> Bool {
         switch SDL_EventType(event.type) {
             case SDL_KEYDOWN:
-                handleKeyPressEvent(event)
+                return handleKeyPressEvent(event)
             case SDL_KEYUP:
-                handleKeyReleaseEvent(event)
+                return handleKeyReleaseEvent(event)
             default:
-                handleSystemEvent(event)
+                return handleSystemEvent(event)
         }
     }
 
-    private func handleKeyPressEvent(_ event: SDL_Event) {
-        activeState?.keyWasPressed(key: event.key.keysym.sym)
+    private func handleKeyPressEvent(_ event: SDL_Event) -> Bool {
+        return activeState?.keyWasPressed(key: event.key.keysym.sym) ?? false
     }
 
-    private func handleKeyReleaseEvent(_ event: SDL_Event) {
-        activeState?.keyWasReleased(key: event.key.keysym.sym)
+    private func handleKeyReleaseEvent(_ event: SDL_Event) -> Bool {
+        return activeState?.keyWasReleased(key: event.key.keysym.sym) ?? false
     }
 
-    private mutating func handleSystemEvent(_ event: SDL_Event) {
+    private mutating func handleSystemEvent(_ event: SDL_Event) -> Bool {
         switch SDL_EventType(event.type) {
             case SDL_WINDOWEVENT:
-                handleWindowEvent(event)
+                return handleWindowEvent(event)
             case SDL_QUIT:
                 running = false
+                return true
             default:
-                break
+                return false
         }
     }
 
-    private mutating func handleWindowEvent(_ event: SDL_Event) {
+    private mutating func handleWindowEvent(_ event: SDL_Event) -> Bool {
         switch SDL_WindowEventID(UInt32(event.window.event)) {
             case SDL_WINDOWEVENT_CLOSE:
                 running = false
+                return true
             default:
-                break
+                return false
         }
     }
 }

@@ -72,11 +72,13 @@ class Game: State, Serializable {
         tick += 1
     }
 
-    func keyWasPressed(key: SDL_Keycode) {
+    func keyWasPressed(key: SDL_Keycode) -> Bool {
         if player.isDead && Int(key) == SDLK_ESCAPE {
             mainMenu.deleteGame()
             app.popState()
+            return true
         }
+        return false
     }
 
     func handlePlayerCommand(key: SDL_Keycode) -> Bool {
