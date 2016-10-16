@@ -6,7 +6,7 @@ public enum Direction4 {
     case south
     case west
 
-    var vector: Vector2i {
+    public var vector: Vector2i {
         switch self {
             case .north: return Vector2( 0, -1)
             case .east:  return Vector2( 1,  0)
@@ -32,7 +32,7 @@ enum Direction8 {
     case west
     case northWest
 
-    var vector: Vector2i {
+    public var vector: Vector2i {
         switch self {
             case .north:     return Vector2( 0, -1)
             case .northEast: return Vector2( 1, -1)

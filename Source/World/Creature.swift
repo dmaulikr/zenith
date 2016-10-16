@@ -283,7 +283,8 @@ public class Creature: Object, Configurable, Spawnable {
         return Creature.config.array(type, "attackStyles")!.map { AttackStyle(rawValue: $0)! }
     }
 
-    public func hit(direction hitDirection: Direction4, style: AttackStyle) {
+    public func hit(direction hitDirection: Direction4, style: AttackStyle? = nil) {
+        let style = style ?? (wieldedItem != nil ? .hit : attackStyles.randomElement()!)
         let damage = calculateDamage(style: style)
         tileUnder.adjacentTile(hitDirection.vector)?.beHit(by: self, direction: hitDirection,
                                                            style: style, damage: damage)
@@ -372,6 +373,10 @@ public class Creature: Object, Configurable, Spawnable {
 
     func canSee(_ other: Creature) -> Bool {
         return other.tileUnder.structure?.blocksSight != true && canSee(other.tileUnder)
+    }
+
+    public func relationship(to other: Creature) -> Relationship {
+        return type != other.type ? .hostile : .neutral
     }
 
     static var _spawnInfoMap = SpawnInfoMap()
@@ -525,4 +530,11 @@ public enum AttackStyle: String {
             case .bite: return "bites"
         }
     }
+}
+
+public enum Relationship {
+
+    case friendly
+    case neutral
+    case hostile
 }

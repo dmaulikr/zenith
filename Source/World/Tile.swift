@@ -11,7 +11,7 @@ public class Tile: Configurable, Serializable {
 
     unowned let area: Area
     public let position: Vector2i
-    var globalPosition: Vector2i {
+    public var globalPosition: Vector2i {
         return Vector2(area.position) * Area.size + position
     }
     private(set) var items: [Item]
@@ -78,7 +78,7 @@ public class Tile: Configurable, Serializable {
         }
     }
 
-    func adjacentTile(_ direction: Vector2i) -> Tile? {
+    public func adjacentTile(_ direction: Vector2i) -> Tile? {
         var position = self.position + direction
         var relativeAreaPosition = Vector2(0, 0)
 

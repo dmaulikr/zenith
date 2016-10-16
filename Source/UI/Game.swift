@@ -83,10 +83,10 @@ class Game: State, Serializable {
 
     func handlePlayerCommand(key: SDL_Keycode) -> Bool {
         switch Int(key) {
-            case SDLK_UP:     return performMove(.north)
-            case SDLK_RIGHT:  return performMove(.east)
-            case SDLK_DOWN:   return performMove(.south)
-            case SDLK_LEFT:   return performMove(.west)
+            case SDLK_UP:     return performMoveOrAttack(.north)
+            case SDLK_RIGHT:  return performMoveOrAttack(.east)
+            case SDLK_DOWN:   return performMoveOrAttack(.south)
+            case SDLK_LEFT:   return performMoveOrAttack(.west)
             case SDLK_COMMA:  return performPickUp()
             case SDLK_PERIOD: return performWait()
             case SDLK_r:      return performRest()
@@ -110,7 +110,13 @@ class Game: State, Serializable {
         messageStream.render(region: gui.messageViewRect)
     }
 
-    private func performMove(_ direction: Direction4) -> Bool {
+    private func performMoveOrAttack(_ direction: Direction4) -> Bool {
+        if let otherCreature = player.tileUnder.adjacentTile(direction.vector)?.creature {
+            if player.relationship(to: otherCreature) == .hostile {
+                player.hit(direction: direction, style: player.attackStyles.randomElement()!)
+                return true
+            }
+        }
         player.tryToMove(direction)
         return true
     }
