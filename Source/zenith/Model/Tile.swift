@@ -18,7 +18,9 @@ class Tile: Configurable, Serializable {
     var creature: Creature? {
         willSet {
             if let newCreature = newValue {
-                area.registerCreature(newCreature)
+                if newCreature !== creature { // FIXME: This shouldn't happen.
+                    area.registerCreature(newCreature)
+                }
             } else if let oldCreature = creature {
                 area.unregisterCreature(oldCreature)
             }
