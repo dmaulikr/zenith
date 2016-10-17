@@ -7,7 +7,7 @@ zenith is an upcoming graphical open-world roguelike game, still in its early de
 Requirements
 ------------
 
-- [Swift][1]
+- [Swift >= 3.0][1]
 - [SDL >= 2.0.4][2]
 
 
