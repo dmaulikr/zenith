@@ -3,4 +3,5 @@ import XCTest
 
 XCTMain([
     testCase(SerializationTests.allTests),
+    testCase(UITests.allTests),
 ])
