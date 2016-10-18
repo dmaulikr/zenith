@@ -24,7 +24,10 @@ public class Game: State, Serializable {
                 return nil
             }
             // Load a saved game.
-            let saveFile = FileHandle(forReadingAtPath: Assets.globalSavePath)!
+            guard let saveFile = FileHandle(forReadingAtPath: Assets.globalSavePath) else {
+                let globalSaveFileName = Assets.globalSavePath.components(separatedBy: "/").last!
+                fatalError("\(globalSaveFileName) not found in \(Assets.savedGamePath)")
+            }
             deserialize(from: saveFile)
             world = World(startTime: startTime)
             world.updateAdjacentAreas(relativeTo: playerAreaPosition)
