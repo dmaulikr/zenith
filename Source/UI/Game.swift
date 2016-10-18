@@ -63,7 +63,7 @@ public class Game: State, Serializable {
 
         if playerAreaPosition != player.area.position {
             playerAreaPosition = player.area.position
-            world.saveNonAdjacentAreas(player: player)
+            saveToFile(keepAdjacentAreasInMemory: true)
         }
 
         do {
@@ -260,12 +260,13 @@ public class Game: State, Serializable {
         #endif
     }
 
-    func saveToFile() {
+    func saveToFile(keepAdjacentAreasInMemory: Bool) {
         try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
                                                  withIntermediateDirectories: false)
         FileManager.default.createFile(atPath: Assets.globalSavePath, contents: nil)
         serialize(to: FileHandle(forWritingAtPath: Assets.globalSavePath)!)
-        world.saveUnsavedAreas(player: player)
+        world.saveNonAdjacentAreas(player: player, keepInMemory: false)
+        world.saveAdjacentAreas(player: player, keepInMemory: keepAdjacentAreasInMemory)
     }
 
     public func serialize(to file: FileHandle) {

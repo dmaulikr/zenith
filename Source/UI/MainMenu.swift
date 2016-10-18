@@ -57,9 +57,7 @@ public class MainMenu: State {
     }
 
     func saveAndQuit() {
-        if let game = game {
-            game.saveToFile()
-        }
+        game?.saveToFile(keepAdjacentAreasInMemory: false)
         app.stop()
     }
 
