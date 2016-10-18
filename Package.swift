@@ -9,6 +9,7 @@ let package = Package(
         Target(name: "UI", dependencies: ["Basic", "Graphics", "World"]),
         Target(name: "zenith", dependencies: ["UI"]),
         Target(name: "WorldTests"),
+        Target(name: "UITests"),
     ],
     dependencies: [
         .Package(url: "https://github.com/emlai/CSDL2.swift.git", majorVersion: 1),

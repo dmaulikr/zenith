@@ -20,5 +20,7 @@ Sprite.transparentColor = Color(r: 0x5a, g: 0x52, b: 0x68)
 
 font = BitmapFont(fileName: Assets.graphicsPath + "font.bmp")
 
-app.pushState(MainMenu(font: font))
+let mainMenu = MainMenu(font: font)
+mainMenu.game = Game(mainMenu: mainMenu, loadSavedGame: true)
+app.pushState(mainMenu)
 app.run()

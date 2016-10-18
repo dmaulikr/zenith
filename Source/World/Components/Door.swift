@@ -10,7 +10,7 @@ class Door: StructureComponent, Closeable {
 
     private weak var structure: Structure!
     private var openSpritePositionOffset: Vector2i
-    private var state: State
+    private(set) var state: State
     var preventsMovement: Bool { return state == .closed }
 
     enum State {

@@ -3,7 +3,7 @@ import Foundation
 import Basic
 import World
 
-class Game: State, Serializable {
+public class Game: State, Serializable {
 
     private(set) var world: World!
     private(set) var tick: Int = 0
@@ -15,7 +15,7 @@ class Game: State, Serializable {
     private(set) var player: Creature!
     private var playerAreaPosition = Vector3i(0, 0, 0)
 
-    init?(mainMenu: MainMenu, loadSavedGame: Bool = false) {
+    public init?(mainMenu: MainMenu, loadSavedGame: Bool = false) {
         self.mainMenu = mainMenu
         gui = GameGUI(resolution: app.window.resolution)
 
@@ -49,11 +49,11 @@ class Game: State, Serializable {
         }
     }
 
-    func enter() {
+    public func enter() {
         gui = GameGUI(resolution: app.window.resolution)
     }
 
-    func update() {
+    public func update() {
         if !player.isDead {
             messageStream.makeMessagesOld()
         }
@@ -72,7 +72,7 @@ class Game: State, Serializable {
         tick += 1
     }
 
-    func keyWasPressed(key: SDL_Keycode) -> Bool {
+    public func keyWasPressed(key: SDL_Keycode) -> Bool {
         if player.isDead && Int(key) == SDLK_ESCAPE {
             mainMenu.deleteGame()
             app.popState()
@@ -104,7 +104,7 @@ class Game: State, Serializable {
         }
     }
 
-    func render() {
+    public func render() {
         world.render(destination: gui.worldViewRect, player: player)
         sidebar.render(region: gui.sidebarRect)
         messageStream.render(region: gui.messageViewRect)
@@ -265,14 +265,14 @@ class Game: State, Serializable {
         world.saveUnsavedAreas(player: player)
     }
 
-    func serialize(to file: FileHandle) {
+    public func serialize(to file: FileHandle) {
         file.write(tick)
         file.write(startTime.ticks)
         file.write(player.area.position)
         file.write(player.tileUnder.position)
     }
 
-    func deserialize(from file: FileHandle) {
+    public func deserialize(from file: FileHandle) {
         file.read(&tick)
         var startTimeTicks = 0
         file.read(&startTimeTicks)

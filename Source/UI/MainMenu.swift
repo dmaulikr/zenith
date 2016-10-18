@@ -5,7 +5,7 @@ import Graphics
 public class MainMenu: State {
 
     private var menu: Menu<MenuItem>
-    private var game: Game?
+    public var game: Game?
 
     private enum MenuItem: String, CustomStringConvertible {
         case newGame = "New game"
@@ -17,7 +17,6 @@ public class MainMenu: State {
 
     public init(font: Font) {
         menu = Menu(items: [.newGame, .preferences, .quit])
-        game = Game(mainMenu: self, loadSavedGame: true)
     }
 
     public func render() {
