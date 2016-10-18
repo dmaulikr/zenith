@@ -277,6 +277,10 @@ public class Tile: Configurable, Serializable {
         items.remove(at: index)
     }
 
+    func removeAllItems() {
+        items.removeAll(keepingCapacity: true)
+    }
+
     func reactToMovementAttempt(of mover: Creature) {
         structure?.reactToMovementAttempt(of: mover)
     }
