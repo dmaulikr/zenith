@@ -46,7 +46,8 @@ enum Direction8 {
     }
 
     static var allDirections: [Direction8] = [.north, .northEast, .east, .southEast,
-                                                   .south, .southWest, .west, .northWest]
+                                              .south, .southWest, .west, .northWest]
+
     static var random: Direction8 {
         return allDirections.randomElement!
     }
