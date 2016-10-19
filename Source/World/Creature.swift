@@ -41,7 +41,7 @@ public class Creature: Object, Configurable, Spawnable {
         mana = 0
         maxMana = 0
         attributes = Creature.initAttributes(forCreatureType: type)
-        super.init(type: type)
+        super.init(type: type, config: Creature.config)
         calculateDerivedStats()
         tile.creature = self
     }

@@ -7,10 +7,10 @@ public class Object: Entity, CustomStringConvertible {
     let type: String
     private let name: Name
 
-    init(type: String) {
+    init(type: String, config: Toml) {
         self.type = type
         name = Name(type)
-        super.init()
+        super.init(config: config)
     }
 
     public var description: String {
@@ -23,11 +23,11 @@ public class Object: Entity, CustomStringConvertible {
 
     func addComponents(config: Toml) {
         config.array(type, "components")?.forEach {
-            addComponent(createComponent($0))
+            addComponent(createComponent($0, config: config))
         }
     }
 
-    func createComponent(_ name: String) -> Component {
+    func createComponent(_ name: String, config: Toml) -> Component {
         switch name {
             case "Wall":
                 return Wall()
@@ -35,6 +35,8 @@ public class Object: Entity, CustomStringConvertible {
                 return Door(structure: self as! Structure, openSpritePositionOffset: Vector2(1, 0))
             case "Dig":
                 return Dig()
+            case "LightSource":
+                return LightSource(type: type, config: config)
             default:
                 fatalError("unknown component type '\(name)'")
         }

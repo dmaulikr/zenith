@@ -8,20 +8,15 @@ public class Item: Object, Configurable, Spawnable, Hashable, Equatable {
     public static let config = Configuration.load(name: "item")
     public private(set) var sprite: Sprite
     let wieldedSprite: Sprite
-    var emitsLight: Bool { return lightRange != 0 }
-    let lightColor: Color
-    let lightRange: Int
 
-    override init(type: String) {
+    init(type: String) {
         if type.hasSuffix("Corpse") {
             let creatureType = type.replacingOccurrences(of: "Corpse", with: "")
             // Assumes corpse sprites are located in the third grid column.
             let spriteRect = Creature.spriteRect(forObjectType: creatureType).moved(by: Vector2(2 * tileSize, 0))
             sprite = Sprite(fileName: Assets.graphicsPath + "creature.bmp", bitmapRegion: spriteRect)
             wieldedSprite = sprite
-            lightColor = Color.black
-            lightRange = 0
-            super.init(type: creatureType + "Corpse")
+            super.init(type: creatureType + "Corpse", config: Item.config)
             return
         }
         assert(Item.config.hasTable(type))
@@ -29,14 +24,8 @@ public class Item: Object, Configurable, Spawnable, Hashable, Equatable {
                         bitmapRegion: Item.spriteRect(forObjectType: type))
         wieldedSprite = Sprite(fileName: Assets.graphicsPath + "item.bmp",
                                bitmapRegion: Item.spriteRect(forObjectType: type, offset: Vector2(0, 1)))
-        if Item.config.hasKey(type, "lightColor") {
-            lightColor = Item.config.color(type, "lightColor")!
-            lightRange = Item.config.int(type, "lightRange")!
-        } else {
-            lightColor = Color.black
-            lightRange = 0
-        }
-        super.init(type: type)
+
+        super.init(type: type, config: Item.config)
         addComponents(config: Item.config)
     }
 

@@ -8,10 +8,10 @@ public class Structure: Object, Configurable, Spawnable {
 
     public static let config = Configuration.load(name: "structure")
 
-    public override init(type: String) {
+    public init(type: String) {
         sprite = Sprite(fileName: Assets.graphicsPath + "structure.bmp",
                         bitmapRegion: Structure.spriteRect(forObjectType: type))
-        super.init(type: type)
+        super.init(type: type, config: Structure.config)
         addComponents(config: Structure.config)
     }
 

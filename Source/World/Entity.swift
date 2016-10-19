@@ -1,5 +1,7 @@
 import Foundation
+import Toml
 import Basic
+import Graphics
 
 /// A general-purpose base object that is made up of `Component`s. Components
 /// can be added and modified at run-time, providing a flexible system
@@ -7,9 +9,11 @@ import Basic
 public class Entity: Serializable {
 
     private(set) var components: [Component]
+    private let config: Toml
 
-    init() {
+    init(config: Toml) {
         components = []
+        self.config = config
     }
 
     /// Adds the given component to this entity.
@@ -33,6 +37,21 @@ public class Entity: Serializable {
         for component in components { component.update() }
     }
 
+    var emitsLight: Bool {
+        let lightSourceComponent: LightSource? = getComponent()
+        return lightSourceComponent != nil
+    }
+
+    var lightColor: Color {
+        let lightSourceComponent: LightSource = getComponent()
+        return lightSourceComponent.lightColor
+    }
+
+    var lightRange: Int {
+        let lightSourceComponent: LightSource = getComponent()
+        return lightSourceComponent.lightRange
+    }
+
     public func serialize(to stream: OutputStream) {
         stream <<< components.count
         components.forEach {
@@ -46,7 +65,7 @@ public class Entity: Serializable {
         components.removeAll(keepingCapacity: true)
         components.reserveCapacity(componentCount)
         for _ in 0..<componentCount {
-            var component = (self as! Object).createComponent(stream.readString())
+            var component = (self as! Object).createComponent(stream.readString(), config: config)
             component.deserialize(from: stream)
             components.append(component)
         }
