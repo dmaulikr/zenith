@@ -24,18 +24,18 @@ public class Game: State, Serializable {
                 return nil
             }
             // Load a saved game.
-            guard let saveFile = FileHandle(forReadingAtPath: Assets.globalSavePath) else {
+            guard let saveFileStream = InputStream(fileAtPath: Assets.globalSavePath) else {
                 let globalSaveFileName = Assets.globalSavePath.components(separatedBy: "/").last!
                 fatalError("\(globalSaveFileName) not found in \(Assets.savedGamePath)")
             }
-            deserialize(from: saveFile)
+            saveFileStream.open()
+            deserialize(from: saveFileStream)
             world = World(startTime: startTime)
             world.updateAdjacentAreas(relativeTo: playerAreaPosition)
             messageStream = MessageStream(game: self)
             sidebar = Sidebar(gui: gui, game: self)
-            var playerTilePosition = Vector2(0, 0)
-            saveFile.read(&playerTilePosition)
-            player = world.area(at: playerAreaPosition)?.tile(at: playerTilePosition).creature!
+            let playerTilePosition = saveFileStream.readVector2i()
+            player = world.area(at: playerAreaPosition)!.tile(at: playerTilePosition).creature!
             player.controller = PlayerController(game: self)
             player.messageStream = messageStream
         } else {
@@ -264,24 +264,21 @@ public class Game: State, Serializable {
         try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
                                                  withIntermediateDirectories: false)
         FileManager.default.createFile(atPath: Assets.globalSavePath, contents: nil)
-        serialize(to: FileHandle(forWritingAtPath: Assets.globalSavePath)!)
+        let fileStream = OutputStream(toFileAtPath: Assets.globalSavePath, append: false)!
+        fileStream.open()
+        fileStream <<< self
         world.saveNonAdjacentAreas(player: player, keepInMemory: false)
         world.saveAdjacentAreas(player: player, keepInMemory: keepAdjacentAreasInMemory)
     }
 
-    public func serialize(to file: FileHandle) {
-        file.write(tick)
-        file.write(startTime.ticks)
-        file.write(player.area.position)
-        file.write(player.tileUnder.position)
+    public func serialize(to stream: OutputStream) {
+        stream <<< tick <<< startTime.ticks <<< player.area.position <<< player.tileUnder.position
     }
 
-    public func deserialize(from file: FileHandle) {
-        file.read(&tick)
-        var startTimeTicks = 0
-        file.read(&startTimeTicks)
-        startTime = Time(ticks: startTimeTicks)
-        file.read(&playerAreaPosition)
+    public func deserialize(from stream: InputStream) {
+        stream >>> tick
+        startTime = Time(ticks: stream.readInt())
+        stream >>> playerAreaPosition // player.tileUnder.position will be read later.
     }
 }
 

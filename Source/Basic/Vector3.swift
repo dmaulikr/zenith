@@ -126,15 +126,11 @@ extension Vector3: Hashable {
 }
 
 extension Vector3: Serializable {
-    public func serialize(to file: FileHandle) {
-        file.write(x)
-        file.write(y)
-        file.write(z)
+    public func serialize(to stream: OutputStream) {
+        stream <<< x <<< y <<< z
     }
 
-    public mutating func deserialize(from file: FileHandle) {
-        file.read(&x)
-        file.read(&y)
-        file.read(&z)
+    public mutating func deserialize(from stream: InputStream) {
+        stream >>> x >>> y >>> z
     }
 }

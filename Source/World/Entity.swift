@@ -33,23 +33,21 @@ public class Entity: Serializable {
         for component in components { component.update() }
     }
 
-    public func serialize(to file: FileHandle) {
-        file.write(components.count)
-        for element in components {
-            file.write(polymorphicSerializable: element)
+    public func serialize(to stream: OutputStream) {
+        stream <<< components.count
+        components.forEach {
+            stream <<< String(describing: type(of: $0))
+            $0.serialize(to: stream)
         }
     }
 
-    public func deserialize(from file: FileHandle) {
-        var componentCount = 0
-        file.read(&componentCount)
-        components = []
+    public func deserialize(from stream: InputStream) {
+        let componentCount = stream.readInt()
+        components.removeAll(keepingCapacity: true)
         components.reserveCapacity(componentCount)
         for _ in 0..<componentCount {
-            var componentClassName = ""
-            file.read(&componentClassName)
-            var component = (self as! Object).createComponent(componentClassName)
-            component.deserialize(from: file)
+            var component = (self as! Object).createComponent(stream.readString())
+            component.deserialize(from: stream)
             components.append(component)
         }
     }

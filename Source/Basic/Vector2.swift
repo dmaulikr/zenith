@@ -132,13 +132,11 @@ extension Vector2: Hashable {
 }
 
 extension Vector2: Serializable {
-    public func serialize(to file: FileHandle) {
-        file.write(x)
-        file.write(y)
+    public func serialize(to stream: OutputStream) {
+        stream <<< x <<< y
     }
 
-    public mutating func deserialize(from file: FileHandle) {
-        file.read(&x)
-        file.read(&y)
+    public mutating func deserialize(from stream: InputStream) {
+        stream >>> x >>> y
     }
 }

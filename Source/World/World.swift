@@ -143,19 +143,20 @@ public class World {
             try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
                                                      withIntermediateDirectories: false)
             FileManager.default.createFile(atPath: Assets.savedGamePath + fileName, contents: nil)
-            let file = FileHandle(forWritingAtPath: Assets.savedGamePath + fileName)!
-            area.serialize(to: file)
+            let fileStream = OutputStream(toFileAtPath: Assets.savedGamePath + fileName, append: false)!
+            fileStream.open()
+            area.serialize(to: fileStream)
             if !keepInMemory { areas[position] = nil }
         }
     }
 
     func tryToDeserializeArea(at position: Vector3i) -> Area? {
         let fileName = Area.saveFileName(forPosition: position)
-        guard let file = FileHandle(forReadingAtPath: Assets.savedGamePath + fileName) else {
-            return nil
-        }
-        var area = Area(world: self, position: position)
-        file.read(&area)
+        guard let fileStream = InputStream(fileAtPath: Assets.savedGamePath + fileName) else { return nil }
+        fileStream.open()
+        guard fileStream.hasBytesAvailable else { return nil }
+        let area = Area(world: self, position: position)
+        area.deserialize(from: fileStream)
         areas[position] = area
         return area
     }

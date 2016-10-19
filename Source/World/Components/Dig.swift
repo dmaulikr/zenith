@@ -22,7 +22,7 @@ struct Dig: ItemComponent {
         }
     }
 
-    func serialize(to file: FileHandle) {}
+    func serialize(to stream: OutputStream) {}
 
-    func deserialize(from file: FileHandle) {}
+    func deserialize(from stream: InputStream) {}
 }

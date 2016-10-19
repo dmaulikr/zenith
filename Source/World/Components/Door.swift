@@ -13,9 +13,17 @@ class Door: StructureComponent, Closeable {
     private(set) var state: State
     var preventsMovement: Bool { return state == .closed }
 
-    enum State {
+    enum State: Serializable {
         case closed
         case open
+
+        public func serialize(to stream: OutputStream) {
+            stream <<< (self == .closed)
+        }
+
+        public mutating func deserialize(from stream: InputStream) {
+            self = stream.readBool() ? .closed : .open
+        }
     }
 
     init(structure: Structure, openSpritePositionOffset: Vector2i) {
@@ -61,18 +69,12 @@ class Door: StructureComponent, Closeable {
         hitter.addMessage("You \(style.verb) \(structure.name(.definite)) open.")
     }
 
-    func serialize(to file: FileHandle) {
-        file.write(openSpritePositionOffset)
-        file.write(state == .closed)
+    func serialize(to stream: OutputStream) {
+        stream <<< openSpritePositionOffset <<< state
     }
 
-    func deserialize(from file: FileHandle) {
-        file.read(&openSpritePositionOffset)
-        var closed = false
-        file.read(&closed)
-        state = closed ? .closed : .open
-        if !closed {
-            structure.sprite.bitmapRegion.position += openSpritePositionOffset
-        }
+    func deserialize(from stream: InputStream) {
+        stream >>> openSpritePositionOffset >>> state
+        if state == .open { structure.sprite.bitmapRegion.position += openSpritePositionOffset }
     }
 }

@@ -121,26 +121,23 @@ public class Area: Serializable {
         return position.y + position.x * Area.size
     }
 
-    public func serialize(to file: FileHandle) {
-        for tile in tiles {
-            file.write(tile)
-        }
-        file.write(populationDensity!)
+    public func serialize(to stream: OutputStream) {
+        tiles.forEach { stream <<< $0 }
+        stream <<< populationDensity!
     }
 
-    public func deserialize(from file: FileHandle) {
+    public func deserialize(from stream: InputStream) {
         assert(tiles.isEmpty)
 
         for x in 0..<Area.size {
             for y in 0..<Area.size {
-                var tile = Tile(area: self, position: Vector2(x, y))
-                file.read(&tile)
+                let tile = Tile(area: self, position: Vector2(x, y))
+                tile.deserialize(from: stream)
                 tiles.append(tile)
             }
         }
-        var populationDensity = 0.0
-        file.read(&populationDensity)
-        self.populationDensity = populationDensity
+        populationDensity = Double()
+        stream >>> populationDensity!
     }
 
     static func saveFileName(forPosition position: Vector3i) -> String {

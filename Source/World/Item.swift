@@ -84,16 +84,6 @@ public class Item: Object, Configurable, Spawnable, Hashable, Equatable {
         tileUnder.removeItem(self)
         destinationTile.addItem(self)
     }
-
-    public override func serialize(to file: FileHandle) {
-        super.serialize(to: file)
-    }
-
-    required convenience public init(deserializedFrom file: FileHandle) {
-        var type = ""
-        file.read(&type)
-        self.init(type: type)
-    }
 }
 
 public func ==(lhs: Item, rhs: Item) -> Bool {

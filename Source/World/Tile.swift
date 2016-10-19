@@ -327,59 +327,48 @@ public class Tile: Configurable, Serializable {
         }
     }
 
-    public func serialize(to file: FileHandle) {
-        file.write(items.count)
+    public func serialize(to stream: OutputStream) {
+        stream <<< items.count
         for item in items {
-            file.write(item.type)
+            stream <<< item.type
         }
 
-        file.write(structure != nil)
+        stream <<< (structure != nil)
         if let structure = structure {
-            file.write(structure.type)
-            file.write(structure)
+            stream <<< structure.type <<< structure
         }
 
-        file.write(creature != nil)
+        stream <<< (creature != nil)
         if let creature = creature {
-            file.write(creature.type)
-            file.write(creature)
+            stream <<< creature.type <<< creature
         }
 
-        file.write(groundType)
+        stream <<< groundType
     }
 
-    public func deserialize(from file: FileHandle) {
-        var itemCount = 0
-        file.read(&itemCount)
-        items = []
+    public func deserialize(from stream: InputStream) {
+        let itemCount = stream.readInt()
+        items.removeAll(keepingCapacity: true)
+        items.reserveCapacity(itemCount)
+
         for _ in 0..<itemCount {
-            var itemType = ""
-            file.read(&itemType)
-            items.append(Item(type: itemType))
+            items.append(Item(type: stream.readString()))
         }
 
-        var hasStructure = false
-        file.read(&hasStructure)
-        if hasStructure {
-            var structureType = ""
-            file.read(&structureType)
-            structure = Structure(type: structureType)
-            file.read(&structure!)
+        if stream.readBool() {
+            structure = Structure(type: stream.readString())
+            stream >>> structure!
         } else {
             structure = nil
         }
 
-        var hasCreature = false
-        file.read(&hasCreature)
-        if hasCreature {
-            var creatureType = ""
-            file.read(&creatureType)
-            creature = Creature(type: creatureType, tile: self, controller: AIController())
-            file.read(&creature!)
+        if stream.readBool() {
+            creature = Creature(type: stream.readString(), tile: self, controller: AIController())
+            stream >>> creature!
         } else {
             creature = nil
         }
 
-        file.read(&groundType)
+        stream >>> groundType
     }
 }

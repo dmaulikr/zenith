@@ -11,7 +11,7 @@ struct Wall: StructureComponent {
         mover.addMessage("The wall blocks your way.")
     }
 
-    func serialize(to file: FileHandle) {}
+    func serialize(to stream: OutputStream) {}
 
-    func deserialize(from file: FileHandle) {}
+    func deserialize(from stream: InputStream) {}
 }

@@ -66,33 +66,31 @@ public class Creature: Object, Configurable, Spawnable {
         case psyche
         case charisma
 
-        func serialize(to file: FileHandle) {
+        func serialize(to stream: OutputStream) {
             switch self {
-                case .rightArmStrength:  file.write(0)
-                case .leftArmStrength:   file.write(1)
-                case .armStrength:       file.write(2)
-                case .rightLegStrength:  file.write(3)
-                case .leftLegStrength:   file.write(4)
-                case .legStrength:       file.write(5)
-                case .strength:          file.write(6)
-                case .rightArmDexterity: file.write(7)
-                case .leftArmDexterity:  file.write(8)
-                case .dexterity:         file.write(9)
-                case .rightLegAgility:   file.write(10)
-                case .leftLegAgility:    file.write(11)
-                case .agility:           file.write(12)
-                case .endurance:         file.write(13)
-                case .perception:        file.write(14)
-                case .intelligence:      file.write(15)
-                case .psyche:            file.write(16)
-                case .charisma:          file.write(17)
+                case .rightArmStrength:  stream <<< 0
+                case .leftArmStrength:   stream <<< 1
+                case .armStrength:       stream <<< 2
+                case .rightLegStrength:  stream <<< 3
+                case .leftLegStrength:   stream <<< 4
+                case .legStrength:       stream <<< 5
+                case .strength:          stream <<< 6
+                case .rightArmDexterity: stream <<< 7
+                case .leftArmDexterity:  stream <<< 8
+                case .dexterity:         stream <<< 9
+                case .rightLegAgility:   stream <<< 10
+                case .leftLegAgility:    stream <<< 11
+                case .agility:           stream <<< 12
+                case .endurance:         stream <<< 13
+                case .perception:        stream <<< 14
+                case .intelligence:      stream <<< 15
+                case .psyche:            stream <<< 16
+                case .charisma:          stream <<< 17
             }
         }
 
-        mutating func deserialize(from file: FileHandle) {
-            var number = 0
-            file.read(&number)
-            switch number {
+        mutating func deserialize(from stream: InputStream) {
+            switch stream.readInt() {
                 case 0:  self = .rightArmStrength
                 case 1:  self = .leftArmStrength
                 case 2:  self = .armStrength
@@ -443,40 +441,41 @@ public class Creature: Object, Configurable, Spawnable {
         }
     }
 
-    public override func serialize(to file: FileHandle) {
-        file.write(backpack.count)
-        for item in backpack {
-            file.write(item.type)
-        }
-
-        file.write(wieldedItem?.type)
-
-        file.write(attributes)
-        file.write(health)
-        file.write(energy)
-        file.write(mana)
+    public override func serialize(to stream: OutputStream) {
+        stream <<< backpack.count
+        backpack.forEach { stream <<< $0.type }
+        stream <<< wieldedItem?.type <<< attributes <<< health <<< energy <<< mana
     }
 
-    public override func deserialize(from file: FileHandle) {
-        var backpackSize = 0
-        file.read(&backpackSize)
+    public override func deserialize(from stream: InputStream) {
+        let backpackSize = stream.readInt()
         backpack.removeAll(keepingCapacity: true)
         backpack.reserveCapacity(backpackSize)
         for _ in 0..<backpackSize {
-            var itemType = ""
-            file.read(&itemType)
-            backpack.append(Item(type: itemType))
+            backpack.append(Item(type: stream.readString()))
         }
 
-        var wieldedItemType: String? = nil
-        file.read(&wieldedItemType, elementInitializer: { "" })
-        wieldedItem = backpack.first(where: { $0.type == wieldedItemType })
+        let wieldedItemType: String?
+        if stream.readBool() {
+            wieldedItemType = stream.readString()
+            wieldedItem = backpack.first { $0.type == wieldedItemType }
+        } else {
+            wieldedItemType = nil
+        }
 
-        file.read(&attributes, keyInitializer: { .charisma }, valueInitializer: { 0 })
+        let attributeCount = stream.readInt()
+        attributes.removeAll(keepingCapacity: true)
+        for _ in 0..<attributeCount {
+            var a = Attribute.charisma
+            var b = 0
+            stream >>> a >>> b
+            attributes[a] = b
+        }
+
         calculateDerivedStats()
-        file.read(&health)
-        file.read(&energy)
-        file.read(&mana)
+        stream >>> health
+        stream >>> energy
+        stream >>> mana
         assert(health <= maxHealth && energy <= maxEnergy && mana <= maxMana)
     }
 }
@@ -485,21 +484,21 @@ public enum Action: Serializable, CustomStringConvertible {
 
     case resting(ticksLeft: Int)
 
-    public func serialize(to file: FileHandle) {
+    public func serialize(to stream: OutputStream) {
         switch self {
             case .resting(let ticksLeft):
-                file.write(0)
-                file.write(ticksLeft)
+                stream <<< 0
+                stream <<< ticksLeft
         }
     }
 
-    public mutating func deserialize(from file: FileHandle) {
+    public mutating func deserialize(from stream: InputStream) {
         var whichCase = 0
-        file.read(&whichCase)
+        stream >>> whichCase
         switch whichCase {
             case 0:
                 var ticksLeft = 0
-                file.read(&ticksLeft)
+                stream >>> ticksLeft
                 self = .resting(ticksLeft: ticksLeft)
             default:
                 assert(false)
