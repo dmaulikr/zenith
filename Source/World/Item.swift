@@ -30,9 +30,7 @@ public class Item: Object, Configurable, Spawnable, Hashable, Equatable {
         wieldedSprite = Sprite(fileName: Assets.graphicsPath + "item.bmp",
                                bitmapRegion: Item.spriteRect(forObjectType: type, offset: Vector2(0, 1)))
         if Item.config.hasKey(type, "lightColor") {
-            lightColor = Color(hue: Item.config.double(type, "lightColor", "hue")!,
-                               saturation: Item.config.double(type, "lightColor", "saturation")!,
-                               lightness: Item.config.double(type, "lightColor", "lightness")!)
+            lightColor = Item.config.color(type, "lightColor")!
             lightRange = Item.config.int(type, "lightRange")!
         } else {
             lightColor = Color.black

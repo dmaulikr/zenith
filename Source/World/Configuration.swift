@@ -1,5 +1,6 @@
 import Toml
 import Basic
+import Graphics
 
 public struct Assets {
     public static let assetsPath = #file.substring(to: #file.range(of: "/", options: .backwards)!.upperBound) + "../../"
@@ -44,5 +45,14 @@ extension Configurable {
 
     private static func createSpriteRect(from data: (Rect<Int>, Int)) -> Rect<Int> {
         return data.0.moved(by: Vector2(Int.random(0..<data.1)! * tileSize, 0))
+    }
+}
+
+extension Toml {
+    func color(_ path: String...) -> Color? {
+        guard let hue = self.double(path + ["hue"]) else { return nil }
+        guard let saturation = self.double(path + ["saturation"]) else { return nil }
+        guard let lightness = self.double(path + ["lightness"]) else { return nil }
+        return Color(hue: hue, saturation: saturation, lightness: lightness)
     }
 }
