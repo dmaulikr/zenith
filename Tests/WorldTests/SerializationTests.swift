@@ -1,4 +1,5 @@
 import XCTest
+import Foundation
 import Basic
 @testable import World
 
@@ -31,15 +32,17 @@ class SerializationTests: XCTestCase {
             sourceTile.addItem(Item(type: "humanCorpse"))
             sourceTile.creature = Creature(type: "bat", tile: sourceTile, controller: AIController())
             sourceTile.creature!.takeDamage(1)
-            sourceTile.serialize(to: file)
+            let saveStream = OutputStream(toFileAtPath: testFileName, append: false)!
+            saveStream.open()
+            sourceTile.serialize(to: saveStream)
         }
-
-        file.seek(toFileOffset: 0)
 
         let world = World(startTime: Time(ticks: 1))
         let area = Area(world: world, position: Vector3(-666, 666, 0))
         let targetTile = Tile(area: area, position: Vector2(Area.size - 1, Area.size - 1))
-        targetTile.deserialize(from: file)
+        let loadStream = InputStream(fileAtPath: testFileName)!
+        loadStream.open()
+        targetTile.deserialize(from: loadStream)
         XCTAssertEqual(sourceTile, targetTile)
     }
 

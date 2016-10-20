@@ -1,7 +1,8 @@
 import XCTest
 @testable import WorldTests
+@testable import UITests
 
 XCTMain([
     testCase(SerializationTests.allTests),
-    testCase(UITests.allTests),
+    testCase(CommandTests.allTests),
 ])
