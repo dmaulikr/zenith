@@ -9,7 +9,7 @@ public class Area: Serializable {
     private(set) var tiles: [Tile]
     private(set) var creatures: [Creature]
     var populationDensity: Double!
-    private var buildingMetadata: [BuildingMetadata]
+    private(set) var buildingMetadata: [BuildingMetadata]
 
     public static let size = 16
     public static let sizeVector = Vector2(size, size)

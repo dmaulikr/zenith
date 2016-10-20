@@ -1,9 +1,10 @@
 import Basic
 
-struct BuildingMetadata {
-    var allRoomTiles = [Tile]()
-    var nonCornerTiles = [Tile]()
-    var wallTiles = [Tile]()
+class BuildingMetadata {
+    public internal(set) var allRoomTiles = [Tile]()
+    public internal(set) var nonCornerTiles = [Tile]()
+    public internal(set) var wallTiles = [Tile]()
+    public internal(set) var doorTiles = [Tile]()
 }
 
 class Builder {
@@ -43,6 +44,63 @@ class Builder {
             }
             _ = tryToSpawnRoom(northWestCorner: area.tile(at: rect.topLeft), roomSize: rect.size)
         }
+
+        for adjacentArea in area.adjacent8Areas {
+            guard let adjacentArea = adjacentArea else { continue }
+            generateTunnels(between: area, and: adjacentArea)
+        }
+    }
+
+    private static func generateTunnels(between area1: Area, and area2: Area) {
+        _ = generateRoadsBetween_loopHelper(area1) { sourceTile in
+            generateRoadsBetween_loopHelper(area2) { targetTile in
+                if sourceTile === targetTile { return false }
+
+                let sourcePosition = sourceTile.globalPosition
+                let targetPosition = targetTile.globalPosition
+
+                let hasNoStructure = { (position: Vector2i) -> Bool in
+                    guard let tile = sourceTile.adjacentTile(position - sourcePosition) else { return false }
+                    return tile.structure == nil
+                }
+
+                let hasGround = { (position: Vector2i) -> Bool in
+                    sourceTile.adjacentTile(position - sourcePosition)?.structure?.type == "ground"
+                }
+
+                if !findPathAStar(from: sourcePosition, to: targetPosition, isAllowed: hasNoStructure).isEmpty {
+                    return false // A path already exists.
+                }
+
+                for roadPosition in findPathAStar(from: sourcePosition, to: targetPosition, isAllowed: hasGround) {
+                    sourceTile.adjacentTile(roadPosition - sourcePosition)!.structure = nil
+                }
+
+                return true
+            }
+        }
+    }
+
+    /// Helper function for `generateRoadsBetween` (above) to avoid code duplication.
+    private static func generateRoadsBetween_loopHelper(_ area: Area, innerLoop: (Tile) -> Bool) -> Bool {
+        var didGenerate = false
+
+        for buildingMetadata in area.buildingMetadata {
+            let doorTileCandidate = buildingMetadata.nonCornerTiles.randomElement!
+
+            for offset in neighborOffsets {
+                guard let neighborTile = doorTileCandidate.adjacentTile(offset) else { continue }
+                if neighborTile.structure?.type == "ground" {
+                    if innerLoop(neighborTile) {
+                        doorTileCandidate.structure = Structure(type: "door")
+                        buildingMetadata.doorTiles.append(doorTileCandidate)
+                        didGenerate = true
+                    }
+                    break
+                }
+            }
+        }
+        return didGenerate
     }
 
     private static func tryToSpawnRoom(northWestCorner: Tile, roomSize: Vector2i) -> BuildingMetadata? {
