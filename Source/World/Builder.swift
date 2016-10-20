@@ -1,5 +1,11 @@
 import Basic
 
+struct BuildingMetadata {
+    var allRoomTiles = [Tile]()
+    var nonCornerTiles = [Tile]()
+    var wallTiles = [Tile]()
+}
+
 class Builder {
 
     private static var cellarPlan = [Vector2i: Rect<Int>]()
@@ -13,16 +19,15 @@ class Builder {
 
     static func spawnBuilding(northWestCorner: Tile) {
         let buildingSize = Vector2(Int(Double.random(4...10)), Int(Double.random(4...10)))
-        let result = tryToSpawnRoom(northWestCorner: northWestCorner, roomSize: buildingSize)
-        if result == nil { return }
-        let (allRoomTiles, nonCornerTiles, wallTiles) = result!
+        guard let metadata = tryToSpawnRoom(northWestCorner: northWestCorner, roomSize: buildingSize) else { return }
 
         // Spawn door
-        nonCornerTiles.randomElement!.structure = Structure(type: "door")
+        metadata.nonCornerTiles.randomElement!.structure = Structure(type: "door")
 
         // Spawn stairs to cellar
         if Float.random(0...1) < 0.3 {
-            let stairwayTile = allRoomTiles.filter { tile in !wallTiles.contains { $0 === tile } }.randomElement!
+            let floorTiles = metadata.allRoomTiles.filter { tile in !metadata.wallTiles.contains { $0 === tile } }
+            let stairwayTile = floorTiles.randomElement!
             stairwayTile.structure = Structure(type: "stairsDown")
             Builder.cellarPlan[stairwayTile.position] = Rect(position: northWestCorner.position,
                                                              size: buildingSize)
@@ -40,12 +45,9 @@ class Builder {
         }
     }
 
-    private static func tryToSpawnRoom(northWestCorner: Tile, roomSize: Vector2i)
-        -> (allRoomTiles: [Tile], nonCornerTiles: [Tile], wallTiles: [Tile])? {
+    private static func tryToSpawnRoom(northWestCorner: Tile, roomSize: Vector2i) -> BuildingMetadata? {
         let wallType = "brickWall"
-        var allRoomTiles = [Tile]()
-        var wallTiles = [Tile]()
-        var nonCornerTiles = [Tile]()
+        var metadata = BuildingMetadata()
 
         func isCorner(position: Vector2i) -> Bool {
             return (position.x == 0 || position.x == roomSize.x - 1)
@@ -64,9 +66,9 @@ class Builder {
                 for tile in targetTile.adjacent4Tiles {
                     if tile?.structure?.type == wallType { return false }
                 }
-                nonCornerTiles.append(targetTile)
+                metadata.nonCornerTiles.append(targetTile)
             }
-            wallTiles.append(targetTile)
+            metadata.wallTiles.append(targetTile)
             return true
         }
 
@@ -103,12 +105,14 @@ class Builder {
                 if let type = targetTile.structure?.type, ["tree", "ground"].contains(type) {
                     targetTile.structure = nil // Remove natural obstacles, like trees.
                 }
-                allRoomTiles.append(targetTile)
+                metadata.allRoomTiles.append(targetTile)
             }
         }
 
         // Spawn walls
-        wallTiles.forEach { $0.structure = Structure(type: wallType) }
-        return (allRoomTiles: allRoomTiles, nonCornerTiles: nonCornerTiles, wallTiles: wallTiles)
+        metadata.wallTiles.forEach { $0.structure = Structure(type: wallType) }
+
+        northWestCorner.area.registerBuilding(metadata)
+        return metadata
     }
 }

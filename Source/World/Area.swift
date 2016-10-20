@@ -9,6 +9,7 @@ public class Area: Serializable {
     private(set) var tiles: [Tile]
     private(set) var creatures: [Creature]
     var populationDensity: Double!
+    private var buildingMetadata: [BuildingMetadata]
 
     public static let size = 16
     public static let sizeVector = Vector2(size, size)
@@ -20,6 +21,7 @@ public class Area: Serializable {
         tiles = []
         tiles.reserveCapacity(Area.size * Area.size)
         creatures = []
+        buildingMetadata = []
     }
 
     func generate() {
@@ -84,6 +86,10 @@ public class Area: Serializable {
 
     func unregisterCreature(_ creature: Creature) {
         creatures.remove(at: creatures.index { $0 === creature }!)
+    }
+
+    func registerBuilding(_ metadata: BuildingMetadata) {
+        buildingMetadata.append(metadata)
     }
 
     private func connectStairs() {
