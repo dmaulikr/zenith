@@ -109,11 +109,6 @@ public func findPathAStar(from source: Vector2i, to target: Vector2i, isAllowed:
     // The set of nodes already evaluated.
     var closedSet = Set<Vector2i>()
 
-    // The set of currently discovered nodes still to be evaluated.
-    // Initially, only the start node is known.
-    var openSet = Set<Vector2i>()
-    openSet.insert(source)
-
     // For each node, which node it can most efficiently be reached from.
     // If a node can be reached from many nodes, cameFrom will eventually contain the
     // most efficient previous step.
@@ -132,15 +127,19 @@ public func findPathAStar(from source: Vector2i, to target: Vector2i, isAllowed:
     // For the first node, that value is completely heuristic.
     fScore[source] = heuristicCostEstimate(source, target)
 
+    // The set of currently discovered nodes still to be evaluated.
+    // Initially, only the start node is known.
+    var openSet = Heap<Vector2i>() { (fScore[$0] ?? Int.max) < (fScore[$1] ?? Int.max) }
+    openSet.insert(source)
+
     while !openSet.isEmpty {
         // Find the node in openSet having the lowest fScore value.
-        let current = openSet.min { fScore[$0]! < fScore[$1]! }!
+        let current = openSet.remove()!
 
         if current == target {
             return reconstructPath(cameFrom, current)
         }
 
-        openSet.remove(current)
         closedSet.insert(current)
 
         for offset in neighborOffsets {
