@@ -31,6 +31,7 @@ class HelpView: State {
         debugCommands = [
             (key: "1", info: "spawn wall"),
             (key: "2", info: "spawn door"),
+            (key: "3", info: "see everything"),
         ]
         #endif
     }

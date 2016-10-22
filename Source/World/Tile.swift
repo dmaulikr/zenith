@@ -42,7 +42,7 @@ public class Tile: Configurable, Serializable {
     private var groundSprite: Sprite!
     private var renderCache: Sprite
     private var renderCacheIsInvalidated: Bool
-    private var renderCacheLightColor: Color = Color.black
+    private var renderCacheLightColor: Color?
     public static let config = Configuration.load(name: "terrain")
     private static let fogOfWarSprite = Sprite(fileName: Assets.graphicsPath + "fogOfWar.bmp")
     private static var bounds = Rect(position: Vector2(0, 0), size: tileSizeVector).asSDLRect()
@@ -176,27 +176,32 @@ public class Tile: Configurable, Serializable {
         }
     }
 
-    func render() {
-        if renderCacheIsInvalidated || renderCacheLightColor != lightColor {
+    func render(withLight: Bool) {
+        if renderCacheLightColor != lightColor || withLight != (renderCacheLightColor != nil) {
+            renderCacheIsInvalidated = true
+        }
+        if renderCacheIsInvalidated {
             let targetSurfaceBackup = targetSurface
             let targetViewportBackup = targetViewport
             targetSurface = renderCache.surface
             targetViewport = Tile.bounds
-            renderActual()
+            renderActual(withLight: withLight)
             targetSurface = targetSurfaceBackup
             targetViewport = targetViewportBackup
-            renderCacheLightColor = lightColor
+            renderCacheLightColor = withLight ? lightColor : nil
             renderCacheIsInvalidated = false
         }
         renderCache.render()
     }
 
-    private func renderActual() {
+    private func renderActual(withLight: Bool) {
         groundSprite.render()
         for item in items { item.render() }
         structure?.render()
         creature?.render()
-        renderLight()
+        if withLight {
+            renderLight()
+        }
     }
 
     func invalidateRenderCache() {

@@ -60,7 +60,7 @@ public class World {
         sunlight = Color(hue: 0.125, saturation: 0.1, lightness: 0.2 + brightness * 0.35)
     }
 
-    public func render(destination: Rect<Int>, player: Creature) {
+    public func render(destination: Rect<Int>, player: Creature, seeEverything: Bool) {
         let viewport = targetViewport
         var oldClipRect = SDL_Rect()
         SDL_GetClipRect(targetSurface, &oldClipRect)
@@ -73,11 +73,11 @@ public class World {
         for relativeTileX in -tileDrawDistance.x...tileDrawDistance.x {
             for relativeTileY in -tileDrawDistance.y...tileDrawDistance.y {
                 if let tileToDraw = player.tileUnder.adjacentTile(Vector2(relativeTileX, relativeTileY)) {
-                    if !player.canSee(tileToDraw) { continue }
+                    if !player.canSee(tileToDraw) && !seeEverything { continue }
                     sdlRect.x = Int32(destination.left + (tileDrawDistance.x + relativeTileX) * tileSize)
                     sdlRect.y = Int32(destination.top  + (tileDrawDistance.y + relativeTileY) * tileSize)
                     targetViewport = sdlRect
-                    tileToDraw.render()
+                    tileToDraw.render(withLight: !seeEverything)
                 }
             }
         }

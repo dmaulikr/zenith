@@ -14,6 +14,7 @@ public class Game: State, Serializable {
     private var sidebar: Sidebar!
     private(set) var player: Creature!
     private var playerAreaPosition = Vector3i(0, 0, 0)
+    private var seeEverythingMode: Bool = false
 
     public init?(mainMenu: MainMenu, loadSavedGame: Bool = false) {
         self.mainMenu = mainMenu
@@ -103,12 +104,13 @@ public class Game: State, Serializable {
             case SDLK_k:      return performKick()
             case SDLK_1:      return performSpawnWall()
             case SDLK_2:      return performSpawnDoor()
+            case SDLK_3:      return toggleSeeEverythingMode()
             default:          return false
         }
     }
 
     public func render() {
-        world.render(destination: gui.worldViewRect, player: player)
+        world.render(destination: gui.worldViewRect, player: player, seeEverything: seeEverythingMode)
         sidebar.render(region: gui.sidebarRect)
         messageStream.render(region: gui.messageViewRect)
     }
@@ -254,6 +256,15 @@ public class Game: State, Serializable {
             } else {
                 player.tileUnder.structure = Structure(type: "door")
             }
+            return true
+        #else
+            return false
+        #endif
+    }
+
+    private func toggleSeeEverythingMode() -> Bool {
+        #if !release
+            seeEverythingMode = !seeEverythingMode
             return true
         #else
             return false
