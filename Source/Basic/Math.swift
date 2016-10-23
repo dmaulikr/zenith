@@ -101,8 +101,9 @@ public let neighborOffsets = [Vector2(0, -1), Vector2(0, 1), Vector2(-1, 0), Vec
 /// Returns the tile positions making up any one of the shortest paths leading from
 /// the source to the target tile position, using the A* pathfinding algorithm.
 /// The algorithm will only traverse through tile for which `isAllowed` returns true.
-/// If no suitable path is found, an empty array is returned.
-public func findPathAStar(from source: Vector2i, to target: Vector2i, isAllowed: (Vector2i) -> Bool) -> [Vector2i] {
+/// If no suitable path is found, returns `nil`.
+public func findPathAStar(from source: Vector2i, to target: Vector2i, isAllowed: (Vector2i) -> Bool,
+                          cost: (Vector2i, Vector2i) -> Int) -> [Vector2i]? {
     // A* search algorithm implementation adapted from
     // https://en.wikipedia.org/w/index.php?title=A*_search_algorithm&oldid=734434637#Pseudocode
 
@@ -125,16 +126,16 @@ public func findPathAStar(from source: Vector2i, to target: Vector2i, isAllowed:
     var fScore = [Vector2i: Int]() // default value = infinity
 
     // For the first node, that value is completely heuristic.
-    fScore[source] = heuristicCostEstimate(source, target)
+    fScore[source] = heuristicCostEstimate(from: source, to: target)
 
     // The set of currently discovered nodes still to be evaluated.
     // Initially, only the start node is known.
-    var openSet = Heap<Vector2i>() { (fScore[$0] ?? Int.max) < (fScore[$1] ?? Int.max) }
-    openSet.insert(source)
+//    var openSet = Heap<Vector2i>() { (fScore[$0] ?? Int.max) < (fScore[$1] ?? Int.max) }
+    var openSet: Set = [source]
 
     while !openSet.isEmpty {
         // Find the node in openSet having the lowest fScore value.
-        let current = openSet.remove()!
+        let current = openSet.min { fScore[$0]! < fScore[$1]! }!
 
         if current == target {
             return reconstructPath(cameFrom, current)
@@ -149,7 +150,7 @@ public func findPathAStar(from source: Vector2i, to target: Vector2i, isAllowed:
             if !isAllowed(neighbor) { continue }
 
             // The distance from start to a neighbor.
-            let tentative_gScore = (gScore[current] ?? (Int.max - 1)) + 1 // - 1 to prevent overflow.
+            let tentative_gScore = (gScore[current] ?? Int.max) + cost(current, neighbor)
 
             if !openSet.contains(neighbor) { // Discover a new node.
                 openSet.insert(neighbor)
@@ -160,29 +161,36 @@ public func findPathAStar(from source: Vector2i, to target: Vector2i, isAllowed:
             // This path is the best until now. Record it!
             cameFrom[neighbor] = current
             gScore[neighbor] = tentative_gScore
-
-            fScore[neighbor] = (gScore[neighbor] ?? Int.max) + heuristicCostEstimate(neighbor, target)
+            fScore[neighbor] = tentative_gScore + heuristicCostEstimate(from: neighbor, to: target)
         }
     }
-    
-    return []
+
+    return nil
 }
 
 /// Used by `findPathAStar` to collect all tile positions making up the path from `source` to `target`.
 private func reconstructPath(_ cameFrom: [Vector2i: Vector2i], _ current: Vector2i) -> [Vector2i] {
     var current = current
     var totalPath = [current]
-
     while let newCurrent = cameFrom[current] {
         current = newCurrent
         totalPath.append(current)
     }
-
     return totalPath
 }
 
 /// Used by `findPathAStar` to estimate the relative path length between the given two positions.
-private func heuristicCostEstimate(_ a: Vector2i, _ b: Vector2i) -> Int {
-    let distance = Vector2(abs(a.x - b.x), abs(a.y - b.y))
-    return distance.x * distance.y
+private func heuristicCostEstimate(from: Vector2i, to: Vector2i) -> Int {
+    let a = abs(from.x - to.x)
+    let b = abs(from.y - to.y)
+    return (a+1) * (b+1)
+//    return a * b
+
+//    if a == 0 {
+//        return b
+//    } else if b == 0 {
+//        return a
+//    } else {
+//        return (a+1) * (b+1)
+//    }
 }

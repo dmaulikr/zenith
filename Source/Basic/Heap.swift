@@ -218,6 +218,7 @@ public struct Heap<T> {
 
 extension Heap where T: Equatable {
     public func contains(_ element: T) -> Bool {
+//        return elements.contains(element)
         return index(of: element) != nil
     }
 

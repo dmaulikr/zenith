@@ -45,60 +45,83 @@ class Builder {
             _ = tryToSpawnRoom(northWestCorner: area.tile(at: rect.topLeft), roomSize: rect.size)
         }
 
-        for adjacentArea in area.adjacent8Areas {
-            guard let adjacentArea = adjacentArea else { continue }
+        for adjacentArea in area.adjacent8Areas.flatMap({ $0 }) {
             generateTunnels(between: area, and: adjacentArea)
         }
+        generateTunnels(between: area, and: area)
     }
 
     private static func generateTunnels(between area1: Area, and area2: Area) {
-        _ = generateRoadsBetween_loopHelper(area1) { sourceTile in
-            generateRoadsBetween_loopHelper(area2) { targetTile in
-                if sourceTile === targetTile { return false }
+        _ = generateRoadsBetween_loopHelper(area1) { sourceBuilding in
+            generateRoadsBetween_loopHelper(area2) { targetBuilding in
+                if sourceBuilding === targetBuilding { return false }
+//
+//                guard let sourceTileTemp
+//                    = sourceBuilding.nonCornerTiles.randomElement!.adjacent4Tiles.first(where: { $0?.structure?.type == "ground" }) else { return false }
+//                guard let targetTileTemp
+//                    = targetBuilding.nonCornerTiles.randomElement!.adjacent4Tiles.first(where: { $0?.structure?.type == "ground" }) else { return false }
+//                guard let sourceTile = sourceTileTemp else { return false }
+//                guard let targetTile = targetTileTemp else { return false }
+
+                let sourceTile = sourceBuilding.nonCornerTiles.randomElement!
+                let targetTile = targetBuilding.nonCornerTiles.randomElement!
+
+                let sourceTileStructureBackup = sourceTile.structure
+                let targetTileStructureBackup = targetTile.structure
+                sourceTile.structure = nil
+                targetTile.structure = nil
+                defer {
+                    if sourceTile.structure?.type != "door" { sourceTile.structure = sourceTileStructureBackup }
+                    if targetTile.structure?.type != "door" { targetTile.structure = targetTileStructureBackup }
+                }
 
                 let sourcePosition = sourceTile.globalPosition
                 let targetPosition = targetTile.globalPosition
 
-                let hasNoStructure = { (position: Vector2i) -> Bool in
+                func hasNoStructure(position: Vector2i) -> Bool {
                     guard let tile = sourceTile.adjacentTile(position - sourcePosition) else { return false }
                     return tile.structure == nil
                 }
 
-                let hasGround = { (position: Vector2i) -> Bool in
-                    sourceTile.adjacentTile(position - sourcePosition)?.structure?.type == "ground"
+                func hasGroundOrNoStructure(position: Vector2i) -> Bool {
+                    guard let tile = sourceTile.adjacentTile(position - sourcePosition) else { return false }
+                    if let structure = tile.structure { return structure.type == "ground" }
+                    return true
                 }
 
-                if !findPathAStar(from: sourcePosition, to: targetPosition, isAllowed: hasNoStructure).isEmpty {
+                func cost(from: Vector2i, to: Vector2i) -> Int {
+                    guard let tile = sourceTile.adjacentTile(to - sourcePosition) else { return Int.max }
+                    return tile.structure != nil ? 1 : 0
+//                    return 0
+                }
+
+                if findPathAStar(from: sourcePosition, to: targetPosition,
+                                 isAllowed: hasNoStructure, cost: cost) != nil {
                     return false // A path already exists.
                 }
 
-                for roadPosition in findPathAStar(from: sourcePosition, to: targetPosition, isAllowed: hasGround) {
-                    sourceTile.adjacentTile(roadPosition - sourcePosition)!.structure = nil
+                guard let path = findPathAStar(from: sourcePosition, to: targetPosition,
+                                               isAllowed: hasGroundOrNoStructure, cost: cost) else {
+//                    fatalError()
+                    return false
                 }
 
+                for roadPosition in path {
+                    sourceTile.adjacentTile(roadPosition - sourcePosition)?.structure = nil
+                }
+
+                sourceTile.structure = Structure(type: "door")
+                targetTile.structure = Structure(type: "door")
                 return true
             }
         }
     }
 
     /// Helper function for `generateRoadsBetween` (above) to avoid code duplication.
-    private static func generateRoadsBetween_loopHelper(_ area: Area, innerLoop: (Tile) -> Bool) -> Bool {
+    private static func generateRoadsBetween_loopHelper(_ area: Area, innerLoop: (BuildingMetadata) -> Bool) -> Bool {
         var didGenerate = false
-
         for buildingMetadata in area.buildingMetadata {
-            let doorTileCandidate = buildingMetadata.nonCornerTiles.randomElement!
-
-            for offset in neighborOffsets {
-                guard let neighborTile = doorTileCandidate.adjacentTile(offset) else { continue }
-                if neighborTile.structure?.type == "ground" {
-                    if innerLoop(neighborTile) {
-                        doorTileCandidate.structure = Structure(type: "door")
-                        buildingMetadata.doorTiles.append(doorTileCandidate)
-                        didGenerate = true
-                    }
-                    break
-                }
-            }
+            if innerLoop(buildingMetadata) { didGenerate = true }
         }
         return didGenerate
     }
