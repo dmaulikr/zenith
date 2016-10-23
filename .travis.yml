@@ -1,0 +1,19 @@
+sudo: false
+
+language: generic
+
+os:
+    - osx
+
+osx_image: xcode8
+
+before_install:
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install sdl2; fi
+
+script:
+    - swift build --configuration $CONFIGURATION --verbose
+    - swift test --verbose
+
+env:
+    - CONFIGURATION=release
+    - CONFIGURATION=debug
