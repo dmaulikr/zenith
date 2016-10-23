@@ -15,6 +15,7 @@ public class Game: State, Serializable {
     private(set) var player: Creature!
     private var playerAreaPosition = Vector3i(0, 0, 0)
     private var seeEverythingMode: Bool = false
+    private var walkThroughWallsMode: Bool = false
 
     public init?(mainMenu: MainMenu, loadSavedGame: Bool = false) {
         self.mainMenu = mainMenu
@@ -105,6 +106,7 @@ public class Game: State, Serializable {
             case SDLK_1:      return performSpawnWall()
             case SDLK_2:      return performSpawnDoor()
             case SDLK_3:      return toggleSeeEverythingMode()
+            case SDLK_4:      return toggleWalkThroughWallsMode()
             default:          return false
         }
     }
@@ -122,7 +124,7 @@ public class Game: State, Serializable {
                 return true
             }
         }
-        player.tryToMove(direction)
+        player.tryToMove(direction, walkThroughWalls: walkThroughWallsMode)
         return true
     }
 
@@ -265,6 +267,15 @@ public class Game: State, Serializable {
     private func toggleSeeEverythingMode() -> Bool {
         #if !release
             seeEverythingMode = !seeEverythingMode
+            return true
+        #else
+            return false
+        #endif
+    }
+
+    private func toggleWalkThroughWallsMode() -> Bool {
+        #if !release
+            walkThroughWallsMode = !walkThroughWallsMode
             return true
         #else
             return false

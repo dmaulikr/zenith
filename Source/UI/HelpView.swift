@@ -32,6 +32,7 @@ class HelpView: State {
             (key: "1", info: "spawn wall"),
             (key: "2", info: "spawn door"),
             (key: "3", info: "see everything"),
+            (key: "4", info: "walk through walls"),
         ]
         #endif
     }

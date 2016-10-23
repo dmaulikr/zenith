@@ -142,14 +142,14 @@ public class Creature: Object, Configurable, Spawnable {
     public var psyche:            Int { return attributeValue(.psyche) }
     public var charisma:          Int { return attributeValue(.charisma) }
 
-    public func tryToMove(_ direction: Direction4) {
+    public func tryToMove(_ direction: Direction4, walkThroughWalls: Bool = false) {
         guard let destinationTile = tileUnder.adjacentTile(direction.vector) else {
             return
         }
         if destinationTile.creature != nil { return }
         let canMove = destinationTile.structure?.preventsMovement != true
         destinationTile.reactToMovementAttempt(of: self)
-        if !canMove { return }
+        if !canMove && !walkThroughWalls { return }
         move(to: destinationTile)
     }
 
