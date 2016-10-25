@@ -90,8 +90,8 @@ class PreferencesMenu: State {
 
     private func savePreferencesToFile() throws {
         let resolution = resolutions[currentResolutionIndex]
-        toml.setValue(key: ["resolution"], value: [resolution.x, resolution.y])
-        toml.setValue(key: ["scale"], value: scales[currentScaleIndex])
+        toml.set(value: [resolution.x, resolution.y], for: ["resolution"])
+        toml.set(value: scales[currentScaleIndex], for: ["scale"])
         try toml.description.write(toFile: Assets.preferencesPath, atomically: true, encoding: .utf8)
     }
 }

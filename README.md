@@ -1,4 +1,4 @@
-zenith
+zenith [![Build Status](https://travis-ci.org/emlai/zenith.svg?branch=master)](https://travis-ci.org/emlai/zenith)
 ======
 
 zenith is an upcoming graphical open-world roguelike game, still in its early development stages.
