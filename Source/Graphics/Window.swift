@@ -12,7 +12,7 @@ public class Window {
         SDL_Init(Uint32(SDL_INIT_VIDEO))
 
         window = SDL_CreateWindow(title,
-                                  SDL_WINDOWPOS_CENTERED_MASK, SDL_WINDOWPOS_CENTERED_MASK,
+                                  Int32(SDL_WINDOWPOS_CENTERED_MASK), Int32(SDL_WINDOWPOS_CENTERED_MASK),
                                   Int32(size.x), Int32(size.y), SDL_WINDOW_ALLOW_HIGHDPI.rawValue)
         guard window != nil else { fatalSDLError() }
 
