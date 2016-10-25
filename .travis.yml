@@ -11,8 +11,8 @@ before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install sdl2; fi
 
 script:
-    - swift build --configuration $CONFIGURATION --verbose
-    - swift test --verbose
+    - swift build --configuration $CONFIGURATION --verbose -Xlinker -L/usr/local/lib
+    - swift test --verbose -Xlinker -L/usr/local/lib
 
 env:
     - CONFIGURATION=release
