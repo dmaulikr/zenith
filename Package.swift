@@ -13,6 +13,11 @@ let package = Package(
     ],
     dependencies: [
         .Package(url: "https://github.com/emlai/CSDL2.swift.git", majorVersion: 1),
-        .Package(url: "https://github.com/emlai/swift-toml.git", "0.4.0+zenith"),
     ]
 )
+
+#if os(Linux)
+    package.dependencies.append(.Package(url: "https://github.com/emlai/swift-toml.git", "0.4.0+zenith+linux"))
+#else
+    package.dependencies.append(.Package(url: "https://github.com/emlai/swift-toml.git", "0.4.0+zenith"))
+#endif

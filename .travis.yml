@@ -1,18 +1,26 @@
-sudo: false
+sudo: required
+dist: trusty
 
 language: generic
 
 os:
+    - linux
     - osx
 
 osx_image: xcode8
 
 before_install:
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget http://libsdl.org/release/SDL2-2.0.5.tar.gz -O - | tar xz; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd SDL2-2.0.5 && ./configure --prefix=/usr/local && make -j && sudo make install); export LD_LIBRARY_PATH=/usr/local/lib; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -y install xvfb; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget https://swift.org/builds/swift-3.0-release/ubuntu1404/swift-3.0-RELEASE/swift-3.0-RELEASE-ubuntu14.04.tar.gz -O - | tar xz; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH=$PATH:$PWD/swift-3.0-RELEASE-ubuntu14.04/usr/bin; fi
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew install sdl2; fi
 
 script:
     - swift build --configuration $CONFIGURATION --verbose -Xlinker -L/usr/local/lib
-    - swift test --verbose -Xlinker -L/usr/local/lib
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then xvfb-run -a -s "-screen 0 800x600x24" swift test --verbose -Xlinker -L/usr/local/lib; fi
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then swift test --verbose -Xlinker -L/usr/local/lib; fi
 
 env:
     - CONFIGURATION=release
