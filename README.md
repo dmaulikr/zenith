@@ -14,10 +14,6 @@ Requirements
 Usage
 -----
 
-Install dependencies:
-
-    swift package fetch
-
 Build in release mode and run the project:
 
     swift build -c release && .build/release/zenith
@@ -35,4 +31,3 @@ Contributions are welcome! Fork the project and submit a pull request, or open a
 
 [1]: https://swift.org
 [2]: https://www.libsdl.org
-
