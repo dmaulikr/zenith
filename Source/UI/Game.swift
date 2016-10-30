@@ -264,9 +264,10 @@ public class Game: State, Serializable {
         try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
                                                  withIntermediateDirectories: false)
         FileManager.default.createFile(atPath: Assets.globalSavePath, contents: nil)
-        let fileStream = OutputStream(toFileAtPath: Assets.globalSavePath, append: false)!
+        let fileStream = OutputStream.toMemory()
         fileStream.open()
         fileStream <<< self
+        fileStream.writeDataToFile(Assets.globalSavePath)
         world.saveNonAdjacentAreas(player: player, keepInMemory: false)
         world.saveAdjacentAreas(player: player, keepInMemory: keepAdjacentAreasInMemory)
     }

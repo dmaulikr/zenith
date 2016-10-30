@@ -43,6 +43,13 @@ public func <<< <Key, Value>(stream: OutputStream, dictionary: [Key: Value]) -> 
     return stream
 }
 
+extension OutputStream {
+    public final func writeDataToFile(_ filePath: String) {
+        let dataInMemory = property(forKey: .dataWrittenToMemoryStreamKey)! as! Data
+        try! dataInMemory.write(to: URL(fileURLWithPath: filePath))
+    }
+}
+
 extension InputStream {
     public func readString() -> String {
         var string = String()

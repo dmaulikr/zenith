@@ -32,9 +32,10 @@ class SerializationTests: XCTestCase {
             sourceTile.addItem(Item(type: "humanCorpse"))
             sourceTile.creature = Creature(type: "bat", tile: sourceTile, controller: AIController())
             sourceTile.creature!.takeDamage(1)
-            let saveStream = OutputStream(toFileAtPath: testFileName, append: false)!
+            let saveStream = OutputStream.toMemory()
             saveStream.open()
             sourceTile.serialize(to: saveStream)
+            saveStream.writeDataToFile(testFileName)
         }
 
         let world = World(startTime: Time(ticks: 1))

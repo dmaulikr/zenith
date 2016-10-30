@@ -143,9 +143,10 @@ public final class World {
             try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
                                                      withIntermediateDirectories: false)
             FileManager.default.createFile(atPath: Assets.savedGamePath + fileName, contents: nil)
-            let fileStream = OutputStream(toFileAtPath: Assets.savedGamePath + fileName, append: false)!
+            let fileStream = OutputStream.toMemory()
             fileStream.open()
             area.serialize(to: fileStream)
+            fileStream.writeDataToFile(Assets.savedGamePath + fileName)
             if !keepInMemory { areas[position] = nil }
         }
     }
