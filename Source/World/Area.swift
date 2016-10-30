@@ -50,8 +50,8 @@ public final class Area: Serializable {
         return tiles[index(position)]
     }
 
-    func adjacentArea(direction: Vector2i) -> Area? {
-        return world.area(at: position + Vector3(direction))
+    func adjacentArea(direction: Vector2i, loadSavedIfNotInMemory: Bool = false) -> Area? {
+        return world.area(at: position + Vector3(direction), loadSavedIfNotInMemory: loadSavedIfNotInMemory)
     }
 
     var adjacent4Areas: [Area?] {

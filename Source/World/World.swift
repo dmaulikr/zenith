@@ -72,7 +72,7 @@ public final class World {
 
         for relativeTileX in -tileDrawDistance.x...tileDrawDistance.x {
             for relativeTileY in -tileDrawDistance.y...tileDrawDistance.y {
-                if let tileToDraw = player.tileUnder.adjacentTile(Vector2(relativeTileX, relativeTileY)) {
+                if let tileToDraw = player.tileUnder.adjacentTile(Vector2(relativeTileX, relativeTileY), loadSavedIfNotInMemory: true) {
                     if !player.canSee(tileToDraw) { continue }
                     sdlRect.x = Int32(destination.left + (tileDrawDistance.x + relativeTileX) * tileSize)
                     sdlRect.y = Int32(destination.top  + (tileDrawDistance.y + relativeTileY) * tileSize)
@@ -86,8 +86,13 @@ public final class World {
         targetViewport = viewport
     }
 
-    public func area(at position: Vector3i) -> Area? {
-        return areas[position] ?? tryToDeserializeArea(at: position)
+    public func area(at position: Vector3i, loadSavedIfNotInMemory: Bool = false) -> Area? {
+        if let areaInMemory = areas[position] {
+            return areaInMemory
+        } else if loadSavedIfNotInMemory {
+            return tryToDeserializeArea(at: position)
+        }
+        return nil
     }
 
     private func generateAreas(player: Creature) {

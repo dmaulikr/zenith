@@ -78,7 +78,7 @@ public final class Tile: Configurable, Serializable {
         }
     }
 
-    public func adjacentTile(_ direction: Vector2i) -> Tile? {
+    public func adjacentTile(_ direction: Vector2i, loadSavedIfNotInMemory: Bool = false) -> Tile? {
         var position = self.position + direction
         var relativeAreaPosition = Vector2(0, 0)
 
@@ -102,7 +102,7 @@ public final class Tile: Configurable, Serializable {
         if relativeAreaPosition == Vector2(0, 0) {
             return area.tile(at: position)
         } else {
-            return area.adjacentArea(direction: relativeAreaPosition)?.tile(at: position)
+            return area.adjacentArea(direction: relativeAreaPosition, loadSavedIfNotInMemory: loadSavedIfNotInMemory)?.tile(at: position)
         }
     }
 

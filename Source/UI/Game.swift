@@ -35,7 +35,8 @@ public class Game: State, Serializable {
             messageStream = MessageStream(game: self)
             sidebar = Sidebar(gui: gui, game: self)
             let playerTilePosition = saveFileStream.readVector2i()
-            player = world.area(at: playerAreaPosition)!.tile(at: playerTilePosition).creature!
+            player = world.area(at: playerAreaPosition, loadSavedIfNotInMemory: true)!
+                          .tile(at: playerTilePosition).creature!
             player.controller = PlayerController(game: self)
             player.messageStream = messageStream
         } else {
