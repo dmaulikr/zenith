@@ -1,3 +1,5 @@
+import Foundation
+
 public enum NameFlag {
     case indefinite
     case definite
@@ -11,12 +13,12 @@ struct Name {
 
     init(_ type: String) {
         var nameBase = ""
-        for character in type.characters {
-            if String(character).lowercased() != String(character) {
+        for unicodeScalar in type.unicodeScalars {
+            if CharacterSet.uppercaseLetters.contains(unicodeScalar) {
                 nameBase += " "
-                nameBase += String(character).lowercased()
+                nameBase += String(unicodeScalar).lowercased()
             } else {
-                nameBase.append(character)
+                nameBase += String(unicodeScalar)
             }
         }
         self.nameBase = nameBase
