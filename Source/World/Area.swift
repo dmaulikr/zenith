@@ -27,8 +27,9 @@ public final class Area: Serializable {
 
         for x in 0..<Area.size {
             for y in 0..<Area.size {
-                tiles.append(Tile(area: self, position: Vector2(x, y)))
-                tiles.last!.generate()
+                let tile = Tile(area: self, position: Vector2(x, y))
+                tile.generate()
+                tiles.append(tile)
             }
         }
 
