@@ -2,7 +2,7 @@ import Foundation
 import Basic
 import Graphics
 
-public class Area: Serializable {
+public final class Area: Serializable {
 
     unowned let world: World
     public let position: Vector3i

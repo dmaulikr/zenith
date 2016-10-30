@@ -7,7 +7,7 @@ public let tileSize = 20
 public let tileSizeVector = Vector2(tileSize, tileSize)
 public let tileRectangle = Rect(position: Vector2(0, 0), size: tileSizeVector)
 
-public class Tile: Configurable, Serializable {
+public final class Tile: Configurable, Serializable {
 
     unowned let area: Area
     public let position: Vector2i

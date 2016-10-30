@@ -3,7 +3,7 @@ import Foundation
 import Basic
 import Graphics
 
-public class World {
+public final class World {
 
     public var currentTime: Time
     var sunlight = Color(hue: 0, saturation: 0, lightness: 0)

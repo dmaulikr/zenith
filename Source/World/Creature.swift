@@ -2,7 +2,7 @@ import Foundation
 import Basic
 import Graphics
 
-public class Creature: Object, Configurable, Spawnable {
+public final class Creature: Object, Configurable, Spawnable {
 
     public private(set) unowned var tileUnder: Tile
     var backpack: [Item]
