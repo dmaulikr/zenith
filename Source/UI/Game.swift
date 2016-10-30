@@ -265,7 +265,7 @@ public class Game: State, Serializable {
         try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
                                                  withIntermediateDirectories: false)
         FileManager.default.createFile(atPath: Assets.globalSavePath, contents: nil)
-        let fileStream = OutputStream.toMemory()
+        let fileStream = OutputStream(toMemory: ())
         fileStream.open()
         fileStream <<< self
         fileStream.writeDataToFile(Assets.globalSavePath)
