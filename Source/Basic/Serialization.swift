@@ -45,7 +45,7 @@ public func <<< <Key, Value>(stream: OutputStream, dictionary: [Key: Value]) -> 
 
 extension OutputStream {
     public final func writeDataToFile(_ filePath: String) {
-        let dataInMemory = property(forKey: .dataWrittenToMemoryStreamKey)! as! Data
+        let dataInMemory = property(forKey: .dataWrittenToMemoryStreamKey)! as! NSData
         try! dataInMemory.write(to: URL(fileURLWithPath: filePath))
     }
 }
