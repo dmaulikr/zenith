@@ -37,6 +37,7 @@ public typealias Vector3i = Vector3<Int>
 public typealias Vector3d = Vector3<Double>
 public typealias Vector3f = Vector3<Float>
 
+@_specialize(Int)
 public func +<T: Numeric>(left: Vector3<T>, right: Vector3<T>) -> Vector3<T> {
     return Vector3<T>(left.x + right.x, left.y + right.y, left.z + right.z)
 }
@@ -45,6 +46,7 @@ public func +=<T: Numeric>(left: inout Vector3<T>, right: Vector3<T>) {
     left = left + right
 }
 
+@_specialize(Int)
 public func -<T: Numeric>(left: Vector3<T>, right: Vector3<T>) -> Vector3<T> {
     return Vector3<T>(left.x - right.x, left.y - right.y, left.z - right.z)
 }
@@ -53,6 +55,7 @@ public func -=<T: Numeric>(left: inout Vector3<T>, right: Vector3<T>) {
     left = left - right
 }
 
+@_specialize(Int)
 public func *<T: Numeric>(left: Vector3<T>, right: Vector3<T>) -> Vector3<T> {
     return Vector3<T>(left.x * right.x, left.y * right.y, left.z * right.z)
 }
@@ -61,6 +64,7 @@ public func *=<T: Numeric>(left: inout Vector3<T>, right: Vector3<T>) {
     left = left * right
 }
 
+@_specialize(Int)
 public func /<T: Numeric>(left: Vector3<T>, right: Vector3<T>) -> Vector3<T> {
     return Vector3<T>(left.x / right.x, left.y / right.y, left.z / right.z)
 }
@@ -69,6 +73,7 @@ public func /=<T: Numeric>(left: inout Vector3<T>, right: Vector3<T>) {
     left = left / right
 }
 
+@_specialize(Int)
 public func %<T: Numeric>(left: Vector3<T>, right: Vector3<T>) -> Vector3<T> {
     return Vector3<T>(left.x % right.x, left.y % right.y, left.z % right.z)
 }
@@ -77,6 +82,7 @@ public func %=<T: Numeric>(left: inout Vector3<T>, right: Vector3<T>) {
     left = left % right
 }
 
+@_specialize(Int)
 public func *<T: Numeric>(left: Vector3<T>, right: T) -> Vector3<T> {
     return Vector3<T>(left.x * right, left.y * right, left.z * right)
 }
@@ -85,6 +91,7 @@ public func *=<T: Numeric>(left: inout Vector3<T>, right: T) {
     left = left * right
 }
 
+@_specialize(Int)
 public func /<T: Numeric>(left: Vector3<T>, right: T) -> Vector3<T> {
     return Vector3<T>(left.x / right, left.y / right, left.z / right)
 }
@@ -93,6 +100,7 @@ public func /=<T: Numeric>(left: inout Vector3<T>, right: T) {
     left = left / right
 }
 
+@_specialize(Int)
 public func %<T: Numeric>(left: Vector3<T>, right: T) -> Vector3<T> {
     return Vector3<T>(left.x % right, left.y % right, left.z % right)
 }
@@ -101,18 +109,22 @@ public func %=<T: Numeric>(left: inout Vector3<T>, right: T) {
     left = left % right
 }
 
+@_specialize(Int)
 public prefix func +<T: Numeric>(vector: Vector3<T>) -> Vector3<T> {
     return Vector3<T>(+vector.x, +vector.y, +vector.z)
 }
 
+@_specialize(Int)
 public prefix func -<T: Numeric>(vector: Vector3<T>) -> Vector3<T> {
     return Vector3<T>(-vector.x, -vector.y, -vector.z)
 }
 
+@_specialize(Int)
 public func ==<T: Numeric>(left: Vector3<T>, right: Vector3<T>) -> Bool {
     return left.x == right.x && left.y == right.y && left.z == right.z
 }
 
+@_specialize(Int)
 public func !=<T: Numeric>(left: Vector3<T>, right: Vector3<T>) -> Bool {
     return !(left == right)
 }

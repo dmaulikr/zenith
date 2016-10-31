@@ -2,7 +2,7 @@ import Foundation
 import Basic
 import Graphics
 
-public class Item: Object, Configurable, Spawnable, Hashable, Equatable {
+public final class Item: Object, Configurable, Spawnable, Hashable, Equatable {
 
     weak var tileUnder: Tile?
     public static let config = Configuration.load(name: "item")

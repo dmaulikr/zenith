@@ -35,7 +35,8 @@ public class Game: State, Serializable {
             messageStream = MessageStream(game: self)
             sidebar = Sidebar(gui: gui, game: self)
             let playerTilePosition = saveFileStream.readVector2i()
-            player = world.area(at: playerAreaPosition)!.tile(at: playerTilePosition).creature!
+            player = world.area(at: playerAreaPosition, loadSavedIfNotInMemory: true)!
+                          .tile(at: playerTilePosition).creature!
             player.controller = PlayerController(game: self)
             player.messageStream = messageStream
         } else {
@@ -264,9 +265,10 @@ public class Game: State, Serializable {
         try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
                                                  withIntermediateDirectories: false)
         FileManager.default.createFile(atPath: Assets.globalSavePath, contents: nil)
-        let fileStream = OutputStream(toFileAtPath: Assets.globalSavePath, append: false)!
+        let fileStream = OutputStream(toMemory: ())
         fileStream.open()
         fileStream <<< self
+        fileStream.writeDataToFile(Assets.globalSavePath)
         world.saveNonAdjacentAreas(player: player, keepInMemory: false)
         world.saveAdjacentAreas(player: player, keepInMemory: keepAdjacentAreasInMemory)
     }

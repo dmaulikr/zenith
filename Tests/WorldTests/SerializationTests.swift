@@ -32,9 +32,10 @@ class SerializationTests: XCTestCase {
             sourceTile.addItem(Item(type: "humanCorpse"))
             sourceTile.creature = Creature(type: "bat", tile: sourceTile, controller: AIController())
             sourceTile.creature!.takeDamage(1)
-            let saveStream = OutputStream(toFileAtPath: testFileName, append: false)!
+            let saveStream = OutputStream(toMemory: ())
             saveStream.open()
             sourceTile.serialize(to: saveStream)
+            saveStream.writeDataToFile(testFileName)
         }
 
         let world = World(startTime: Time(ticks: 1))
@@ -77,7 +78,11 @@ func XCTAssertEqual<T: EqualAssertable>(_ expression1: T?, _ expression2: T?) {
 
 extension Entity {
     static func assertEqual(_ entity1: Entity, _ entity2: Entity) {
-        XCTAssertEqual(entity1.components, entity2.components)
+        XCTAssertEqual(entity1.components.count, entity2.components.count)
+        for (component1, component2) in zip(entity1.components, entity2.components) {
+            XCTAssert(type(of: component1) == type(of: component2))
+            // TODO: Downcast the components and check for equality.
+        }
     }
 }
 

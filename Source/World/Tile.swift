@@ -7,7 +7,7 @@ public let tileSize = 20
 public let tileSizeVector = Vector2(tileSize, tileSize)
 public let tileRectangle = Rect(position: Vector2(0, 0), size: tileSizeVector)
 
-public class Tile: Configurable, Serializable {
+public final class Tile: Configurable, Serializable {
 
     unowned let area: Area
     public let position: Vector2i
@@ -78,7 +78,7 @@ public class Tile: Configurable, Serializable {
         }
     }
 
-    public func adjacentTile(_ direction: Vector2i) -> Tile? {
+    public func adjacentTile(_ direction: Vector2i, loadSavedIfNotInMemory: Bool = false) -> Tile? {
         var position = self.position + direction
         var relativeAreaPosition = Vector2(0, 0)
 
@@ -102,7 +102,7 @@ public class Tile: Configurable, Serializable {
         if relativeAreaPosition == Vector2(0, 0) {
             return area.tile(at: position)
         } else {
-            return area.adjacentArea(direction: relativeAreaPosition)?.tile(at: position)
+            return area.adjacentArea(direction: relativeAreaPosition, loadSavedIfNotInMemory: loadSavedIfNotInMemory)?.tile(at: position)
         }
     }
 

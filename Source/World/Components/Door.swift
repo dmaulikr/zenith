@@ -6,7 +6,7 @@ protocol Closeable {
     func close(closer: Creature)
 }
 
-class Door: StructureComponent, Closeable {
+final class Door: StructureComponent, Closeable {
 
     private weak var structure: Structure!
     private var openSpritePositionOffset: Vector2i

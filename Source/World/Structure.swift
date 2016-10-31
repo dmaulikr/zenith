@@ -1,7 +1,7 @@
 import Basic
 import Graphics
 
-public class Structure: Object, Configurable, Spawnable {
+public final class Structure: Object, Configurable, Spawnable {
 
     var sprite: Sprite
     weak var tile: Tile!

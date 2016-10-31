@@ -2,7 +2,7 @@ import Foundation
 import Basic
 import Graphics
 
-public class Area: Serializable {
+public final class Area: Serializable {
 
     unowned let world: World
     public let position: Vector3i
@@ -27,8 +27,9 @@ public class Area: Serializable {
 
         for x in 0..<Area.size {
             for y in 0..<Area.size {
-                tiles.append(Tile(area: self, position: Vector2(x, y)))
-                tiles.last!.generate()
+                let tile = Tile(area: self, position: Vector2(x, y))
+                tile.generate()
+                tiles.append(tile)
             }
         }
 
@@ -49,8 +50,8 @@ public class Area: Serializable {
         return tiles[index(position)]
     }
 
-    func adjacentArea(direction: Vector2i) -> Area? {
-        return world.area(at: position + Vector3(direction))
+    func adjacentArea(direction: Vector2i, loadSavedIfNotInMemory: Bool = false) -> Area? {
+        return world.area(at: position + Vector3(direction), loadSavedIfNotInMemory: loadSavedIfNotInMemory)
     }
 
     var adjacent4Areas: [Area?] {

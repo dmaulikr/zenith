@@ -3,7 +3,7 @@ import Foundation
 import Basic
 import Graphics
 
-public class World {
+public final class World {
 
     public var currentTime: Time
     var sunlight = Color(hue: 0, saturation: 0, lightness: 0)
@@ -72,7 +72,7 @@ public class World {
 
         for relativeTileX in -tileDrawDistance.x...tileDrawDistance.x {
             for relativeTileY in -tileDrawDistance.y...tileDrawDistance.y {
-                if let tileToDraw = player.tileUnder.adjacentTile(Vector2(relativeTileX, relativeTileY)) {
+                if let tileToDraw = player.tileUnder.adjacentTile(Vector2(relativeTileX, relativeTileY), loadSavedIfNotInMemory: true) {
                     if !player.canSee(tileToDraw) { continue }
                     sdlRect.x = Int32(destination.left + (tileDrawDistance.x + relativeTileX) * tileSize)
                     sdlRect.y = Int32(destination.top  + (tileDrawDistance.y + relativeTileY) * tileSize)
@@ -86,8 +86,13 @@ public class World {
         targetViewport = viewport
     }
 
-    public func area(at position: Vector3i) -> Area? {
-        return areas[position] ?? tryToDeserializeArea(at: position)
+    public func area(at position: Vector3i, loadSavedIfNotInMemory: Bool = false) -> Area? {
+        if let areaInMemory = areas[position] {
+            return areaInMemory
+        } else if loadSavedIfNotInMemory {
+            return tryToDeserializeArea(at: position)
+        }
+        return nil
     }
 
     private func generateAreas(player: Creature) {
@@ -143,9 +148,10 @@ public class World {
             try? FileManager.default.createDirectory(atPath: Assets.savedGamePath,
                                                      withIntermediateDirectories: false)
             FileManager.default.createFile(atPath: Assets.savedGamePath + fileName, contents: nil)
-            let fileStream = OutputStream(toFileAtPath: Assets.savedGamePath + fileName, append: false)!
+            let fileStream = OutputStream(toMemory: ())
             fileStream.open()
             area.serialize(to: fileStream)
+            fileStream.writeDataToFile(Assets.savedGamePath + fileName)
             if !keepInMemory { areas[position] = nil }
         }
     }
