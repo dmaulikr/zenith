@@ -70,7 +70,7 @@ public struct Bitmap {
     }
 
     public init(size: Vector2i) {
-        surface = SDL_CreateRGBSurface(0, Int32(size.x), Int32(size.y), 32, 0, 0, 0, 0)
+        surface = SDL_CreateRGBSurface(0, Int32(size.x), Int32(size.y), 32, 0xFF0000, 0xFF00, 0xFF, 0xFF000000)
     }
 
     static func get(fileName: String) -> Bitmap {

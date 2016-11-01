@@ -15,6 +15,7 @@ public final class Tile: Configurable, Serializable {
         return Vector2(area.position) * Area.size + position
     }
     private(set) var items: [Item]
+    private var liquids: [Liquid]
     public var structure: Structure? {
         didSet {
             structure?.tile = self
@@ -53,6 +54,7 @@ public final class Tile: Configurable, Serializable {
         creature = nil
         lightColor = area.globalLight
         items = []
+        liquids = []
         renderCache = Sprite(image: Bitmap(size: tileSizeVector))
         renderCacheIsInvalidated = true
         groundType = ""
@@ -122,8 +124,9 @@ public final class Tile: Configurable, Serializable {
         calculateLightEmission()
     }
 
-    private var lightEmitters: [Item] {
-        var lightEmitters = items.filter { $0.emitsLight }
+    private var lightEmitters: [Entity] {
+        var lightEmitters: [Entity] = items.filter { $0.emitsLight }
+        lightEmitters.append(contentsOf: liquids.filter { $0.emitsLight }.map { $0 as Entity })
         if let wieldedItem = creature?.wieldedItem, wieldedItem.emitsLight {
             lightEmitters.append(wieldedItem)
         }
@@ -165,7 +168,7 @@ public final class Tile: Configurable, Serializable {
         }
     }
 
-    func invalidateRenderCachesOfAdjacentTiles(illuminatedBy lightEmitter: Item) {
+    func invalidateRenderCachesOfAdjacentTiles(illuminatedBy lightEmitter: Entity) {
         if structure?.blocksSight == true { return }
         let distance = lightEmitter.lightRange
 
@@ -193,6 +196,7 @@ public final class Tile: Configurable, Serializable {
 
     private func renderActual() {
         groundSprite.render()
+        for liquid in liquids { liquid.render() }
         for item in items { item.render() }
         structure?.render()
         creature?.render()
@@ -241,7 +245,7 @@ public final class Tile: Configurable, Serializable {
                 if g > 1 { g = 1 } else if g < 0 { g = 0 }
                 if b > 1 { b = 1 } else if b < 0 { b = 0 }
 
-                let newPixel = UInt32(255 * r) << 16 | UInt32(255 * g) << 8 | UInt32(255 * b)
+                let newPixel = 255 << 24 | UInt32(255 * r) << 16 | UInt32(255 * g) << 8 | UInt32(255 * b)
                 pixelsPointer.advanced(by: Int(y * targetWidth + x)).pointee = newPixel
                 y += 1
             }
@@ -279,6 +283,14 @@ public final class Tile: Configurable, Serializable {
 
     func removeAllItems() {
         items.removeAll(keepingCapacity: true)
+    }
+
+    func addLiquid(_ liquid: Liquid) {
+        liquids.append(liquid)
+        invalidateRenderCache()
+        if liquid.emitsLight {
+            invalidateRenderCachesOfAdjacentTiles(illuminatedBy: liquid)
+        }
     }
 
     func reactToMovementAttempt(of mover: Creature) {
@@ -333,6 +345,11 @@ public final class Tile: Configurable, Serializable {
             stream <<< item.type
         }
 
+        stream <<< liquids.count
+        for liquid in liquids {
+            stream <<< liquid
+        }
+
         stream <<< (structure != nil)
         if let structure = structure {
             stream <<< structure.type <<< structure
@@ -353,6 +370,14 @@ public final class Tile: Configurable, Serializable {
 
         for _ in 0..<itemCount {
             items.append(Item(type: stream.readString()))
+        }
+
+        let liquidCount = stream.readInt()
+        liquids.removeAll(keepingCapacity: true)
+        liquids.reserveCapacity(itemCount)
+
+        for _ in 0..<liquidCount {
+            liquids.append(Liquid(deserializedFrom: stream))
         }
 
         if stream.readBool() {

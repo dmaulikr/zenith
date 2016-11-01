@@ -316,11 +316,17 @@ public final class Creature: Object, Configurable, Spawnable {
 
     func takeDamage(_ damage: Int) {
         assert(damage > 0)
-        health -= Double(damage) / Double(endurance)
+        let effectiveDamage = Double(damage) / Double(endurance)
+        health -= effectiveDamage
+        bleed(amount: effectiveDamage)
 
         if health <= 0 {
             die()
         }
+    }
+
+    private func bleed(amount: Double) {
+        tileUnder.addLiquid(Liquid(type: "blood", amount: amount))
     }
 
     func die() {
