@@ -5,24 +5,41 @@ import CSDL2
 
 final class Liquid: Object, Configurable {
 
+    private unowned let tileUnder: Tile
     private let amount: Double
+    private var fadeLevel: Double
     private let sprite: Sprite
+    private static let fadeStep = 0.001
     public static let config = Configuration.load(name: "material")
 
-    init(type: String, amount: Double) {
+    init(tile: Tile, type: String, amount: Double) {
+        tileUnder = tile
         self.amount = amount
+        fadeLevel = 1
         sprite = Sprite(image: Bitmap(size: tileSizeVector))
         super.init(type: type, config: Liquid.config)
         addComponents(config: Liquid.config)
         createSprite()
     }
 
-    convenience init(deserializedFrom stream: InputStream) {
-        self.init(type: stream.readString(), amount: stream.readDouble())
+    convenience init(deserializedFrom stream: InputStream, tile: Tile) {
+        self.init(tile: tile, type: stream.readString(), amount: stream.readDouble())
+        fadeLevel = stream.readDouble()
+        SDL_SetSurfaceAlphaMod(sprite.surface, UInt8(fadeLevel * 255))
     }
 
     deinit {
         sprite.deallocate()
+    }
+
+    override func update() {
+        fadeLevel = max(0, fadeLevel - Liquid.fadeStep)
+        SDL_SetSurfaceAlphaMod(sprite.surface, UInt8(fadeLevel * 255))
+        tileUnder.invalidateRenderCache()
+    }
+
+    var hasFadedAway: Bool {
+        return fadeLevel <= 0
     }
 
     func render() {
@@ -43,7 +60,7 @@ final class Liquid: Object, Configurable {
     }
 
     override func serialize(to stream: OutputStream) {
-        stream <<< type <<< amount
+        stream <<< type <<< amount <<< fadeLevel
     }
 
     override func deserialize(from stream: InputStream) {

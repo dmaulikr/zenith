@@ -326,7 +326,7 @@ public final class Creature: Object, Configurable, Spawnable {
     }
 
     private func bleed(amount: Double) {
-        tileUnder.addLiquid(Liquid(type: "blood", amount: amount))
+        tileUnder.addLiquid(Liquid(tile: tileUnder, type: "blood", amount: amount))
     }
 
     func die() {

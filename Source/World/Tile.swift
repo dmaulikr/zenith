@@ -121,6 +121,8 @@ public final class Tile: Configurable, Serializable {
     var tileAbove: Tile? { return area.areaAbove?.tile(at: position) }
 
     func update() {
+        for liquid in liquids { liquid.update() }
+        liquids = liquids.filter { !$0.hasFadedAway }
         calculateLightEmission()
     }
 
@@ -377,7 +379,7 @@ public final class Tile: Configurable, Serializable {
         liquids.reserveCapacity(itemCount)
 
         for _ in 0..<liquidCount {
-            liquids.append(Liquid(deserializedFrom: stream))
+            liquids.append(Liquid(deserializedFrom: stream, tile: self))
         }
 
         if stream.readBool() {
