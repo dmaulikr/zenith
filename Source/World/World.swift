@@ -30,12 +30,11 @@ public final class World {
     public func update(player: Creature) throws {
         generateAreas(player: player)
 
-        var creaturesToUpdate = [Creature]()
-
+        var creaturesToUpdate = player.isDead ? [] : [player]
         for dx in -areaUpdateDistance...areaUpdateDistance {
             for dy in -areaUpdateDistance...areaUpdateDistance {
                 if let area = area(at: player.area.position + Vector3(dx, dy, 0)) {
-                    creaturesToUpdate.append(contentsOf: area.creatures)
+                    creaturesToUpdate.append(contentsOf: area.creatures.filter { $0 !== player })
                 }
             }
         }
