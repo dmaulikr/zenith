@@ -251,6 +251,8 @@ public final class Creature: Object, Configurable, Spawnable {
     }
 
     override func update() throws {
+        bleed(amount: (1 - Double(health) / Double(maxHealth)) * 4)
+
         if case .some(.resting(let ticksLeft)) = currentAction {
             if ticksLeft > 0 {
                 currentAction = .resting(ticksLeft: ticksLeft - 1)
