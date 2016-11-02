@@ -232,9 +232,11 @@ public final class Creature: Object, Configurable, Spawnable {
     }
 
     public func wieldItem(_ item: Item?) {
+        tileUnder.unregisterPossibleLightEmitter(wieldedItem)
         wieldedItem = item
         if let item = item {
             addMessage("You wield \(item.name(.definite)).")
+            tileUnder.registerPossibleLightEmitter(item)
         }
     }
 
@@ -251,6 +253,8 @@ public final class Creature: Object, Configurable, Spawnable {
     }
 
     override func update() throws {
+        bleed(amount: (1 - Double(health) / Double(maxHealth)) * 4)
+
         if case .some(.resting(let ticksLeft)) = currentAction {
             if ticksLeft > 0 {
                 currentAction = .resting(ticksLeft: ticksLeft - 1)
@@ -316,11 +320,17 @@ public final class Creature: Object, Configurable, Spawnable {
 
     func takeDamage(_ damage: Int) {
         assert(damage > 0)
-        health -= Double(damage) / Double(endurance)
+        let effectiveDamage = Double(damage) / Double(endurance)
+        health -= effectiveDamage
+        bleed(amount: effectiveDamage)
 
         if health <= 0 {
             die()
         }
+    }
+
+    private func bleed(amount: Double) {
+        tileUnder.addLiquid(Liquid(tile: tileUnder, type: "blood", amount: amount))
     }
 
     func die() {

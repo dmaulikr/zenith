@@ -15,6 +15,7 @@ public final class Tile: Configurable, Serializable {
         return Vector2(area.position) * Area.size + position
     }
     private(set) var items: [Item]
+    private var liquids: [Liquid]
     public var structure: Structure? {
         didSet {
             structure?.tile = self
@@ -27,12 +28,15 @@ public final class Tile: Configurable, Serializable {
                 if newCreature !== creature { // FIXME: This shouldn't happen.
                     area.registerCreature(newCreature)
                 }
+                registerPossibleLightEmitter(newCreature.wieldedItem)
             } else if let oldCreature = creature {
                 area.unregisterCreature(oldCreature)
+                unregisterPossibleLightEmitter(oldCreature.wieldedItem)
             }
         }
     }
     var lightColor: Color
+    private var lightEmitters: [Object]
     var groundType: String {
         didSet {
             groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
@@ -52,7 +56,9 @@ public final class Tile: Configurable, Serializable {
         self.position = position
         creature = nil
         lightColor = area.globalLight
+        lightEmitters = []
         items = []
+        liquids = []
         renderCache = Sprite(image: Bitmap(size: tileSizeVector))
         renderCacheIsInvalidated = true
         groundType = ""
@@ -119,15 +125,15 @@ public final class Tile: Configurable, Serializable {
     var tileAbove: Tile? { return area.areaAbove?.tile(at: position) }
 
     func update() {
-        calculateLightEmission()
-    }
-
-    private var lightEmitters: [Item] {
-        var lightEmitters = items.filter { $0.emitsLight }
-        if let wieldedItem = creature?.wieldedItem, wieldedItem.emitsLight {
-            lightEmitters.append(wieldedItem)
+        for liquid in liquids { liquid.update() }
+        liquids = liquids.filter {
+            if $0.hasFadedAway {
+                unregisterPossibleLightEmitter($0)
+                return false
+            }
+            return true
         }
-        return lightEmitters
+        calculateLightEmission()
     }
 
     func calculateLightEmission() {
@@ -165,7 +171,19 @@ public final class Tile: Configurable, Serializable {
         }
     }
 
-    func invalidateRenderCachesOfAdjacentTiles(illuminatedBy lightEmitter: Item) {
+    func registerPossibleLightEmitter(_ object: Object?) {
+        if let object = object, object.emitsLight {
+            lightEmitters.append(object)
+        }
+    }
+
+    func unregisterPossibleLightEmitter(_ object: Object?) {
+        if let object = object, object.emitsLight {
+            lightEmitters.remove(at: lightEmitters.index { $0 === object }!)
+        }
+    }
+
+    func invalidateRenderCachesOfAdjacentTiles(illuminatedBy lightEmitter: Entity) {
         if structure?.blocksSight == true { return }
         let distance = lightEmitter.lightRange
 
@@ -193,6 +211,7 @@ public final class Tile: Configurable, Serializable {
 
     private func renderActual() {
         groundSprite.render()
+        for liquid in liquids { liquid.render() }
         for item in items { item.render() }
         structure?.render()
         creature?.render()
@@ -241,7 +260,7 @@ public final class Tile: Configurable, Serializable {
                 if g > 1 { g = 1 } else if g < 0 { g = 0 }
                 if b > 1 { b = 1 } else if b < 0 { b = 0 }
 
-                let newPixel = UInt32(255 * r) << 16 | UInt32(255 * g) << 8 | UInt32(255 * b)
+                let newPixel = 255 << 24 | UInt32(255 * r) << 16 | UInt32(255 * g) << 8 | UInt32(255 * b)
                 pixelsPointer.advanced(by: Int(y * targetWidth + x)).pointee = newPixel
                 y += 1
             }
@@ -253,6 +272,7 @@ public final class Tile: Configurable, Serializable {
         invalidateRenderCache()
         items.append(item)
         item.tileUnder = self
+        registerPossibleLightEmitter(item)
     }
 
     func removeTopItem() -> Item? {
@@ -260,6 +280,7 @@ public final class Tile: Configurable, Serializable {
             return nil
         }
         invalidateRenderCache()
+        unregisterPossibleLightEmitter(topItem)
         if topItem.emitsLight {
             invalidateRenderCachesOfAdjacentTiles(illuminatedBy: topItem)
         }
@@ -270,6 +291,7 @@ public final class Tile: Configurable, Serializable {
     func removeItem(_ itemToBeRemoved: Item) {
         guard let index = items.index(where: { $0 === itemToBeRemoved }) else { return }
         invalidateRenderCache()
+        unregisterPossibleLightEmitter(itemToBeRemoved)
         if itemToBeRemoved.emitsLight {
             invalidateRenderCachesOfAdjacentTiles(illuminatedBy: itemToBeRemoved)
         }
@@ -279,6 +301,15 @@ public final class Tile: Configurable, Serializable {
 
     func removeAllItems() {
         items.removeAll(keepingCapacity: true)
+    }
+
+    func addLiquid(_ liquid: Liquid) {
+        liquids.append(liquid)
+        invalidateRenderCache()
+        registerPossibleLightEmitter(liquid)
+        if liquid.emitsLight {
+            invalidateRenderCachesOfAdjacentTiles(illuminatedBy: liquid)
+        }
     }
 
     func reactToMovementAttempt(of mover: Creature) {
@@ -333,6 +364,11 @@ public final class Tile: Configurable, Serializable {
             stream <<< item.type
         }
 
+        stream <<< liquids.count
+        for liquid in liquids {
+            stream <<< liquid
+        }
+
         stream <<< (structure != nil)
         if let structure = structure {
             stream <<< structure.type <<< structure
@@ -352,7 +388,15 @@ public final class Tile: Configurable, Serializable {
         items.reserveCapacity(itemCount)
 
         for _ in 0..<itemCount {
-            items.append(Item(type: stream.readString()))
+            addItem(Item(type: stream.readString()))
+        }
+
+        let liquidCount = stream.readInt()
+        liquids.removeAll(keepingCapacity: true)
+        liquids.reserveCapacity(itemCount)
+
+        for _ in 0..<liquidCount {
+            addLiquid(Liquid(deserializedFrom: stream, tile: self))
         }
 
         if stream.readBool() {

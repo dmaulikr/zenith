@@ -75,6 +75,12 @@ extension InputStream {
         return byte
     }
 
+    public func readDouble() -> Double {
+        var double = Double()
+        self >>> double
+        return double
+    }
+
     public func readVector2i() -> Vector2i {
         var vector = Vector2i(0, 0)
         vector.deserialize(from: self)
