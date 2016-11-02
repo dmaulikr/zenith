@@ -33,9 +33,12 @@ final class Liquid: Object, Configurable {
     }
 
     override func update() {
+        let oldFadeLevel = fadeLevel
         fadeLevel = max(0, fadeLevel - Liquid.fadeStep)
-        SDL_SetSurfaceAlphaMod(sprite.surface, UInt8(fadeLevel * 255))
-        tileUnder.invalidateRenderCache()
+        if UInt8(fadeLevel * 255) != UInt8(oldFadeLevel * 255) {
+            SDL_SetSurfaceAlphaMod(sprite.surface, UInt8(fadeLevel * 255))
+            tileUnder.invalidateRenderCache()
+        }
     }
 
     var hasFadedAway: Bool {

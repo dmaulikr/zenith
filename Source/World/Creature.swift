@@ -232,9 +232,11 @@ public final class Creature: Object, Configurable, Spawnable {
     }
 
     public func wieldItem(_ item: Item?) {
+        tileUnder.unregisterPossibleLightEmitter(wieldedItem)
         wieldedItem = item
         if let item = item {
             addMessage("You wield \(item.name(.definite)).")
+            tileUnder.registerPossibleLightEmitter(item)
         }
     }
 

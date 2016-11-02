@@ -28,12 +28,15 @@ public final class Tile: Configurable, Serializable {
                 if newCreature !== creature { // FIXME: This shouldn't happen.
                     area.registerCreature(newCreature)
                 }
+                registerPossibleLightEmitter(newCreature.wieldedItem)
             } else if let oldCreature = creature {
                 area.unregisterCreature(oldCreature)
+                unregisterPossibleLightEmitter(oldCreature.wieldedItem)
             }
         }
     }
     var lightColor: Color
+    private var lightEmitters: [Object]
     var groundType: String {
         didSet {
             groundSprite = Sprite(fileName: Assets.graphicsPath + "terrain.bmp",
@@ -53,6 +56,7 @@ public final class Tile: Configurable, Serializable {
         self.position = position
         creature = nil
         lightColor = area.globalLight
+        lightEmitters = []
         items = []
         liquids = []
         renderCache = Sprite(image: Bitmap(size: tileSizeVector))
@@ -122,17 +126,14 @@ public final class Tile: Configurable, Serializable {
 
     func update() {
         for liquid in liquids { liquid.update() }
-        liquids = liquids.filter { !$0.hasFadedAway }
-        calculateLightEmission()
-    }
-
-    private var lightEmitters: [Entity] {
-        var lightEmitters: [Entity] = items.filter { $0.emitsLight }
-        lightEmitters.append(contentsOf: liquids.filter { $0.emitsLight }.map { $0 as Entity })
-        if let wieldedItem = creature?.wieldedItem, wieldedItem.emitsLight {
-            lightEmitters.append(wieldedItem)
+        liquids = liquids.filter {
+            if $0.hasFadedAway {
+                unregisterPossibleLightEmitter($0)
+                return false
+            }
+            return true
         }
-        return lightEmitters
+        calculateLightEmission()
     }
 
     func calculateLightEmission() {
@@ -167,6 +168,18 @@ public final class Tile: Configurable, Serializable {
                 raycast(lightVector: Vector2(-distance, dy))
                 raycast(lightVector: Vector2( distance, dy))
             }
+        }
+    }
+
+    func registerPossibleLightEmitter(_ object: Object?) {
+        if let object = object, object.emitsLight {
+            lightEmitters.append(object)
+        }
+    }
+
+    func unregisterPossibleLightEmitter(_ object: Object?) {
+        if let object = object, object.emitsLight {
+            lightEmitters.remove(at: lightEmitters.index { $0 === object }!)
         }
     }
 
@@ -259,6 +272,7 @@ public final class Tile: Configurable, Serializable {
         invalidateRenderCache()
         items.append(item)
         item.tileUnder = self
+        registerPossibleLightEmitter(item)
     }
 
     func removeTopItem() -> Item? {
@@ -266,6 +280,7 @@ public final class Tile: Configurable, Serializable {
             return nil
         }
         invalidateRenderCache()
+        unregisterPossibleLightEmitter(topItem)
         if topItem.emitsLight {
             invalidateRenderCachesOfAdjacentTiles(illuminatedBy: topItem)
         }
@@ -276,6 +291,7 @@ public final class Tile: Configurable, Serializable {
     func removeItem(_ itemToBeRemoved: Item) {
         guard let index = items.index(where: { $0 === itemToBeRemoved }) else { return }
         invalidateRenderCache()
+        unregisterPossibleLightEmitter(itemToBeRemoved)
         if itemToBeRemoved.emitsLight {
             invalidateRenderCachesOfAdjacentTiles(illuminatedBy: itemToBeRemoved)
         }
@@ -290,6 +306,7 @@ public final class Tile: Configurable, Serializable {
     func addLiquid(_ liquid: Liquid) {
         liquids.append(liquid)
         invalidateRenderCache()
+        registerPossibleLightEmitter(liquid)
         if liquid.emitsLight {
             invalidateRenderCachesOfAdjacentTiles(illuminatedBy: liquid)
         }
@@ -371,7 +388,7 @@ public final class Tile: Configurable, Serializable {
         items.reserveCapacity(itemCount)
 
         for _ in 0..<itemCount {
-            items.append(Item(type: stream.readString()))
+            addItem(Item(type: stream.readString()))
         }
 
         let liquidCount = stream.readInt()
@@ -379,7 +396,7 @@ public final class Tile: Configurable, Serializable {
         liquids.reserveCapacity(itemCount)
 
         for _ in 0..<liquidCount {
-            liquids.append(Liquid(deserializedFrom: stream, tile: self))
+            addLiquid(Liquid(deserializedFrom: stream, tile: self))
         }
 
         if stream.readBool() {
