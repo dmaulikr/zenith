@@ -105,7 +105,7 @@ public final class Area: Serializable {
     }
 
     private func calculatePopulationDensity() -> Double {
-        let neighborAreas = adjacent4Areas.filter{ $0 != nil }
+        let neighborAreas = adjacent4Areas.filter { $0 != nil }
         if neighborAreas.isEmpty {
             return Double.random(Area.populationDensityRange)
         } else {

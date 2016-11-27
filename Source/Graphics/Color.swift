@@ -7,11 +7,11 @@ public struct Color: Equatable {
     public var blue: UInt8
     public var alpha: UInt8
 
-    public init(r: UInt8, g: UInt8, b: UInt8, a: UInt8 = 255) {
-        red = r
-        green = g
-        blue = b
-        alpha = a
+    public init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8 = 255) {
+        self.red = red
+        self.green = green
+        self.blue = blue
+        self.alpha = alpha
     }
 
     public init(hue: Double, saturation: Double, lightness: Double, alpha: Double = 1) {
@@ -20,12 +20,13 @@ public struct Color: Equatable {
         assert(0...1 ~= lightness)
         assert(0...1 ~= alpha)
 
-        let (r, g, b) = Color.hslAsRGB(hue, saturation, lightness)
-        self.init(r: UInt8(r * 255), g: UInt8(g * 255), b: UInt8(b * 255), a: UInt8(alpha * 255))
+        let (red, green, blue) = Color.hslAsRGB(hue, saturation, lightness)
+        self.init(red: UInt8(red * 255), green: UInt8(green * 255),
+                  blue: UInt8(blue * 255), alpha: UInt8(alpha * 255))
     }
 
-    public static let white = Color(r: 255, g: 255, b: 255)
-    public static let black = Color(r: 0, g: 0, b: 0)
+    public static let white = Color(red: 255, green: 255, blue: 255)
+    public static let black = Color(red: 0, green: 0, blue: 0)
 
     public var hue: Double {
         get {
@@ -124,10 +125,8 @@ public struct Color: Equatable {
                 dstB = 1 - (1 - dstB) * (1 - srcB)
         }
 
-        return Color(r: UInt8(min(dstR, 1.0) * 255),
-                     g: UInt8(min(dstG, 1.0) * 255),
-                     b: UInt8(min(dstB, 1.0) * 255),
-                     a: UInt8(min(dstA, 1.0) * 255))
+        return Color(red: UInt8(min(dstR, 1.0) * 255), green: UInt8(min(dstG, 1.0) * 255),
+                     blue: UInt8(min(dstB, 1.0) * 255), alpha: UInt8(min(dstA, 1.0) * 255))
     }
 
     public mutating func blend(with color: Color, blendMode: BlendMode = .alpha) {

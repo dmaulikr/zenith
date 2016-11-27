@@ -16,7 +16,7 @@ let scale = preferences.double("scale") ?? 2
 app = Application(size: Vector2(resolution[0], resolution[1]), title: "Zenith")
 app.window.scale = scale
 
-Sprite.transparentColor = Color(r: 0x5a, g: 0x52, b: 0x68)
+Sprite.transparentColor = Color(red: 0x5a, green: 0x52, blue: 0x68)
 
 font = BitmapFont(fileName: Assets.graphicsPath + "font.bmp")
 

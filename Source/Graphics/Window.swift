@@ -103,7 +103,8 @@ public class Window {
         frameTexture = SDL_CreateTexture(renderer, UInt32(SDL_PIXELFORMAT_ARGB8888),
                                          Int32(SDL_TEXTUREACCESS_STREAMING.rawValue),
                                          Int32(resolution.x), Int32(resolution.y))
-        frameSurface = SDL_CreateRGBSurface(0, Int32(resolution.x), Int32(resolution.y), 32, 0xFF0000, 0xFF00, 0xFF, 0xFF000000)
+        frameSurface = SDL_CreateRGBSurface(0, Int32(resolution.x), Int32(resolution.y),
+                                            32, 0xFF0000, 0xFF00, 0xFF, 0xFF000000)
         targetSurface = frameSurface
     }
 }

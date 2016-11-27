@@ -67,51 +67,33 @@ public final class Creature: Object, Configurable, Spawnable {
         case charisma
 
         func serialize(to stream: OutputStream) {
-            switch self {
-                case .rightArmStrength:  stream <<< 0
-                case .leftArmStrength:   stream <<< 1
-                case .armStrength:       stream <<< 2
-                case .rightLegStrength:  stream <<< 3
-                case .leftLegStrength:   stream <<< 4
-                case .legStrength:       stream <<< 5
-                case .strength:          stream <<< 6
-                case .rightArmDexterity: stream <<< 7
-                case .leftArmDexterity:  stream <<< 8
-                case .dexterity:         stream <<< 9
-                case .rightLegAgility:   stream <<< 10
-                case .leftLegAgility:    stream <<< 11
-                case .agility:           stream <<< 12
-                case .endurance:         stream <<< 13
-                case .perception:        stream <<< 14
-                case .intelligence:      stream <<< 15
-                case .psyche:            stream <<< 16
-                case .charisma:          stream <<< 17
-            }
+            stream <<< Attribute.stringToAttributeMap.first { $0.value == self }!.key
         }
 
         mutating func deserialize(from stream: InputStream) {
-            switch stream.readInt() {
-                case 0:  self = .rightArmStrength
-                case 1:  self = .leftArmStrength
-                case 2:  self = .armStrength
-                case 3:  self = .rightLegStrength
-                case 4:  self = .leftLegStrength
-                case 5:  self = .legStrength
-                case 6:  self = .strength
-                case 7:  self = .rightArmDexterity
-                case 8:  self = .leftArmDexterity
-                case 9:  self = .dexterity
-                case 10: self = .rightLegAgility
-                case 11: self = .leftLegAgility
-                case 12: self = .agility
-                case 13: self = .endurance
-                case 14: self = .perception
-                case 15: self = .intelligence
-                case 16: self = .psyche
-                case 17: self = .charisma
-                default: assert(false)
-            }
+            self = Attribute.stringToAttributeMap[stream.readInt()]!
         }
+
+        private static let stringToAttributeMap: [Int: Attribute] = [
+            0: .rightArmStrength,
+            1: .leftArmStrength,
+            2: .armStrength,
+            3: .rightLegStrength,
+            4: .leftLegStrength,
+            5: .legStrength,
+            6: .strength,
+            7: .rightArmDexterity,
+            8: .leftArmDexterity,
+            9: .dexterity,
+            10: .rightLegAgility,
+            11: .leftLegAgility,
+            12: .agility,
+            13: .endurance,
+            14: .perception,
+            15: .intelligence,
+            16: .psyche,
+            17: .charisma,
+        ]
     }
 
     private func attributeValue(_ attribute: Attribute) -> Int {
@@ -123,6 +105,7 @@ public final class Creature: Object, Configurable, Spawnable {
         return subAttributeValues.reduce(0, +) / subAttributes.count
     }
 
+    // swiftlint:disable colon
     public var rightArmStrength:  Int { return attributeValue(.rightArmStrength) }
     public var leftArmStrength:   Int { return attributeValue(.leftArmStrength) }
     public var armStrength:       Int { return attributeValue(.armStrength) }
@@ -141,6 +124,7 @@ public final class Creature: Object, Configurable, Spawnable {
     public var intelligence:      Int { return attributeValue(.intelligence) }
     public var psyche:            Int { return attributeValue(.psyche) }
     public var charisma:          Int { return attributeValue(.charisma) }
+    // swiftlint:enable colon
 
     public func tryToMove(_ direction: Direction4) {
         guard let destinationTile = tileUnder.adjacentTile(direction.vector) else {

@@ -85,6 +85,7 @@ public class Game: State, Serializable {
         return false
     }
 
+    // swiftlint:disable cyclomatic_complexity
     func handlePlayerCommand(key: SDL_Keycode) -> Bool {
         switch Int(key) {
             case SDLK_UP:     return performMoveOrAttack(.north)
@@ -107,6 +108,7 @@ public class Game: State, Serializable {
             default:          return false
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
     public func render() {
         world.render(destination: gui.worldViewRect, player: player)
