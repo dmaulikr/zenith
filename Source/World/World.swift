@@ -71,7 +71,8 @@ public final class World {
 
         for relativeTileX in -tileDrawDistance.x...tileDrawDistance.x {
             for relativeTileY in -tileDrawDistance.y...tileDrawDistance.y {
-                if let tileToDraw = player.tileUnder.adjacentTile(Vector2(relativeTileX, relativeTileY), loadSavedIfNotInMemory: true) {
+                let tileVector = Vector2(relativeTileX, relativeTileY)
+                if let tileToDraw = player.tileUnder.adjacentTile(tileVector, loadSavedIfNotInMemory: true) {
                     if !player.canSee(tileToDraw) { continue }
                     sdlRect.x = Int32(destination.left + (tileDrawDistance.x + relativeTileX) * tileSize)
                     sdlRect.y = Int32(destination.top  + (tileDrawDistance.y + relativeTileY) * tileSize)

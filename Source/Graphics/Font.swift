@@ -3,9 +3,9 @@ import Basic
 
 public protocol Font {
 
-    func renderText(_: String, at: Vector2i, color: Color)
+    func renderText(_: String, at position: Vector2i, color: Color)
 
-    func renderText(_: String, at: Vector2i, color: Color, align: Alignment)
+    func renderText(_: String, at position: Vector2i, color: Color, align: Alignment)
 
     func textWidth(_: String) -> Int
 

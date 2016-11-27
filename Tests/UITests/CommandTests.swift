@@ -104,17 +104,15 @@ class CommandTests: XCTestCase {
         XCTAssert(doorComponent.state == .closed)
     }
 
-    static var allTests : [(String, (CommandTests) -> () throws -> Void)] {
-        return [
-            ("testMove", testMove),
-            ("testPickUp", testPickUp),
-            ("testWield", testWield),
-            ("testDig", testDig),
-            ("testEat", testEat),
-            ("testDrop", testDrop),
-            ("testCloseDoor", testCloseDoor),
-        ]
-    }
+    static let allTests = [
+        ("testMove", testMove),
+        ("testPickUp", testPickUp),
+        ("testWield", testWield),
+        ("testDig", testDig),
+        ("testEat", testEat),
+        ("testDrop", testDrop),
+        ("testCloseDoor", testCloseDoor),
+    ]
 }
 
 struct MockFont: Font {

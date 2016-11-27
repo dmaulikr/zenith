@@ -47,11 +47,9 @@ class SerializationTests: XCTestCase {
         XCTAssertEqual(sourceTile, targetTile)
     }
 
-    static var allTests : [(String, (SerializationTests) -> () throws -> Void)] {
-        return [
-            ("testTileSerialization", testTileSerialization),
-        ]
-    }
+    static let allTests = [
+        ("testTileSerialization", testTileSerialization),
+    ]
 }
 
 protocol EqualAssertable {

@@ -1,0 +1,12 @@
+line_length: 120
+
+excluded:
+    - Packages
+
+disabled_rules:
+    - operator_whitespace
+    - force_cast
+    - force_try
+    - todo
+    - comma
+    - variable_name

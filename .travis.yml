@@ -21,6 +21,7 @@ script:
     - swift build --configuration $CONFIGURATION --verbose -Xlinker -L/usr/local/lib
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then xvfb-run -a -s "-screen 0 800x600x24" swift test --verbose -Xlinker -L/usr/local/lib; fi
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then swift test --verbose -Xlinker -L/usr/local/lib; fi
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then swiftlint; fi
 
 env:
     - CONFIGURATION=release

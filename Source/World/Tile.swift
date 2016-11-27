@@ -108,7 +108,8 @@ public final class Tile: Configurable, Serializable {
         if relativeAreaPosition == Vector2(0, 0) {
             return area.tile(at: position)
         } else {
-            return area.adjacentArea(direction: relativeAreaPosition, loadSavedIfNotInMemory: loadSavedIfNotInMemory)?.tile(at: position)
+            return area.adjacentArea(direction: relativeAreaPosition,
+                                     loadSavedIfNotInMemory: loadSavedIfNotInMemory)?.tile(at: position)
         }
     }
 
