@@ -33,8 +33,8 @@ public struct BitmapFont: Font {
         var position = Vector2<Int32>(position)
         switch alignment {
             case .left:   break
-            case .center: position.x -= textWidth(text) / 2
-            case .right:  position.x -= textWidth(text)
+            case .center: position.x -= Int32(textWidth(text) / 2)
+            case .right:  position.x -= Int32(textWidth(text))
         }
         SDL_SetSurfaceColorMod(bitmap.surface, color.red, color.green, color.blue)
         SDL_SetSurfaceAlphaMod(bitmap.surface, color.alpha)
