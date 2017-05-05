@@ -28,17 +28,17 @@ struct Menu<T: CustomStringConvertible> {
 
     mutating func selectNext() {
         if items.isEmpty { return }
-        if selectionIndex == items.count - 1 { return }
         labels[selectionIndex].color = labelColor
         selectionIndex += 1
+        if selectionIndex >= labels.count { selectionIndex = 0 }
         labels[selectionIndex].color = selectionColor
     }
 
     mutating func selectPrevious() {
         if items.isEmpty { return }
-        if selectionIndex == 0 { return }
         labels[selectionIndex].color = labelColor
         selectionIndex -= 1
+        if selectionIndex < 0 { selectionIndex = labels.count - 1 }
         labels[selectionIndex].color = selectionColor
     }
 
