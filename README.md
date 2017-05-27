@@ -3,6 +3,11 @@ zenith [![Build Status](https://travis-ci.org/emlai/zenith.svg?branch=master)](h
 
 zenith is an upcoming graphical open-world roguelike game, still in its early development stages.
 
+![screenshot from 2017-05-27 19-24-37](https://cloud.githubusercontent.com/assets/7543552/26522927/15fdea12-4314-11e7-9830-c65c397579fa.png)
+
+![screenshot from 2017-05-27 19-35-17](https://cloud.githubusercontent.com/assets/7543552/26522929/161ae5d6-4314-11e7-92ab-fc9d87038586.png)
+
+![screenshot from 2017-05-27 19-30-05](https://cloud.githubusercontent.com/assets/7543552/26522928/15ff2206-4314-11e7-9926-abe0a259f7d4.png)
 
 Requirements
 ------------
